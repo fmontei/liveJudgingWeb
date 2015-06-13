@@ -1,0 +1,21 @@
+.navbar {
+	margin-bottom: 0px;
+	border-radius: 0px;
+	min-height: 40px;
+}
+
+.navbar-default {
+	background-color: #373737;
+	border: 0px;
+}
+
+.navbar-default .navbar-brand {
+	color: #c9c9c9;
+	height: 40px;
+	padding: 9px 9px;
+
+}
+
+.navbar-header a:hover {
+	color: #ffffff !important;
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="liveJudgingAdmin" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="liveJudgingAdmin" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="liveJudgingAdmin" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="liveJudgingAdmin" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Live Judging Admin</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/simple-sidebar.css">
+  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+</head>
+<body ng-controller="MainCtrl">
+
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#"><i class="fa fa-gavel"></i> Live Judging Admin</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="wrapper">
+
+    <div id="sidebar-wrapper">
+      <ul class="sidebar-nav">
+        <li ng-class="{selected: currentPath == '/event'}">
+          <a href="#/event"><i class="fa fa-calendar-o"></i> Event</a>
+        </li>
+        <li ng-class="{selected: currentPath == '/projects'}">
+          <a href="#/projects"><i class="fa fa-cubes"></i>Projects</a>
+        </li>
+        <li ng-class="{selected: currentPath == '/judges'}">
+          <a href="#/judges"><i class="fa fa-users"></i> Judges</a>
+        </li>
+        <li ng-class="{selected: currentPath == '/rubrics'}">
+          <a href="#/rubrics"><i class="fa fa-star-half-o"></i> Rubrics</a>
+        </li>
+        <li ng-class="{selected: currentPath == '/settings'}">
+          <a href="#/settings"><i class="fa fa-cogs"></i>Settings</a>
+        </li>
+      </ul>
+    </div>
+
+    <div id="page-content-wrapper">
+      <div ng-view></div>
+    </div>
+
+  </div>
+
+  <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+
+  
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+  -->
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script src="app.js"></script>
+
+  <script src="modules/event/event.js"></script>
+  <script src="modules/projects/projects.js"></script>
+  <script src="modules/judges/judges.js"></script>
+  <script src="modules/rubrics/rubrics.js"></script>
+  <script src="modules/categories/categories.js"></script>
+  <script src="modules/settings/settings.js"></script>
+</body>
+</html>
