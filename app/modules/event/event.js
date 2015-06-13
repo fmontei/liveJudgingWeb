@@ -10,5 +10,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 }])
 
 .controller('EventCtrl', [function() {
-
+	
 }]);
+

@@ -1,4 +1,12 @@
 /* app css stylesheet */
+ @font-face {
+    font-family: 'Montserrat';
+    src: url('../font/Montserrat-Regular.ttf');
+}
+
+* {
+  font-family: 'Montserrat', sans-serif;
+}
 
 .menu {
   list-style: none;

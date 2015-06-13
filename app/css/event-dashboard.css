@@ -1,0 +1,133 @@
+/* Spinning progress glyphicon */
+.rotate {
+    -webkit-animation:spin 2s linear infinite;
+    -moz-animation:spin 2s linear infinite;
+    animation:spin 2s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+/* Overall Progress Bar (at the top of page) */
+.progress {
+  text-align: center;
+  position: relative;
+}
+
+/* Text embedded in all Progress Bars */
+.progress .progress-value {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: black;
+ }
+
+/* Judge-specific Progress Bar */
+.progress.inline {
+  margin-top: 10px;
+  width: 90%;
+}
+
+/* Content beneath tabs */
+.beneath-tab {
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 20px;
+}
+
+/* Notification bell button */
+.notification-btn {
+  color: gold;
+  font-size: 18px;
+  border-style: solid;
+  border-width: 2px;
+  float: right;
+}
+
+/*
+ * Accordion chevron
+ */
+a.accordion-toggle:link {
+  color: white;
+  text-decoration: none;
+}
+a.accordion-toggle:visited {
+  color: white;
+  text-decoration: none;
+}
+a.accordion-toggle:hover {
+  color: black;
+  text-decoration: none;
+}
+
+/* 
+ * Judge Progress Tab Items
+ */
+.media {
+  border: solid black 2px;
+  max-height: 68px;
+}
+.media.media-modal {
+  border: none;
+  padding-left: 5px;
+}
+.media.media-completed:hover {
+  cursor: pointer;
+  background: #EEEEEE;
+}
+
+a.team-pic span.completed {
+  display: inline-block;
+  font-size: 35px;
+  position: relative;
+  top: -38px;
+  color: green;
+  filter:alpha(opacity=50);
+  -moz-opacity:0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+}
+
+/*
+ * Team Completion Modal
+ */
+h4.modal-title {
+  max-height: 68px;
+}
+.table.table-modal thead tr {
+  background: rgb(200, 200, 200);
+  border-top: 1px solid #000;
+}
+.table.table-modal {
+  border: none;
+}
+.table.table-modal td {
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+.table.table-modal tbody tr:last-child {
+  border-bottom: 1px solid #000;
+  background-color: #337AB7;
+  color: white;
+}
+
+/*
+ * Notification Modal
+ */
+.recipient {
+  background: #EEEEEE;
+  padding: 5px;
+  display: inline-block;
+  margin-right: 2px;
+}
+.recipient .glyphicon.glyphicon-remove:hover {
+  cursor: pointer;
+  color: #337AB7;
+}
+.ui-autocomplete {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1510 !important;
+}
+

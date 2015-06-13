@@ -1,1 +1,329 @@
-Event!
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+
+      <div class="well" style="height: 100%">
+        <h1 class="page-header">Event Dashboard: GT CIC 2015</h1>
+      </div>
+
+      <div style="font-size: 16px">
+        <p>
+          <i>In progress</i>
+          <span class="glyphicon glyphicon-repeat rotate"></span>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          Time Range: 11:30 am - 6:30 pm
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="col col-sm-8"> 
+          <div class="row">
+            <span class="col col-sm-6 col-lg-5">
+              <div class="progress">
+                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                  <span class="progress-value">40% overall progress</span>
+                </div>
+              </div>
+            </span>
+            <span class="col col-sm-6 col-lg-4">
+              <span style="float: left">32/45 project assignments completed</span>
+            </span>
+          </div>
+        </div>
+        <div class="col col-sm-4"> 
+          <button class="btn btn-default" style="margin-top: -20px; float: right">
+            Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
+          </button>
+        </div>
+      </div>
+
+      <ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
+        <li class="active" id="judge-progress-tab"><a href="#">Judge Progress</a></li>
+        <li id="project-progress-tab"><a href="#">Project Progress</a></li>
+        <li id="category-progress-tab"><a href="#">Categorical Progress</a></li>
+      </ul>
+
+      <div class="beneath-tab" id="project-progress-section" style="display:none">filler content</div>
+      <div class="beneath-tab" id="category-progress-section" style="display:none">moar filler content</div>
+
+      <div class="beneath-tab" id="judge-progress-section">
+        <span style="padding-right: 20px">Sort by:</span>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            Completion <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Completion</a></li>
+            <li><a href="#">Name</a></li>
+            <li><a href="#">Category</a></li>
+          </ul>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            Order <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Ascending</a></li>
+            <li><a href="#">Descending</a></li>
+          </ul>
+        </div>
+
+        <!-- Judge Panels -->
+        <div class="accordion" style="padding-top: 20px">
+          <div class="panel panel-primary accordion-group">
+            <div class="panel-heading" style="height: 60px">
+
+              <div class="row">
+                <span class="col-sm-2" style="margin-top: 10px">
+                  <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" href="#judge1"> 
+                      <span class="glyphicon glyphicon-chevron-right"></span> Abe Lincoln &nbsp;&nbsp;
+                    </a>
+                  </div>
+                </span>
+                <span class="col-sm-1">
+                  <button type="button" class="btn btn-primary notification-btn" data-toggle="modal" data-target="#notification-modal">
+                    <span class="glyphicon glyphicon-bell"></span>
+                  </button>
+                </span>
+                <span class="col-sm-7">
+                  <div class="progress inline">
+                    <span class="progress-value">40%</span>
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                      <span class="sr-only">40% Complete (success)</span>
+                    </div>
+                  </div>
+                </span>
+                <span class="col-sm-2" style="margin-top: 10px">
+                  1/4 Projects Judged
+                </span>
+              </div> 
+            </div>
+
+            <div id="judge1" class="accordion-body collapse">
+              <div class="accordion-inner">
+                <div class="panel-body">
+
+                  <!--List of judge's unsubmitted teams-->
+                  <h4>Not yet submitted (2)</h4>
+                  <div class="row">
+                    <div class="col col-sm-2">
+                      <div class="media">
+                        <div class="media-left">
+                          <a href="#">
+                            <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                          </a>
+                        </div>
+                        <div class="media-body">
+                          <h4 class="media-heading">#76</h4>
+                          <span>Lemur</span>
+                        </div>
+                      </div>
+                    </div>
+                     <div class="col col-sm-2">
+                      <div class="media">
+                        <div class="media-left">
+                          <a href="#">
+                            <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                          </a>
+                        </div>
+                        <div class="media-body">
+                          <h4 class="media-heading">#52</h4>
+                          <span>Turtle</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!--List of judge's completed teams-->
+                  <h4>Completed</h4>
+                  <div class="row">
+                    <div class="col col-sm-2">
+                      <div class="media media-completed" data-toggle="modal" data-target="#completed-team-modal">
+                        <div class="media-left">
+                          <a href="#" class="team-pic">
+                            <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                            <span class="completed">
+                              <span class="glyphicon glyphicon-ok"></span>
+                            </span>
+                          </a>
+                        </div>
+                        <div class="media-body">
+                          <h4 class="media-heading">#33</h4>
+                          <span>Flamingo</span><br />
+                          <!--Number of filled in stars-->
+                          <span class="glyphicon glyphicon-star"></span>
+                          <span class="glyphicon glyphicon-star"></span>
+                          <span class="glyphicon glyphicon-star"></span>
+                          <!--Number of unfilled stars-->
+                          <span class="glyphicon glyphicon-star-empty"></span>
+                          <span class="glyphicon glyphicon-star-empty"></span>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading" style="height: 60px">
+
+              <div class="row">
+                <span class="col-sm-2" style="margin-top: 10px">
+                  <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" href="#judge2">
+                      <span class="glyphicon glyphicon-chevron-right"></span> George Washington &nbsp;&nbsp;
+                    </a>
+                  </div>
+                </span>
+                <span class="col-sm-1">
+                  <button type="button" class="btn btn-primary notification-btn" data-toggle="modal" data-target="#notification-modal">
+                    <span class="glyphicon glyphicon-bell"></span>
+                  </button>
+                </span>
+                <span class="col-sm-7">
+                  <div class="progress inline">
+                    <span class="progress-value">70%</span>
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%">
+                      <span class="sr-only">70% Complete (success)</span>
+                    </div>
+                  </div>
+                </span>
+                <span class="col-sm-2" style="margin-top: 10px">
+                  3/4 Projects Judged
+                </span>
+              </div>
+            </div>
+
+            <div id="judge2" class="accordion-body collapse">
+              <div class="accordion-inner">
+                <div class="panel-body">
+                  Panel content
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Judge Notification Modal-->
+<div class="modal fade" id="notification-modal" tabindex="-1" role="dialog" aria-labelledby="notification-modal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content panel-primary">
+      <div class="modal-header panel-heading">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="notification-modal-label">Send Notification</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col col-sm-3">
+            Recipients:
+          </div>
+          <div class="col col-sm-9">
+            <!--Recipient List-->
+            <div class="row" id="recipients-div" style="margin-bottom: 8px"></div>
+            <div class="row">
+              <input type="text" class="form-control" id="judge_search" placeholder="Search by name..." style="width: 50%">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-sm-3"></div>
+          <div class="col col-sm-9">
+            <div class="checkbox" style="margin-left: -12px">
+              <label style="margin-right: 12px"><input id="send-all-checkbox" type="checkbox" value="">Send to all judges</label>
+              <label><input id="clear-all-checkbox" type="checkbox" value="">Clear</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-sm-12">
+            <div class="form-group" style="margin-left: 10%; margin-right: 10%">
+              <label for="comment">Comment:</label>
+              <textarea class="form-control" rows="5" id="message-to-judge"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+       <div class="modal-footer">
+        <div class="row">
+          <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Send</button></span>
+          <span class="col col-sm-2"></span>
+          <span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Judge Completed Scoring Team Modal-->
+<div class="modal fade" id="completed-team-modal" tabindex="-1" role="dialog" aria-labelledby="completed-team-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content panel-primary">
+      <div class="modal-header panel-heading">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="completed-team-modal-label">
+          <div class="row">
+            <div class="media media-modal">
+              <div class="media-left">
+                <a href="#" class="team-pic">
+                  <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                  <span class="completed">
+                    <span class="glyphicon glyphicon-ok"></span>
+                  </span>
+                </a>
+              </div>
+              <div class="media-body">
+                <h4 class="media-heading">
+                  <div class="row" style="font-size: 24px;">
+                    <span class="col col-sm-3">#33</span>
+                      <span class="col col-sm-9">
+                      <!--Number of filled in stars-->
+                      <span class="glyphicon glyphicon-star"></span>
+                      <span class="glyphicon glyphicon-star"></span>
+                      <span class="glyphicon glyphicon-star"></span>
+                      <!--Number of unfilled stars-->
+                      <span class="glyphicon glyphicon-star-empty"></span>
+                      <span class="glyphicon glyphicon-star-empty"></span>
+                    </span>
+                  </div>
+                  <div class="row" style="font-size: 16px">
+                    <span class="col col-sm-3">Flamingo</span>
+                    <span class="col col-sm-9">Dynamically fill this in</span>
+                  </div>
+                </h4>
+              </div>
+            </div>
+          </div>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-modal">
+          <thead>
+            <tr><td>Criterion</td><td>Score</td></tr>
+          </thead>
+          <tbody>
+            <tr><td>Domestication</td><td>2/5</td></tr>
+            <tr><td>Trainability</td><td>1/5</td></tr>
+            <tr><td>Ease of Care</td><td>3/5</td></tr>
+            <tr><td>Friendliness</td><td>2/5</td></tr>
+            <tr><td>Overall</td><td>2/5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <div class="row">
+          <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Save</button></span>
+          <span class="col col-sm-2"></span>
+          <span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
