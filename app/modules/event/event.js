@@ -13,9 +13,60 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 }])
 
+.directive('changeTabWidget', function() {
+
+	var judge_progress_tab = $("#judge-progress-tab"),
+	  judge_progress_section = $("#judge-progress-section"),
+	  project_progress_tab = $("#project-progress-tab"),
+	  project_progress_section = $("#project-progress-section"),
+	  category_progress_tab = $("#category-progress-tab"),
+	  category_progress_section = $("#category-progress-section");
+
+  judge_progress_tab.click(function() {
+    project_progress_section.hide();
+    category_progress_section.hide();
+    judge_progress_section.show();
+    $(project_progress_tab).removeClass("active");
+    $(category_progress_tab).removeClass("active");
+    $(judge_progress_tab).addClass("active");
+  });
+  project_progress_tab.click(function() {
+    judge_progress_section.hide();
+    category_progress_section.hide();
+    project_progress_section.show();
+    $(judge_progress_tab).removeClass("active");
+    $(category_progress_tab).removeClass("active");
+    $(this).addClass("active");
+  });
+  category_progress_tab.click(function() {
+    judge_progress_section.hide();
+    project_progress_section.hide();
+    category_progress_section.show();
+    $(judge_progress_tab).removeClass("active");
+    $(project_progress_tab).removeClass("active");
+    $(this).addClass("active");
+  });
+
+	return {
+  };
+})
+
+.directive('changeAccordionChevron', function() {
+	$(".accordion-toggle").click(function() {
+    var span = $(this).find("span");
+    if (span.hasClass("glyphicon-chevron-right")) 
+      span.removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    else
+      span.removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+  });
+
+  return {
+  };
+})
+
 .directive('notificationWidget', function() {
 	
-	var judge_list = ["ActionScript", "BASIC", "C"]; // Contains names of judges
+	var judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
   var recipient_list = []; // Contains list of judges to be notified
 
   /*
@@ -80,5 +131,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     recipient_list.length = 0; // Clear recipient list
     send_all_checkbox.attr("checked", false);
   });
+
+  return {
+  };
 });
 

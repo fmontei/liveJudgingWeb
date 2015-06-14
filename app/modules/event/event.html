@@ -37,11 +37,13 @@
         </div>
       </div>
 
-      <ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
-        <li class="active" id="judge-progress-tab"><a href="#">Judge Progress</a></li>
-        <li id="project-progress-tab"><a href="#">Project Progress</a></li>
-        <li id="category-progress-tab"><a href="#">Categorical Progress</a></li>
-      </ul>
+      <change-tab-widget>
+	      <ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
+	        <li class="active" id="judge-progress-tab"><a href="#/event">Judge Progress</a></li>
+	        <li id="project-progress-tab"><a href="#/event">Project Progress</a></li>
+	        <li id="category-progress-tab"><a href="#/event">Categorical Progress</a></li>
+	      </ul>
+      <change-tab-widget>
 
       <div class="beneath-tab" id="project-progress-section" style="display:none">filler content</div>
       <div class="beneath-tab" id="category-progress-section" style="display:none">moar filler content</div>
@@ -76,9 +78,11 @@
               <div class="row">
                 <span class="col-sm-2" style="margin-top: 10px">
                   <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" href="#judge1"> 
-                      <span class="glyphicon glyphicon-chevron-right"></span> Abe Lincoln &nbsp;&nbsp;
-                    </a>
+                  	<change-accordion-chevron>
+	                    <a class="accordion-toggle" data-toggle="collapse" href="#judge1" onclick="return false;"> 
+	                      <span class="glyphicon glyphicon-chevron-right"></span> Abe Lincoln &nbsp;&nbsp;
+	                    </a>
+                    <change-accordion-chevron>
                   </div>
                 </span>
                 <span class="col-sm-1">
@@ -173,9 +177,11 @@
               <div class="row">
                 <span class="col-sm-2" style="margin-top: 10px">
                   <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" href="#judge2">
-                      <span class="glyphicon glyphicon-chevron-right"></span> George Washington &nbsp;&nbsp;
-                    </a>
+                  	<change-accordion-chevron>
+	                    <a class="accordion-toggle" data-toggle="collapse" href="#judge2" onclick="return false;">
+	                      <span class="glyphicon glyphicon-chevron-right"></span> George Washington &nbsp;&nbsp;
+	                    </a>
+                    </change-accordion-chevron>
                   </div>
                 </span>
                 <span class="col-sm-1">
