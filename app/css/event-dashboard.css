@@ -131,3 +131,21 @@ h4.modal-title {
   z-index: 1510 !important;
 }
 
+/* Event Info Form */
+#calendar-icon {
+  font-size: 30px;
+}
+#datepicker-start, #datepicker-end {
+  width: 120%;
+}
+#timepicker-start, #timepicker-start {
+  width: 110%;
+} 
+#datepicker-end, #timepicker-end {
+  margin-left: -20px;
+}
+#begin-event-button {
+  margin-top: 50px;
+  width: 200px;
+}
+

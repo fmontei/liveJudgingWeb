@@ -1,4 +1,118 @@
-<div class="container-fluid">
+<div class="container-fluid" id="event-form-page">
+  <div class="row">
+    <div class="col-md-12">
+
+      <div class="well">
+        <h1 class="page-header">Event Basic Info</h1>
+      </div>
+
+      <form>
+
+      	<div class="row">
+      		<div class="col col-lg-2 col-md-2">
+      			<label>Event Name:</label>
+      		</div>
+      		<div class="col col-lg-3 col-md-3">
+      			<input class="form-control" type="text" />
+      		</div>
+      	</div><br />
+
+      	<div class="row">
+      		<div class="col col-lg-2 col-md-2">
+      			<label>Date:</label>
+      		</div>
+      		<div class="col col-lg-5 col-md-10">
+      			<div class="row">
+      				<span class="col col-lg-2 col-md-2">
+      					<date-widget>
+		      				<input class="form-control" type="text" placeholder="Start Date" id="datepicker-start" />
+	      				</date-widget>
+	      			</span>
+	      			<span class="col col-lg-2 col-md-2">
+	      				<time-widget>
+	      					<input class="form-control" type="text" placeholder="Start Time" id="timepicker-start" />
+	      				</time-widget>
+	      			</span>
+	      			<span class="col col-lg-1 col-md-1">
+	      				<label style="margin-top: 6px">--</label>
+	      			</span>
+	      			<span class="col col-lg-2 col-md-2">
+      					<date-widget>
+		      				<input class="form-control" type="text" placeholder="Start Date" id="datepicker-end" />
+	      				</date-widget>
+	      			</span>
+	      			<span class="col col-lg-2 col-md-2">
+	      				<time-widget>
+	      					<input class="form-control" type="text" placeholder="Start Time" id="timepicker-end" />
+	      				</time-widget>
+	      			</span>
+	      			<span class="col col-lg-2 col-md-2">
+		      			<span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
+	      			</span>
+      			</div>
+      		</div>
+      	</div><br />
+      	
+      	<div class="row">
+      		<div class="col col-lg-2 col-md-2">
+      		</div>
+      		<div class="col col-lg-5 col-md-10">
+      			<div class="row">
+      				<span class="col col-md-3 col-lg-3">
+      					<save-event-widget>
+      						<button class="btn btn-primary" id="save-event-button">Save</button>
+    						</save-event-widget>
+      				</span>
+      				<span class="col col-md-3 col-lg-3">
+      					<button class="btn btn-default">Cancel</button>
+      				</span>
+      			</div>
+      		</div>
+      	</div><br />
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid" id="event-dashboard-unactive-page" style="display: none">
+	<div class="well">
+    <h1 class="page-header">Event Dashboard: GT CIC 2015</h1>
+  </div>
+	<div class="row">
+		<div class="col col-md-1 col-lg-1">
+		</div>
+		<div class="col col-md-11 col-lg-11">
+			<div class="row"> 
+				<span class="col col-md-2 col-lg-2">
+		      <button class="btn btn-default">
+		        Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
+		      </button>
+	      </span>
+	      <span class="col col-md-2 col-lg-2">
+	      	<div class="checkbox">
+            <label style="margin-right: 12px"><input type="checkbox" value="">Auto-start event at:</label>
+          </div>
+	      </span>
+	      <span class="col col-md-2 col-lg-2">
+	      	<time-widget>
+  					<input class="form-control" type="text" placeholder="Enter Time" id="timepicker-autostart" />
+  				</time-widget>
+	      </span>
+    	</div>
+    </div>
+	</div>
+	<div class="row">
+		<div class="text-center">
+			<begin-event-widget>
+				<button class="btn btn-lg btn-default" id="begin-event-button">Begin Event</button>
+			</begin-event-widget>
+		</div>
+	</div>
+</div>
+
+<div class="container-fluid" id="event-dashboard-active-page" style="display: none">
   <div class="row">
     <div class="col-md-12">
 
@@ -52,7 +166,7 @@
         <span style="padding-right: 20px">Sort by:</span>
         <div class="btn-group">
           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-            Completion <span class="caret"></span>
+            Category <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
             <li><a href="#">Completion</a></li>

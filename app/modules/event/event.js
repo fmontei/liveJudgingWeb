@@ -52,6 +52,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 })
 
 .directive('changeAccordionChevron', function() {
+
 	$(".accordion-toggle").click(function() {
     var span = $(this).find("span");
     if (span.hasClass("glyphicon-chevron-right")) 
@@ -134,5 +135,54 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
   return {
   };
+})
+
+.directive('dateWidget', function() {
+
+	$("#datepicker-start").datepicker();
+	$("#datepicker-end").datepicker();
+
+	return {
+  };
+})
+
+.directive('timeWidget', function() {
+	
+	$("#timepicker-start").timepicker();
+	$("#timepicker-end").timepicker();
+	$("#timepicker-autostart").timepicker();
+
+	return {
+  };
+})
+
+.directive('saveEventWidget', function() {
+
+	var event_form_page =  $("#event-form-page"),
+		event_dashboard_unactive_page = $("#event-dashboard-unactive-page");
+
+	$("#save-event-button").click(function() {
+		event_form_page.hide();
+		event_dashboard_unactive_page.show();	
+	});
+
+	return {
+	};
+})
+
+.directive('beginEventWidget', function() {
+
+	var event_dashboard_unactive_page = $("#event-dashboard-unactive-page"),
+		event_dashboard_active_page = $("#event-dashboard-active-page");
+
+	$("#begin-event-button").click(function() {
+		event_dashboard_unactive_page.hide();
+		event_dashboard_active_page.show();	
+	});
+
+	return {
+	};
 });
+
+
 
