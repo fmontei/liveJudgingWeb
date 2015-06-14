@@ -132,17 +132,16 @@ h4.modal-title {
 }
 
 /* Event Info Form */
+.event-create-field {
+	display: inline-block;
+	margin-right: 50px;
+}
+#event-create-checkbox {
+	display: inline-block;
+	margin-right: 10px;
+}
 #calendar-icon {
   font-size: 30px;
-}
-#datepicker-start, #datepicker-end {
-  width: 120%;
-}
-#timepicker-start, #timepicker-start {
-  width: 110%;
-} 
-#datepicker-end, #timepicker-end {
-  margin-left: -20px;
 }
 #begin-event-button {
   margin-top: 50px;

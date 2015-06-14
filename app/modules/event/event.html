@@ -9,65 +9,99 @@
       <form>
 
       	<div class="row">
-      		<div class="col col-lg-2 col-md-2">
+      		<div class="col col-lg-2 col-md-2 col-sm-2">
       			<label>Event Name:</label>
       		</div>
-      		<div class="col col-lg-3 col-md-3">
-      			<input class="form-control" type="text" />
-      		</div>
-      	</div><br />
+      		<div class="col col-lg-3 col-md-3 col-sm-3">
+						<input class="form-control" type="text" placeholder="Event Name" />
+					</div>
+				</div><br />
 
       	<div class="row">
-      		<div class="col col-lg-2 col-md-2">
-      			<label>Date:</label>
+						<div class="col col-lg-2 col-md-2 col-sm-2">
+							<label>End Date:</label>
+						</div>
+						<div class="col col-lg-10 col-md-10 col-sm-10">
+							<div class="row">
+								<div class="col col-lg-2 col-md-2 col-sm-2">
+									<date-widget>
+										<input class="form-control" type="text" placeholder="Start" id="datepicker-start" />
+									</date-widget>
+								</div>
+								<div class="col col-lg-2 col-md-2 col-sm-2">
+									<span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
+								</div>
+							</div>
+						</div>
+      	</div><br />
+				
+				<div class="row">
+						<div class="col col-lg-2 col-md-2 col-sm-2">
+							<label>End Date:</label>
+						</div>
+						<div class="col col-lg-10 col-md-10 col-sm-10">
+							<div class="row">
+								<div class="col col-lg-2 col-md-2 col-sm-2">
+									<date-widget>
+										<input class="form-control" type="text" placeholder="End" id="datepicker-end" />
+									</date-widget>
+								</div>
+								<div class="col col-lg-2 col-md-2 col-sm-2">
+									<span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
+								</div>
+							</div>
+						</div>
+      	</div><br />
+				
+				<div class="row">
+      		<div class="col col-lg-2 col-md-2 col-sm-2">
+      			<label>Start Time:</label>
       		</div>
-      		<div class="col col-lg-5 col-md-10">
+      		<div class="col col-lg-10 col-md-10 col-sm-10">
       			<div class="row">
-      				<span class="col col-lg-2 col-md-2">
-      					<date-widget>
-		      				<input class="form-control" type="text" placeholder="Start Date" id="datepicker-start" />
-	      				</date-widget>
+	      			<span class="col col-lg-2 col-md-2 col-sm-2">
+								<select class="form-control">
+									<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+								</select>
 	      			</span>
-	      			<span class="col col-lg-2 col-md-2">
-	      				<time-widget>
-	      					<input class="form-control" type="text" placeholder="Start Time" id="timepicker-start" />
-	      				</time-widget>
-	      			</span>
-	      			<span class="col col-lg-1 col-md-1">
-	      				<label style="margin-top: 6px">--</label>
-	      			</span>
-	      			<span class="col col-lg-2 col-md-2">
-      					<date-widget>
-		      				<input class="form-control" type="text" placeholder="Start Date" id="datepicker-end" />
-	      				</date-widget>
-	      			</span>
-	      			<span class="col col-lg-2 col-md-2">
-	      				<time-widget>
-	      					<input class="form-control" type="text" placeholder="Start Time" id="timepicker-end" />
-	      				</time-widget>
-	      			</span>
-	      			<span class="col col-lg-2 col-md-2">
-		      			<span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
-	      			</span>
+							<span class="col col-lg-2 col-md-2 col-sm-2">
+								<switch-widget>
+									<input type="checkbox" id="switch-start" checked>
+								</switch-widget>
+							</span>
       			</div>
       		</div>
-      	</div><br />
+      	</div><br /><br />
+				
+				<div class="row">
+      		<div class="col col-lg-2 col-md-2 col-sm-2">
+      			<label>End Time:</label>
+      		</div>
+      		<div class="col col-lg-10 col-md-10 col-sm-10">
+      			<div class="row">
+	      			<span class="col col-lg-2 col-md-2 col-sm-2">
+								<select class="form-control">
+									<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+								</select>
+	      			</span>
+							<span class="col col-lg-2 col-md-2 col-sm-2">
+								<switch-widget>
+									<input type="checkbox" id="switch-end" checked>
+								</switch-widget>
+							</span>
+      			</div>
+      		</div>
+      	</div><br /><br />
       	
       	<div class="row">
-      		<div class="col col-lg-2 col-md-2">
+      		<div class="col col-lg-2 col-md-2 col-sm-2">
       		</div>
-      		<div class="col col-lg-5 col-md-10">
-      			<div class="row">
-      				<span class="col col-md-3 col-lg-3">
-      					<save-event-widget>
-      						<button class="btn btn-primary" id="save-event-button">Save</button>
-    						</save-event-widget>
-      				</span>
-      				<span class="col col-md-3 col-lg-3">
-      					<button class="btn btn-default">Cancel</button>
-      				</span>
-      			</div>
-      		</div>
+      		<div class="col col-lg-4 col-md-4 col-sm-4">
+						<save-event-widget>
+							<button class="btn btn-lg btn-primary" id="save-event-button">Save</button>
+						</save-event-widget>
+						<button class="btn btn-lg btn-default">Cancel</button>
+					</div>
       	</div><br />
 
       </form>
@@ -81,25 +115,28 @@
     <h1 class="page-header">Event Dashboard: GT CIC 2015</h1>
   </div>
 	<div class="row">
-		<div class="col col-md-1 col-lg-1">
+		<div class="col col-md-3 col-lg-1">
 		</div>
 		<div class="col col-md-11 col-lg-11">
 			<div class="row"> 
-				<span class="col col-md-2 col-lg-2">
+				<span class="event-create-field">
 		      <button class="btn btn-default">
 		        Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
 		      </button>
 	      </span>
-	      <span class="col col-md-2 col-lg-2">
+	      <span id="event-create-checkbox">
 	      	<div class="checkbox">
-            <label style="margin-right: 12px"><input type="checkbox" value="">Auto-start event at:</label>
+            <label><input type="checkbox" value="">Auto-start event at:</label>
           </div>
 	      </span>
-	      <span class="col col-md-2 col-lg-2">
+	      <span class="event-create-field">
 	      	<time-widget>
   					<input class="form-control" type="text" placeholder="Enter Time" id="timepicker-autostart" />
   				</time-widget>
 	      </span>
+				<span class="event-create-field">
+					Time Remaining:	
+				</span>
     	</div>
     </div>
 	</div>
