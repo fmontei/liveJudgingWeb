@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.event', ['ngRoute'])
+angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/event', {
@@ -9,7 +9,29 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   });
 }])
 
-.controller('EventCtrl', ['$scope', function($scope) {
+.run(['$cookies', function($cookies) {
+	$cookies.put("view", "event_edit_view");
+	$cookies.put("running", "false");
+}])
+
+.controller('EventCtrl', ['$cookies', '$scope', function($cookies, $scope) {
+	$scope.event = {
+		EVENT_EDIT_VIEW: "event_edit_view",
+		EVENT_READY_VIEW: "event_ready_view",
+		EVENT_IN_PROGRESS_VIEW: "event_in_progress_view",
+		current_view: $cookies.get("view"),
+		running: $cookies.get("running")
+	};
+	$scope.change_view_to = function(view) {
+		$cookies.put("view", view);
+		$scope.event.current_view = view;
+		if (view === $scope.event.EVENT_IN_PROGRESS_VIEW) {
+			$cookies.put("running", "true");
+			$scope.event.running = "true";
+		} 
+		console.log("Event view switched to: " + view);
+	}
+	
 	$scope.times = [];
 	for (var i = 1; i <= 12; i++) {
 		for (var j = 0; j <= 45; j += 15) {
@@ -76,10 +98,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 .directive('notificationWidget', function() {
 	
+	var judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
+	var recipient_list = []; // Contains list of judges to be notified
 	var link = function(scope, elem, attrs) {
-		var judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
-		var recipient_list = []; // Contains list of judges to be notified
-
 		/*
 		 * Initialize the Autocomplete Object for the Notification Modal
 		 */
@@ -158,14 +179,14 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   };
 })
 
-.directive('switchWidget', function() {
+.directive('amPmWidget', function() {
 	return {
 		link: function(scope, elm, attrs) {
-			$("#switch-start").bootstrapSwitch({
+			$("#am-pm-start").bootstrapSwitch({
 				onText: 'am',
 				offText: 'pm'
 			});
-			$("#switch-end").bootstrapSwitch({
+			$("#am-pm-end").bootstrapSwitch({
 				onText: 'am',
 				offText: 'pm'
 			});
@@ -173,29 +194,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   };
 })
 
-.directive('saveEventWidget', function() {
+.directive('multiDayEventWidget', function() {
 	return {
-		link: function(scope, elm, attrs) {
-			var event_form_page =  $("#event-form-page"),
-				event_dashboard_unactive_page = $("#event-dashboard-unactive-page");
-
-			$("#save-event-button").click(function() {
-				event_form_page.hide();
-				event_dashboard_unactive_page.show();	
-			});
-		}
-	};
-})
-
-.directive('beginEventWidget', function() {
-	return {
-		link: function(scope, elm, attrs) {
-			var event_dashboard_unactive_page = $("#event-dashboard-unactive-page"),
-				event_dashboard_active_page = $("#event-dashboard-active-page");
-
-			$("#begin-event-button").click(function() {
-				event_dashboard_unactive_page.hide();
-				event_dashboard_active_page.show();	
+		link: function(scope, elem, attrs) {
+			$("#multi-day-event-checkbox").click(function() {
+				var optional_date_div = $("#end-date-optional");
+				if (this.checked) {
+					optional_date_div.show();
+				} else {
+					optional_date_div.hide();
+				}
 			});
 		}
 	};
