@@ -1,6 +1,35 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
+angular.module('userListApp', [])
+  
+.service('userListService', function task($http, $q) {
+
+  var task = this;
+
+  task.getAllUsers = function() {
+    var defer = $q.defer();
+
+    $http.get('http://api.stevedolan.me/users', {
+      headers: {'Authorization': 'Token token="86082d56c7d66f7615d27f150b837dcd"'}
+    })
+    .success(function(result) {
+      console.log('success');
+      defer.resolve(result);
+    })
+    .error(function(error, status) {
+      console.log('fail');
+      defer.reject(error);
+    });
+
+    return defer.promise;
+  }
+
+  return task;
+
+});
+
+
+angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute', 'userListApp'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/event', {
@@ -10,11 +39,11 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 }])
 
 .run(['$cookies', function($cookies) {
-	$cookies.put("view", "event_in_progress_view");
+	$cookies.put("view", undefined);
 	$cookies.put("running", "false");
 }])
 
-.controller('EventCtrl', ['$cookies', '$scope', function($cookies, $scope) {
+.controller('EventCtrl', ['$cookies', '$scope', 'userListService', function($cookies, $scope, userListService) {
 	$scope.event = {
 		EVENT_EDIT_VIEW: "event_edit_view",
 		EVENT_READY_VIEW: "event_ready_view",
@@ -32,6 +61,12 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 		console.log("Event view switched to: " + view);
 	}
 
+  $scope.getAllUsers = function() {
+    userListService.getAllUsers();
+  }
+  //$scope.getAllUsers();
+
+  $scope.event_list = ["Event 1", "Event 2"];
   $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
   $scope.recipient_list = []; // Contains list of judges to be notified
   $scope.project_list = ["Sample Project 1", "Sample Project 2"];
@@ -45,6 +80,16 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 		}
 	}
 }])
+
+.directive('revealEventDescription', function() {
+  return {
+    link: function(scope, elem, attrs) {
+      $('.event-selection-row .btn').unbind().mouseover(function() {
+        $('#event-selection-desc').show();
+      });
+    }
+  }
+})
 
 .directive('changeTabWidget', function() {
 
