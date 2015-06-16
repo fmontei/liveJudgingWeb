@@ -138,7 +138,7 @@ h4.modal-title {
 #datepicker-start, #datepicker-end {
   width: 120%;
 }
-#timepicker-start, #timepicker-start {
+#timepicker-start, #timepicker-end {
   width: 110%;
 } 
 #datepicker-end, #timepicker-end {
