@@ -13,19 +13,17 @@ angular.module('liveJudgingAdmin.login', ['ngRoute'])
 .controller('LoginCtrl', ['$scope', 'User', 
 	function($scope, User) {
 
-		$scope.register = function() {
-			var newUserData = {
-				'email': 'joe@test.com',
-				'password': 'secret',
-				'password_confirmation': 'secret', //encrypt 
-				'first_name': 'Joe',
-				'last_name': 'Qwerty',
-				'role': 'judge'
-			};
+		$scope.newUser = {};
+		$scope.returningUser = {};
 
-			User.register(newUserData).$promise.then(function(user) {
+		$scope.register = function() {
+
+			User.register($scope.newUser).$promise.then(function(user) {
 				$scope.user = user;
 			});
+		};
+
+		$scope.login = function() {
 		};
 	}
 ])
@@ -40,4 +38,10 @@ angular.module('liveJudgingAdmin.login', ['ngRoute'])
 			}
 		});
 	}
-]);
+])
+
+.factory('LoginService', ['$resource', function($resource) {
+		return $resource('http://api.stevedolan.me/login', {}, {
+			login: {}
+		});
+}]);
