@@ -38,7 +38,7 @@
     width: 200px;
 }
 
-#page-content-wrapper {
+.page-content-wrapper {
     width: 100%;
     position: absolute;
     padding: 15px;
@@ -123,6 +123,16 @@
 
     #sidebar-wrapper {
         width: 200px;
+    }
+
+    .page-content-wrapper {
+        padding: 20px;
+        position: relative;
+    }
+
+    .login-page-content-wrapper {
+        position: none;
+        padding-top: 80px;
     }
 
     #wrapper.toggled #sidebar-wrapper {

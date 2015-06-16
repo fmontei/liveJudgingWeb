@@ -20,7 +20,7 @@
     </ul>
   </div>
 
-  <div id="page-content-wrapper" ng-class="{'login-page-content-wrapper': !isDashboard()}">
+  <div ng-class="{'login-page-content-wrapper': !isDashboard(), 'page-content-wrapper': isDashboard()}">
     <div ng-view></div>
   </div>
 
