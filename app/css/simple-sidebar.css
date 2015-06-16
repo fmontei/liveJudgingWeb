@@ -45,6 +45,10 @@
     top: 40px;
 }
 
+.login-page-content-wrapper {
+    left: 0;
+}
+
 #wrapper.toggled #page-content-wrapper {
     position: absolute;
     margin-right: -200px;
@@ -123,11 +127,6 @@
 
     #wrapper.toggled #sidebar-wrapper {
         width: 0;
-    }
-
-    #page-content-wrapper {
-        padding: 20px;
-        position: relative;
     }
 
     #wrapper.toggled #page-content-wrapper {

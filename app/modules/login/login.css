@@ -1,0 +1,17 @@
+.login-form-wrapper {
+	width:350px;
+	position:absolute;
+	left: calc(50% - 175px);
+}
+
+.login-button {
+	margin-top: 10px;
+}
+
+.login-input {
+	margin-bottom: 10px;
+}
+
+ .login-form {
+ 	margin-top: 10px;
+ }

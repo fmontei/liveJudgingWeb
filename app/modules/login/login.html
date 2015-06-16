@@ -1,19 +1,65 @@
 <!-- Login Form -->
-<div ng-controller="LoginCtrl" class="container content login-form-container">
+<div ng-controller="LoginCtrl" class="container content login-form-wrapper">
 
-  <!-- <form class="login-form" ng-submit="login()">
-    <label>Email</label>
-    <input type="email" id="inputEmail" class="form-control login-input" required autofocus>
-    <label>Password</label>
-    <input type="password" id="inputPassword" class="form-control login-input" required>
-      <button class="btn btn-lg btn-primary login-button" type="submit">Login</button>
-    </div>
-  </form> -->
+	<a href="/app/#/event">Temp link main screen</a>
+	{{newUser.email}}
 
-  <button ng-click="register()">Register</button><br />
-  <button ng-click="getUserList()">Get Users</button><br />
-  <button ng-click="login()">Login</button><br />
+	<tabset>
+		<tab heading="Login" class="login-tab">
+			<form class="login-form" ng-submit="login()">
+			    <label>Email</label>
+			    <input type="email"
+			    	   ng-model="email"
+			    	   class="form-control login-input"
+			    	   required
+			    	   autofocus>
 
-  User: {{user.first_name}}
+			    <label>Password</label>
+			    <input type="password"
+			    	   ng-model="password"
+			    	   class="form-control login-input"
+			    	   required>
+			    <button class="btn btn-lg btn-primary login-button" type="submit">Login</button>
+		  	</form>
+		</tab>
+
+		<tab heading="Register" class="login-tab">
+			<form class="login-form" ng-submit="login()">
+			    <label>Email</label>
+			    <input type="email"
+			    	   ng-model="newUser.email"
+			    	   class="form-control login-input"
+			    	   required
+			    	   autofocus>
+
+			    <label>Password</label>
+			    <input type="password"
+			    	   ng-model="newUser.password"
+			    	   class="form-control login-input"
+			    	   required>
+
+			    <label>Confirm Password</label>
+			    <input type="password"
+			    	   ng-model="newUser.password_confirmation"
+			    	   class="form-control login-input"
+			    	   required>
+
+			    <label>First Name</label>
+			    <input type="text"
+			    	   ng-model="newUser.first_name"
+			    	   class="form-control login-input"
+			    	   required>
+
+			    <label>Last Name</label>
+			    <input type="text"
+			    	   ng-model="newUser.last_name"
+			    	   class="form-control login-input"
+			    	   required>
+			    <button class="btn btn-lg btn-primary login-button"
+			    		ng-click="register()"
+			            type="submit">Register</button>
+		  	</form>
+		</tab>
+	</tabset>		  
 
 </div>
