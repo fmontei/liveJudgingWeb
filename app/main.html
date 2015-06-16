@@ -1,0 +1,27 @@
+<div id="wrapper">
+
+  <div id="sidebar-wrapper" ng-if="isDashboard()">
+    <ul class="sidebar-nav">
+      <li ng-class="{selected: currentPath == '/event'}">
+        <a href="#/event"><i class="fa fa-calendar-o"></i> Event</a>
+      </li>
+      <li ng-class="{selected: currentPath == '/projects'}">
+        <a href="#/projects"><i class="fa fa-cubes"></i>Projects</a>
+      </li>
+      <li ng-class="{selected: currentPath == '/judges'}">
+        <a href="#/judges"><i class="fa fa-users"></i> Judges</a>
+      </li>
+      <li ng-class="{selected: currentPath == '/rubrics'}">
+        <a href="#/rubrics"><i class="fa fa-star-half-o"></i> Rubrics</a>
+      </li>
+      <li ng-class="{selected: currentPath == '/settings'}">
+        <a href="#/settings"><i class="fa fa-cogs"></i>Settings</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="page-content-wrapper" ng-class="{'login-page-content-wrapper': !isDashboard()}">
+    <div ng-view></div>
+  </div>
+
+</div>
