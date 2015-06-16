@@ -18,7 +18,8 @@
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/navbar.css">
   <link rel="stylesheet" href="css/simple-sidebar.css">
-	<link rel="stylesheet" href="css/event-dashboard.css">
+	<link rel="stylesheet" href="css/event.css">
+  <link rel="stylesheet" href="modules/login/login.css">
   <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
 </head>
 <body ng-controller="MainCtrl">
@@ -31,33 +32,10 @@
     </div>
   </nav>
 
-  <div id="wrapper">
-
-    <div id="sidebar-wrapper">
-      <ul class="sidebar-nav">
-        <li ng-class="{selected: currentPath == '/event'}">
-          <a href="#/event"><i class="fa fa-calendar-o"></i> Event</a>
-        </li>
-        <li ng-class="{selected: currentPath == '/projects'}">
-          <a href="#/projects"><i class="fa fa-cubes"></i>Projects</a>
-        </li>
-        <li ng-class="{selected: currentPath == '/judges'}">
-          <a href="#/judges"><i class="fa fa-users"></i> Judges</a>
-        </li>
-        <li ng-class="{selected: currentPath == '/rubrics'}">
-          <a href="#/rubrics"><i class="fa fa-star-half-o"></i> Rubrics</a>
-        </li>
-        <li ng-class="{selected: currentPath == '/settings'}">
-          <a href="#/settings"><i class="fa fa-cogs"></i>Settings</a>
-        </li>
-      </ul>
-    </div>
-
-    <div id="page-content-wrapper">
-      <div ng-view></div>
-    </div>
-
-  </div>
+  <!-- Putting content in an include because it prevents the
+       sidebar (hidden when on the login and event selection
+       pages) from flashing while Angular is loading. -->
+  <ng-include src="'main.html'"></ng-include>
 
   <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -71,15 +49,17 @@
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
   <script src="bower_components/jquery/dist/jquery-ui.min.js"></script>
   <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-resource/angular-resource.min.js"></script>
   <script src="bower_components/angular-route/angular-route.min.js"></script>
 	<script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
-  <script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+  <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
   <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="bower_components/bootstrap/dist/js/bootstrap-switch.min.js"></script>
 
   <script src="app.js"></script>
 
   <script src="modules/event/event.js"></script>
+  <script src="modules/login/login.js"></script>
   <script src="modules/projects/projects.js"></script>
   <script src="modules/judges/judges.js"></script>
   <script src="modules/rubrics/rubrics.js"></script>

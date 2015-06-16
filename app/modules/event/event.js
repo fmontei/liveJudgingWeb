@@ -1,6 +1,35 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
+angular.module('userListApp', [])
+  
+.service('userListService', function task($http, $q) {
+
+  var task = this;
+
+  task.getAllUsers = function() {
+    var defer = $q.defer();
+
+    $http.get('http://api.stevedolan.me/users', {
+      headers: {'Authorization': 'Token token="86082d56c7d66f7615d27f150b837dcd"'}
+    })
+    .success(function(result) {
+      console.log('success');
+      defer.resolve(result);
+    })
+    .error(function(error, status) {
+      console.log('fail');
+      defer.reject(error);
+    });
+
+    return defer.promise;
+  }
+
+  return task;
+
+});
+
+
+angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute', 'userListApp'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/event', {
@@ -10,11 +39,11 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 }])
 
 .run(['$cookies', function($cookies) {
-	$cookies.put("view", "event_edit_view");
+	$cookies.put("view", undefined);
 	$cookies.put("running", "false");
 }])
 
-.controller('EventCtrl', ['$cookies', '$scope', function($cookies, $scope) {
+.controller('EventCtrl', ['$cookies', '$scope', 'userListService', function($cookies, $scope, userListService) {
 	$scope.event = {
 		EVENT_EDIT_VIEW: "event_edit_view",
 		EVENT_READY_VIEW: "event_ready_view",
@@ -31,6 +60,17 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 		} 
 		console.log("Event view switched to: " + view);
 	}
+
+  $scope.getAllUsers = function() {
+    userListService.getAllUsers();
+  }
+  //$scope.getAllUsers();
+
+  $scope.event_list = ["Event 1", "Event 2"];
+  $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
+  $scope.recipient_list = []; // Contains list of judges to be notified
+  $scope.project_list = ["Sample Project 1", "Sample Project 2"];
+  $scope.category_list = ["Sample Category 1", "Sample Category 2", "Sample Category 3", "Sample Category 4"];
 	
 	$scope.times = [];
 	for (var i = 1; i <= 12; i++) {
@@ -40,6 +80,16 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 		}
 	}
 }])
+
+.directive('revealEventDescription', function() {
+  return {
+    link: function(scope, elem, attrs) {
+      $('.event-selection-row .btn').unbind().mouseover(function() {
+        $('#event-selection-desc').show();
+      });
+    }
+  }
+})
 
 .directive('changeTabWidget', function() {
 
@@ -82,10 +132,42 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
   };
 })
 
+.directive('expandAllAccordions', function() {
+  return {
+    link: function(scope, elem, attrs) {
+      $('.expand-all-accordions.judge').unbind().click(function() {
+        $('.accordion-body.judge').collapse('show');
+      });
+      $('.expand-all-accordions.project').unbind().click(function() {
+        $('.accordion-body.project').collapse('show');
+      });
+      $('.expand-all-accordions.category').unbind().click(function() {
+        $('.accordion-body.category').collapse('show');
+      });
+    }
+  }
+})
+
+.directive('collapseAllAccordions', function() {
+  return {
+    link: function(scope, elem, attrs) {
+      $('.collapse-all-accordions.judge').unbind().click(function() {
+        $('.accordion-body.judge').collapse('hide');
+      });
+      $('.collapse-all-accordions.project').unbind().click(function() {
+        $('.accordion-body.project').collapse('hide');
+      });
+      $('.collapse-all-accordions.category').unbind().click(function() {
+        $('.accordion-body.category').collapse('hide');
+      });
+    }
+  }
+})
+
 .directive('changeAccordionChevron', function() {
   return {
 		link: function(scope, elem, attrs) {
-			$(".accordion-toggle").click(function() {
+			$(".accordion-toggle").unbind().click(function(event) {
 				var span = $(this).find("span");
 				if (span.hasClass("glyphicon-chevron-right")) 
 					span.removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
@@ -98,17 +180,15 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
 .directive('notificationWidget', function() {
 	
-	var judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
-	var recipient_list = []; // Contains list of judges to be notified
 	var link = function(scope, elem, attrs) {
 		/*
 		 * Initialize the Autocomplete Object for the Notification Modal
 		 */
 		$("#judge_search").autocomplete({
-			source: judge_list,
+			source: scope.judge_list,
 			select: function(event, ui) {
 				var recipient_name = ui.item.value;
-				if (jQuery.inArray(recipient_name, recipient_list) === -1)
+				if (jQuery.inArray(recipient_name, scope.recipient_list) === -1)
 					create_new_judge_notification_object(recipient_name);
 				$(this).val(""); // Clear input after selecting judge
 				event.preventDefault();
@@ -122,13 +202,13 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 			var recipient_div = $("#recipients-div");
 			recipient_div.append("<div class='recipient'>" + name + 
 				"&nbsp;&nbsp;<span class='glyphicon glyphicon-remove'></span></div>");
-			recipient_list.push(name);
+			scope.recipient_list.push(name);
 			clear_all_checkbox.attr("checked", false);
 			/* Add listener to dynamically created HTML element */
 			$(".recipient .glyphicon.glyphicon-remove").click(function() {
 				if ($(this).parent().html().indexOf(name) >= 0) {
 					/* Remove recipient from list if 'x' is clicked */
-					recipient_list = recipient_list.filter(function(elem) {
+					scope.recipient_list = scope.recipient_list.filter(function(elem) {
 						 return elem != name; 
 					});
 					/* Destroy HTML element */
@@ -144,9 +224,9 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 		var send_all_checkbox = $("#send-all-checkbox");
 		send_all_checkbox.click(function() {
 			if (!this.checked) return;
-			for (var i = 0; i < judge_list.length; i++) {
-				var name = judge_list[i];
-				if (jQuery.inArray(name, recipient_list) === -1)
+			for (var i = 0; i < scope.judge_list.length; i++) {
+				var name = scope.judge_list[i];
+				if (jQuery.inArray(name, scope.recipient_list) === -1)
 					create_new_judge_notification_object(name);
 			}
 			clear_all_checkbox.attr("checked", false);
@@ -160,7 +240,7 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 			if (!this.checked) return;
 			/* Use listener defined in create_new_judge_notification_object() to destroy */
 			$(".recipient .glyphicon.glyphicon-remove").click(); 
-			recipient_list.length = 0; // Clear recipient list
+			scope.recipient_list.length = 0; // Clear recipient list
 			send_all_checkbox.attr("checked", false);
 		});
 	}

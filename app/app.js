@@ -2,8 +2,10 @@
 
 // Declare app level module which depends on views, and components
 angular.module('liveJudgingAdmin', [
+  'ngResource',
   'ngRoute',
   'ui.bootstrap',
+  'liveJudgingAdmin.login',
   'liveJudgingAdmin.event',
   'liveJudgingAdmin.projects',
   'liveJudgingAdmin.judges',
@@ -12,7 +14,7 @@ angular.module('liveJudgingAdmin', [
   'liveJudgingAdmin.settings'
 ]).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.otherwise({redirectTo: '/event'});
+  $routeProvider.otherwise({redirectTo: '/login'});
 }])
 
 .controller('MainCtrl', ['$location', '$route', '$routeParams', '$scope', 
@@ -20,5 +22,13 @@ config(['$routeProvider', function($routeProvider) {
 		$scope.$on('$routeChangeSuccess', function() {
 			$scope.currentPath = $location.path();	
 		});
+
+    // Used to determine if the sidebar should be hidden.
+    $scope.isDashboard = function() {
+      if ($scope.currentPath === '/login' || $scope.currentPath === '/eventSelect') {
+        return false;
+      }
+      return true;
+    }
 		
 }]);
