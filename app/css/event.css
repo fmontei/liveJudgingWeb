@@ -1,3 +1,4 @@
+
 /* Spinning progress glyphicon */
 .rotate {
     -webkit-animation:spin 2s linear infinite;
@@ -131,21 +132,35 @@ h4.modal-title {
   z-index: 1510 !important;
 }
 
-/* Event Info Form */
+/*
+ * Event Creation View
+ */ 
 #calendar-icon {
   font-size: 30px;
-}
-#datepicker-start, #datepicker-end {
-  width: 120%;
-}
-#timepicker-start, #timepicker-end {
-  width: 110%;
-} 
-#datepicker-end, #timepicker-end {
-  margin-left: -20px;
 }
 #begin-event-button {
   margin-top: 50px;
   width: 200px;
 }
+#end-date-optional {
+	display: none;
+}
 
+/*
+ * Event Ready View
+ */
+ .event-ready-span {
+	display: inline-block;
+	margin-right: 5px;
+ }
+
+ /*
+  * Event In Progress View
+  */
+/* Truncate overly long names */
+.truncate { 
+  width: 150%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

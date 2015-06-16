@@ -2,8 +2,10 @@
 
 // Declare app level module which depends on views, and components
 angular.module('liveJudgingAdmin', [
+  'ngResource',
   'ngRoute',
   'ui.bootstrap',
+  'liveJudgingAdmin.login',
   'liveJudgingAdmin.event',
   'liveJudgingAdmin.projects',
   'liveJudgingAdmin.judges',
