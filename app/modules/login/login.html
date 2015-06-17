@@ -1,65 +1,62 @@
 <!-- Login Form -->
 <div ng-controller="LoginCtrl" class="container content login-form-wrapper">
 
-	<a href="/app/#/event">Temp link main screen</a>
-	{{newUser.email}}
+    <a href="/app/#/event">Temp link main screen</a>
 
-	<tabset>
-		<tab heading="Login" class="login-tab">
-			<form class="login-form" ng-submit="login()">
-			    <label>Email</label>
-			    <input type="email"
-			    	   ng-model="email"
-			    	   class="form-control login-input"
-			    	   required
-			    	   autofocus>
+    <tabset>
+        <tab heading="Login" class="login-tab">
+            <form class="login-form" ng-submit="login(returningUser)">
+                <label>Email</label>
+                <input type="email"
+                       ng-model="returningUser.email"
+                       class="form-control login-input"
+                       required
+                       autofocus>
 
-			    <label>Password</label>
-			    <input type="password"
-			    	   ng-model="password"
-			    	   class="form-control login-input"
-			    	   required>
-			    <button class="btn btn-lg btn-primary login-button" type="submit">Login</button>
-		  	</form>
-		</tab>
+                <label>Password</label>
+                <input type="password"
+                       ng-model="returningUser.password"
+                       class="form-control login-input"
+                       required>
+                <button class="btn btn-lg btn-primary login-button">Login</button>
+            </form>
+        </tab>
 
-		<tab heading="Register" class="login-tab">
-			<form class="login-form" ng-submit="login()">
-			    <label>Email</label>
-			    <input type="email"
-			    	   ng-model="newUser.email"
-			    	   class="form-control login-input"
-			    	   required
-			    	   autofocus>
+        <tab heading="Register" class="login-tab">
+            <form class="login-form" ng-submit="register(newUser)">
+                <label>Email</label>
+                <input type="email"
+                       ng-model="newUser.email"
+                       class="form-control login-input"
+                       required
+                       autofocus>
 
-			    <label>Password</label>
-			    <input type="password"
-			    	   ng-model="newUser.password"
-			    	   class="form-control login-input"
-			    	   required>
+                <label>Password</label>
+                <input type="password"
+                       ng-model="newUser.password"
+                       class="form-control login-input"
+                       required>
 
-			    <label>Confirm Password</label>
-			    <input type="password"
-			    	   ng-model="newUser.password_confirmation"
-			    	   class="form-control login-input"
-			    	   required>
+                <label>Confirm Password</label>
+                <input type="password"
+                       ng-model="newUser.password_confirmation"
+                       class="form-control login-input"
+                       required>
 
-			    <label>First Name</label>
-			    <input type="text"
-			    	   ng-model="newUser.first_name"
-			    	   class="form-control login-input"
-			    	   required>
+                <label>First Name</label>
+                <input type="text"
+                       ng-model="newUser.first_name"
+                       class="form-control login-input"
+                       required>
 
-			    <label>Last Name</label>
-			    <input type="text"
-			    	   ng-model="newUser.last_name"
-			    	   class="form-control login-input"
-			    	   required>
-			    <button class="btn btn-lg btn-primary login-button"
-			    		ng-click="register()"
-			            type="submit">Register</button>
-		  	</form>
-		</tab>
-	</tabset>		  
+                <label>Last Name</label>
+                <input type="text"
+                       ng-model="newUser.last_name"
+                       class="form-control login-input"
+                       required>
+                <button class="btn btn-lg btn-primary login-button">Register</button>
+            </form>
+        </tab>
+    </tabset>         
 
 </div>
