@@ -5,34 +5,57 @@
 	border-radius: 24px	;
 }
 
-#add-category-btn {
-	height: 80px;
-	border: solid black 2px;
-	border-radius: 0;
-}
-
 .dropdown {
 	margin-top: -5px;
 }
 
-.category {
+#add-category-btn {
 	height: 80px;
+	width: 200px;
+	border: solid black 2px;
+	border-radius: 0;
+}
+
+#sortable-category-list {
+	list-style-type: none;
+	margin-top: -30px;
+}
+
+.sortable-category {
+  margin-left: auto;
+  margin-right: auto; 
+  height: 80px;
 	background: rgb(204, 204, 204);
 	border: solid black 2px;
 	margin-top: 10px;
-	margin-right: 102px;
-	margin-left: 102px;
+	width: 200px;
+	cursor: grab;
 }
 
-.category  h3 {
-	margin-top: 2px;
+.sortable-category h3 {
+	margin-top: 0;
 }
 
-.category  div:first-of-type {
-	margin-top: -10px;
+.glyphicon-sort-wrapper {
+	font-size: 10px;
+}
+
+.glyphicon-sort-wrapper .glyphicon-sort {
+	margin-right: 5px;
+	margin-top: 3px;
+	float: left;
 }
 
 .category-modal-col {
 	margin-left: 40px;
 }
 
+.project-col {
+	margin-bottom: 20px;
+}
+
+.draggable-project {
+	position: relative;
+	z-index: 2;
+	background-color: white;
+}

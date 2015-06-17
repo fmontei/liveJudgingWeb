@@ -26,6 +26,27 @@ angular.module('domInitApp', [])
 	service.initializeColorPicker = function(identifier) {
 		$(identifier).colorpicker();
 	}
+
+	service.initializeSortable = function(identifier) {
+		$(identifier).sortable({
+			axis: 'y',
+			containment: 'parent',
+			cursor: 'grab',
+			cursorAt: { left: 5 },
+			handle: 'button',
+			cancel: ''
+		});
+		$(identifier).droppable({
+			drop: function(event, ui) {
+				var droppedProject = ui.draggable;
+				if (droppedProject.hasClass('ui-sortable-helper')) return;
+				droppedProject.animate({
+		        opacity: 0.25
+		    }, 500);
+		    droppedProject.fadeOut();
+			}
+		});
+	}
 	
 	return service;
 })
@@ -42,20 +63,43 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'domInitApp'])
 .controller('ProjectsCtrl', ['$scope', 'domInitService',
 	function($scope, domInitService) {
 		
-	$scope.createAmPmSwitch = function(identifier) {
-		domInitService.instantiateAmPmSwitch(identifier);
+		$scope.createAmPmSwitch = function(identifier) {
+			domInitService.instantiateAmPmSwitch(identifier);
+		}
+		
+		$scope.createColorPicker = function(identifier) {
+			domInitService.initializeColorPicker(identifier);
+		}
+		
+		$scope.createSortableCategories = function(identifier) {
+			domInitService.initializeSortable(identifier);
+		} 
+
+		$scope.changeView = function(view) {
+			$scope.currentView = view;
+		}
+
+		$scope.createAmPmSwitch('#am-pm-switch');
+		$scope.createColorPicker("#color-picker");
+		$scope.createSortableCategories("#sortable-category-list");
+		$scope.timeOptions = domInitService.getTimeOptions();
+		$scope.currentView = "default";
+
+		$scope.projectList = ["Lemur", "Turtle", "Fish", "Cheetah", "Bear"];
+}])
+
+.directive('draggable', function() { // Directive needed to work inside ng-when block
+	return {
+		link: function(scope, elem, attrs) {
+			$(".draggable-project").draggable({
+				cursor: "grab",
+				start: function(event, ui) { 
+				  $(this).draggable("option", "cursorAt", {
+				    left: Math.floor(ui.helper.width() / 2),
+				    top: Math.floor(ui.helper.height() / 2)
+				  }); 
+				}
+			});
+		}
 	}
-	$scope.createAmPmSwitch('#am-pm-switch');
-	
-	$scope.createColorPicker = function(identifier) {
-		domInitService.initializeColorPicker(identifier);
-	}
-	$scope.createColorPicker("#color-picker");
-	
-	$scope.timeOptions = domInitService.getTimeOptions();
-	
-	$scope.currentView = "default";
-	$scope.changeView = function(view) {
-		$scope.currentView = view;
-	}
-}]);
+});

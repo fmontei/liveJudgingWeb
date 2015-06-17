@@ -46,34 +46,23 @@
 							</div>
 						</div>
 						
-						<div class="row">
-							<div class="col col-sm-3 col-md-3 col-lg-3">
-								<div class="media">
-									<div class="media-left">
-										<a href="#">
-											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-										</a>
-									</div>
-									<div class="media-body">
-										<h4 class="media-heading">#76</h4>
-										<span>Lemur</span>
-									</div>
-								</div>
-							</div>
-							 <div class="col col-sm-3 col-md-3 col-lg-3">
-								<div class="media">
-									<div class="media-left">
-										<a href="#">
-											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-										</a>
-									</div>
-									<div class="media-body">
-										<h4 class="media-heading">#52</h4>
-										<span>Turtle</span>
+						<div ng-repeat="project in projectList" draggable>
+							<div ng-if="$index % 4 == 0" class="row"></div>
+								<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
+									<div class="media draggable-project">
+										<div class="media-left">
+											<a href="#">
+												<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+											</a>
+										</div>
+										<div class="media-body">
+											<h4 class="media-heading">#76</h4>
+											<span>{{project}} {{$index}}</span>
+										</div>
 									</div>
 								</div>
-							</div>
-						</div> 
+						</div>
+			
 					</div> <!--ng-switch-default-->
 					
 					<div ng-switch-when="category">
@@ -147,34 +136,33 @@
 						</div>
 					</div>
 				
-					<div class="row">
+					<ul>
 						<button class="btn btn-lg btn-success" id="add-category-btn" data-toggle="modal" data-target="#edit-category-modal">
 							<span class="glyphicon glyphicon-plus"></span> Add Category
 						</button>
-					</div>
+					</ul>
 					
-					<div class="row">
-						<div class="category">
-							<h3>Uncategorized</h3>
-							<div>1 Project</div>
-						</div>
-					</div>
-					
-					<div class="row">
-						<div class="category">
-							<h3>Cat. A</h3>
-							<div>4 Projects</div>
-							<div>3 Judges</div>
-						</div>
-					</div>
-					
-					<div class="row">
-						<div class="category">
-							<h3>Cat. B</h3>
-							<div>6 Projects</div>
-							<div>4 Judges</div>
-						</div>
-					</div>
+					<ul id="sortable-category-list">
+						<br /><br /> <!--Important: extra room for dragging-->
+						<li>
+			        <button class="sortable-category">
+								<h3><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> Uncategorized</h3>
+								<span>1 Project</span>
+							</button>
+				    </li>
+				    <li>
+			        <button class="sortable-category">
+								<h3><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> Cat. A</h3>
+								<span>4 Projects / 3 Judges</span>
+							</button>
+				    <li>
+			        <button class="sortable-category">
+								<h3><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> Cat. B</h3>
+								<span>6 Projects / 4 Judges</span>
+							</button>
+				    </li>
+				    <br /><br /> <!--Important: extra room for dragging-->
+					</ul>
 					
 				</div> <!--Text-Center-->
 			</div> <!--Col-->
