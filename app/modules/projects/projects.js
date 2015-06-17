@@ -1,57 +1,8 @@
 'use strict';
 
-angular.module('domInitApp', [])
+angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies'])
 
-.service('domInitService', function() {
-	var service = this;
-	
-	service.instantiateAmPmSwitch = function(identifier) {
-		$(identifier).bootstrapSwitch({
-			onText: 'am',
-			offText: 'pm'
-		});
-	}
-	
-	service.getTimeOptions = function() {
-		service.times = [];
-		for (var i = 1; i <= 12; i++) {
-			for (var j = 0; j <= 45; j += 15) {
-				if (j == 0) service.times.push(i + ":" + j + j);
-				else service.times.push(i + ":" + j);
-			}
-		}
-		return service.times;
-	}
-	
-	service.initializeColorPicker = function(identifier) {
-		$(identifier).colorpicker();
-	}
-
-	service.initializeSortable = function(identifier) {
-		$(identifier).sortable({
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grab',
-			cursorAt: { left: 5 },
-			handle: 'button',
-			cancel: ''
-		});
-		$(identifier).droppable({
-			drop: function(event, ui) {
-				var droppedProject = ui.draggable;
-				if (droppedProject.hasClass('ui-sortable-helper')) return;
-				droppedProject.animate({
-		        opacity: 0.25
-		    }, 500);
-		    droppedProject.fadeOut();
-			}
-		});
-	}
-	
-	return service;
-})
-
-angular.module('liveJudgingAdmin.projects', ['ngRoute', 'domInitApp'])
+.constant('DRAGGABLE', 'draggable-project')
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/projects', {
@@ -60,41 +11,83 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'domInitApp'])
   });
 }])
 
-.controller('ProjectsCtrl', ['$scope', 'domInitService',
-	function($scope, domInitService) {
+.controller('ProjectsCtrl', ['$scope', '$cookies', 'DRAGGABLE', function($scope, $cookies, DRAGGABLE) {
+
+		$scope.getTimeOptions = function() {
+			var times = [];
+			for (var i = 1; i <= 12; i++) {
+				for (var j = 0; j <= 45; j += 15) {
+					if (j == 0) times.push(i + ":" + j + j);
+					else	times.push(i + ":" + j);
+				}
+			}
+			return times;
+		}
 		
 		$scope.createAmPmSwitch = function(identifier) {
-			domInitService.instantiateAmPmSwitch(identifier);
+			$(identifier).bootstrapSwitch({
+				onText: 'am',
+				offText: 'pm'
+			});
 		}
 		
 		$scope.createColorPicker = function(identifier) {
-			domInitService.initializeColorPicker(identifier);
+			$(identifier).colorpicker();
 		}
 		
 		$scope.createSortableCategories = function(identifier) {
-			domInitService.initializeSortable(identifier);
+			$(identifier).sortable({
+				axis: 'y',
+				containment: 'parent',
+				cursor: 'grab',
+				cursorAt: { left: 5 },
+				handle: 'button',
+				cancel: ''
+			});
 		} 
 
 		$scope.changeView = function(view) {
 			$scope.currentView = view;
 		}
-
+		
 		$scope.createAmPmSwitch('#am-pm-switch');
 		$scope.createColorPicker("#color-picker");
 		$scope.createSortableCategories("#sortable-category-list");
-		$scope.timeOptions = domInitService.getTimeOptions();
+		$scope.timeOptions = $scope.getTimeOptions();
 		$scope.currentView = "default";
 
+		$cookies.categoryList = [{
+			name: "Uncategorized",
+			projects: ["Tiger"],
+			judges: []
+		}, 
+		{
+			name: "Cat A.",
+			projects: ["Lemur"], 
+			judges: ["Batman"]
+		}, 
+		{
+			name: "Cat B.",
+			projects: ["Lion", "Monkey"], 
+			judges: ["Superman", "Hulk"]
+		}];
+		$scope.categoryList = $cookies.categoryList;
 		$scope.projectList = ["Lemur", "Turtle", "Fish", "Cheetah", "Bear"];
+
+		$scope.getCategoryByName = function(value) {
+			for (var i = 0; i < $cookies.categoryList.length; i++) {
+				if ($cookies.categoryList[i].name == value) return $cookies.categoryList[i];
+			}
+		}
 }])
 
-.directive('draggable', function() { // Directive needed to work inside ng-when block
+.directive('draggable', ['DRAGGABLE', function(DRAGGABLE) { // Directive needed to work inside ng-when block
 	return {
 		link: function(scope, elem, attrs) {
-			$(".draggable-project").draggable({
-				cursor: "grab",
+			$('.' + DRAGGABLE).draggable({
+				cursor: 'grab',
 				start: function(event, ui) { 
-				  $(this).draggable("option", "cursorAt", {
+				  $(this).draggable('option', 'cursorAt', {
 				    left: Math.floor(ui.helper.width() / 2),
 				    top: Math.floor(ui.helper.height() / 2)
 				  }); 
@@ -102,4 +95,38 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'domInitApp'])
 			});
 		}
 	}
-});
+}])
+
+.directive('droppable', ['DRAGGABLE', function(DRAGGABLE) {
+	var link = function(scope, elem, attrs) {
+		$('.sortable-category').droppable({
+			drop: function(event, ui) {
+				var droppedProject = ui.draggable;
+				if (droppedProject.hasClass(DRAGGABLE)) {
+		    	droppedProject.fadeOut(2000);
+		    	var categoryContainer = $(event.target).find('button');
+		    	var originalColor = categoryContainer.css('backgroundColor');
+					categoryContainer.animate({
+	          backgroundColor: "#fff"
+					}, 1000);
+					categoryContainer.animate({
+	          backgroundColor: originalColor
+					}, 1000);
+		    	var categoryName = $(event.target).find('.sortable-category-header').text().trim();
+		    	var projectName = droppedProject.find('.draggable-project-name').text().trim();
+		    	droppedProjectCallback(scope, categoryName, projectName);
+		  	}
+			}
+		});
+	}
+
+	var droppedProjectCallback = function(scope, categoryName, projectName) {
+		var category = scope.getCategoryByName(categoryName);
+		category.projects.push(projectName);
+		scope.$apply();
+	}
+
+	return {
+		link: link	
+	}
+}]);

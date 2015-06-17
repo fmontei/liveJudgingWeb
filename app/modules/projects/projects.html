@@ -57,7 +57,7 @@
 										</div>
 										<div class="media-body">
 											<h4 class="media-heading">#76</h4>
-											<span>{{project}} {{$index}}</span>
+											<span class="draggable-project-name">{{project}}</span>
 										</div>
 									</div>
 								</div>
@@ -144,23 +144,15 @@
 					
 					<ul id="sortable-category-list">
 						<br /><br /> <!--Important: extra room for dragging-->
-						<li>
-			        <button class="sortable-category">
-								<h3><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> Uncategorized</h3>
-								<span>1 Project</span>
-							</button>
-				    </li>
-				    <li>
-			        <button class="sortable-category">
-								<h3><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> Cat. A</h3>
-								<span>4 Projects / 3 Judges</span>
-							</button>
-				    <li>
-			        <button class="sortable-category">
-								<h3><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> Cat. B</h3>
-								<span>6 Projects / 4 Judges</span>
-							</button>
-				    </li>
+						<div ng-repeat="category in categoryList" droppable>
+							<li class="sortable-category">
+				        <button>
+									<h3 class="sortable-category-header"><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> {{category.name}}</h3>
+									<span ng-if="category.judges.length == 0" class="sortable-category-text">{{category.projects.length}} Projects</span>
+									<span ng-if="category.judges.length > 0" class="sortable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
+								</button>
+					    </li>
+				    </div>
 				    <br /><br /> <!--Important: extra room for dragging-->
 					</ul>
 					
