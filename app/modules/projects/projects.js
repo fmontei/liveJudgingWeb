@@ -58,16 +58,19 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies'])
 
 		$cookies.categoryList = [{
 			name: "Uncategorized",
+			color: "grey",
 			projects: ["Tiger"],
 			judges: []
 		}, 
 		{
 			name: "Cat A.",
+			color: "red",
 			projects: ["Lemur"], 
 			judges: ["Batman"]
 		}, 
 		{
 			name: "Cat B.",
+			color: "green",
 			projects: ["Lion", "Monkey"], 
 			judges: ["Superman", "Hulk"]
 		}];
@@ -103,15 +106,15 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies'])
 			drop: function(event, ui) {
 				var droppedProject = ui.draggable;
 				if (droppedProject.hasClass(DRAGGABLE)) {
-		    	droppedProject.fadeOut(2000);
+		    	droppedProject.fadeOut(400);
 		    	var categoryContainer = $(event.target).find('button');
 		    	var originalColor = categoryContainer.css('backgroundColor');
 					categoryContainer.animate({
 	          backgroundColor: "#fff"
-					}, 1000);
+					}, 400);
 					categoryContainer.animate({
 	          backgroundColor: originalColor
-					}, 1000);
+					}, 400);
 		    	var categoryName = $(event.target).find('.sortable-category-header').text().trim();
 		    	var projectName = droppedProject.find('.draggable-project-name').text().trim();
 		    	droppedProjectCallback(scope, categoryName, projectName);

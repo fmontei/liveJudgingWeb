@@ -18,7 +18,7 @@
 							<div class="col-sm-5 col-md-5 col-lg-5">
 							</div>
 							<div class="col-sm-7 col-md-7 col-lg-7">
-								<div class="dropdown">
+								<div class="dropdown" id="projects-tab-dropdown">
 									<button class="btn btn-default dropdown-toggle" type="button" id="projects-dropdown" 
 										data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 										Sort by
@@ -66,62 +66,52 @@
 					</div> <!--ng-switch-default-->
 					
 					<div ng-switch-when="category">
-					
-						<div class="accordion" style="padding-top: 20px">
-							<div class="panel panel-primary accordion-group">
+						<div ng-repeat="category in categoryList">
+							<div class="accordion" style="padding-top: 20px">
+								<div class="panel panel-default accordion-group" style="border-color: {{category.color}}">
 
-								<div class="panel-heading" style="height: 60px">
-									<div class="row">
-										<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
-											<div class="truncate">
-												<div class="accordion-heading">
-													<a class="accordion-toggle" data-toggle="collapse" href="#category" onclick="return false;"> 
-														<span class="glyphicon glyphicon-chevron-right"></span> &nbsp;&nbsp;
-													</a>
+									<div class="panel-heading" style="background-color: {{category.color}}; border-color: {{category.color}}">
+										<div class="row">
+											<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
+												<div class="truncate">
+													<div class="accordion-heading">
+														<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
+															<span class="glyphicon glyphicon-chevron-right"></span> {{category.name}} 
+														</a>
+													</div>
 												</div>
-											</div>
-										</span>
-									</div> 
-								</div>
-					
-								<div id="category" class="accordion-body collapse">
-									<div class="accordion-inner">
-										<div class="panel-body">
-											<!--Projects not yet judged-->
-											<div class="row">
-												<div class="col col-sm-4 col-md-4 col-lg-4">
-													<div class="media">
-														<div class="media-left">
-															<a href="#">
-																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-															</a>
-														</div>
-														<div class="media-body">
-															<h4 class="media-heading">#76</h4>
-															<span>George Washington</span>
+											</span>
+										</div> 
+									</div>
+						
+									<div id="category{{$index}}" class="accordion-body collapse">
+										<div class="accordion-inner">
+											<div class="panel-body">
+												
+												<div ng-repeat="project in category.projects">
+													<br ng-if="$index % 3 == 0 && $index > 0" />
+													<div class="col col-sm-4 col-md-4 col-lg-4">
+														<div class="media category-accordion-media" >
+															<div class="media-left">
+																<a href="#">
+																	<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+																</a>
+															</div>
+															<div class="media-body">
+																<h4 class="media-heading">#76</h4>
+																<span>{{project}}</span>
+															</div>
 														</div>
 													</div>
 												</div>
-												 <div class="col col-sm-4 col-md-4 col-lg-4">
-													<div class="media">
-														<div class="media-left">
-															<a href="#">
-																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-															</a>
-														</div>
-														<div class="media-body">
-															<h4 class="media-heading">#52</h4>
-															<span>Thomas Jefferson</span>
-														</div>
-													</div>
-												</div>
+
 											</div>
 										</div>
 									</div>
+									
 								</div>
-								
 							</div>
-						</div>
+						</div> <!--ng-repeat-->
 					</div> <!--ng-switch-when-->
 					
 				</div> <!--ng-switch on-->
@@ -146,7 +136,7 @@
 						<br /><br /> <!--Important: extra room for dragging-->
 						<div ng-repeat="category in categoryList" droppable>
 							<li class="sortable-category">
-				        <button>
+				        <button style="background-color: {{category.color}}">
 									<h3 class="sortable-category-header"><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> {{category.name}}</h3>
 									<span ng-if="category.judges.length == 0" class="sortable-category-text">{{category.projects.length}} Projects</span>
 									<span ng-if="category.judges.length > 0" class="sortable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
