@@ -60,13 +60,17 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute', 'userListApp']
 		} 
 		console.log("Event view switched to: " + view);
 	}
+	$scope.reveal_event_desc = function(desc) {
+		$('#event-selection-desc').html('<strong>Event Description:</strong><br />' + desc).show();
+	}
 
   $scope.getAllUsers = function() {
     userListService.getAllUsers();
   }
   //$scope.getAllUsers();
 
-  $scope.event_list = ["Event 1", "Event 2"];
+  $scope.event_list = [{'name': 'Event 1', 'desc': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}, 
+		{'name': 'Event 1', 'desc': 'Integer posuere erat a ante.'}];
   $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
   $scope.recipient_list = []; // Contains list of judges to be notified
   $scope.project_list = ["Sample Project 1", "Sample Project 2"];
@@ -80,16 +84,6 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute', 'userListApp']
 		}
 	}
 }])
-
-.directive('revealEventDescription', function() {
-  return {
-    link: function(scope, elem, attrs) {
-      $('.event-selection-row .btn').unbind().mouseover(function() {
-        $('#event-selection-desc').show();
-      });
-    }
-  }
-})
 
 .directive('changeTabWidget', function() {
 
