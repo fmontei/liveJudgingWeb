@@ -1,1 +1,253 @@
-Pppprojects
+<div ng-controller="ProjectsCtrl">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col col-sm-8 col-md-8 col-lg-8">
+			
+				<div class="row">
+					<div class="page-header">
+						<h1>Projects <span class="label label-default">5</span></h1>
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="col-sm-8 col-md-8 col-lg-8">
+						<em>Drag-'n-drop projects into categories.</em>
+					</div>
+					<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
+						<div class="row">
+							<div class="col-sm-5 col-md-5 col-lg-5">
+							</div>
+							<div class="col-sm-7 col-md-7 col-lg-7">
+								<div class="dropdown">
+									<button class="btn btn-default dropdown-toggle" type="button" id="projects-dropdown" 
+										data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										Sort by
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="projects-dropdown">
+										<li><a href="#/projects" ng-click="changeView('default')">Name</a></li>
+										<li><a href="#/projects" ng-click="changeView('category')">Category</a></li>
+										<li><a href="#/projects">Number</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div ng-switch on="currentView">
+					<div ng-switch-default>
+						<div class="row">
+							<div class="col col-sm-12 col-md-12 col-lg-12">
+								<button class="btn btn-lg btn-success" id="add-project-btn">
+									<span class="glyphicon glyphicon-plus"></span>
+									Add Project
+								</button>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col col-sm-3 col-md-3 col-lg-3">
+								<div class="media">
+									<div class="media-left">
+										<a href="#">
+											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+										</a>
+									</div>
+									<div class="media-body">
+										<h4 class="media-heading">#76</h4>
+										<span>Lemur</span>
+									</div>
+								</div>
+							</div>
+							 <div class="col col-sm-3 col-md-3 col-lg-3">
+								<div class="media">
+									<div class="media-left">
+										<a href="#">
+											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+										</a>
+									</div>
+									<div class="media-body">
+										<h4 class="media-heading">#52</h4>
+										<span>Turtle</span>
+									</div>
+								</div>
+							</div>
+						</div> 
+					</div> <!--ng-switch-default-->
+					
+					<div ng-switch-when="category">
+					
+						<div class="accordion" style="padding-top: 20px">
+							<div class="panel panel-primary accordion-group">
+
+								<div class="panel-heading" style="height: 60px">
+									<div class="row">
+										<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
+											<div class="truncate">
+												<div class="accordion-heading">
+													<a class="accordion-toggle" data-toggle="collapse" href="#category" onclick="return false;"> 
+														<span class="glyphicon glyphicon-chevron-right"></span> &nbsp;&nbsp;
+													</a>
+												</div>
+											</div>
+										</span>
+									</div> 
+								</div>
+					
+								<div id="category" class="accordion-body collapse">
+									<div class="accordion-inner">
+										<div class="panel-body">
+											<!--Projects not yet judged-->
+											<div class="row">
+												<div class="col col-sm-4 col-md-4 col-lg-4">
+													<div class="media">
+														<div class="media-left">
+															<a href="#">
+																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+															</a>
+														</div>
+														<div class="media-body">
+															<h4 class="media-heading">#76</h4>
+															<span>George Washington</span>
+														</div>
+													</div>
+												</div>
+												 <div class="col col-sm-4 col-md-4 col-lg-4">
+													<div class="media">
+														<div class="media-left">
+															<a href="#">
+																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+															</a>
+														</div>
+														<div class="media-body">
+															<h4 class="media-heading">#52</h4>
+															<span>Thomas Jefferson</span>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					</div> <!--ng-switch-when-->
+					
+				</div> <!--ng-switch on-->
+			</div> 
+			
+			<div class="col-sm-4 col-md-4 col-lg-4">
+				<div class="text-center">
+				
+					<div class="row">
+						<div class="page-header">
+							<h1>Categories <span class="label label-default">3</span></h1>
+						</div>
+					</div>
+				
+					<div class="row">
+						<button class="btn btn-lg btn-success" id="add-category-btn" data-toggle="modal" data-target="#edit-category-modal">
+							<span class="glyphicon glyphicon-plus"></span> Add Category
+						</button>
+					</div>
+					
+					<div class="row">
+						<div class="category">
+							<h3>Uncategorized</h3>
+							<div>1 Project</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="category">
+							<h3>Cat. A</h3>
+							<div>4 Projects</div>
+							<div>3 Judges</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="category">
+							<h3>Cat. B</h3>
+							<div>6 Projects</div>
+							<div>4 Judges</div>
+						</div>
+					</div>
+					
+				</div> <!--Text-Center-->
+			</div> <!--Col-->
+
+		</div> <!--Row-->
+	</div> <!--Container-Fluid-->
+</div> <!--ProjectsCtrl-->
+
+<div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog" aria-labelledby="edit-category-modal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content panel-success">
+			<div class="modal-header panel-heading">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="edit-category-modal-label">Edit Category</h4>
+			</div>
+			<div class="modal-body">
+			
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+						<label>Category Name:</label>
+					</div>
+					<div class="col col-lg-7 col-md-7 col-sm-7">
+						<input class="form-control" type="text-area" placeholder="Category Name" />
+					</div>
+				</div><br />
+				
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+						<label>Description:</label>
+					</div>
+					<div class="col col-lg-7 col-md-7 col-sm-7">
+						<textarea class="form-control" rows="3"></textarea>
+					</div>
+				</div><br />
+				
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+						<label>Due by:</label>
+					</div>
+					<div class="col col-lg-5 col-md-5 col-sm-5">
+						<div class="row">
+							<div class="col-sm-8 col-md-8 col-lg-8">
+								<select class="form-control">
+									<option ng-repeat="time in timeOptions">{{time}}</option>
+								</select>
+							</div>
+							<div class="col col-lg-4 col-md-4 col-sm-4">
+								<input type="checkbox" id="am-pm-switch" checked>
+							</div>
+						</div>
+					</div>
+				</div><br />
+				
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+						<label>Color:</label>
+					</div>
+					<div class="col col-lg-5 col-md-5 col-sm-5">
+						<div class="input-group" id="color-picker">
+							<input type="text" value="#000000" class="form-control" />
+							<span class="input-group-addon"><i></i></span>
+						</div>
+					</div>
+				</div><br />
+				
+			</div> <!--Modal-Body-->
+			<div class="modal-footer">
+				<div class="row">
+					<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right">Save</button></span>
+					<span class="col col-sm-2"></span>
+					<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
