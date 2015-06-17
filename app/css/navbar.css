@@ -7,22 +7,28 @@
 	min-height: 40px;
 }
 
-.navbar-nav a {
-	
-}
-
-.navbar-default {
+.lj-navbar-default {
 	background-color: #373737;
 	border: 0px;
+	color: #c9c9c9;
 }
 
-.navbar-default .navbar-brand {
+.lj-navbar-default .navbar-brand {
 	color: #c9c9c9;
 	height: 40px;
 	padding: 9px 9px;
 
 }
 
+.lj-navbar-text {
+	color: #c9c9c9;
+	margin-top: 10px;
+}
+
 .navbar-header a:hover {
 	color: #ffffff !important;
+}
+
+.nav-item {
+	margin-right: 10px;
 }

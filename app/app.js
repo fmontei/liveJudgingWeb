@@ -2,6 +2,7 @@
 
 // Declare app level module which depends on views, and components
 angular.module('liveJudgingAdmin', [
+  'base64',
   'ngResource',
   'ngRoute',
   'ui.bootstrap',
@@ -17,8 +18,8 @@ config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/login'});
 }])
 
-.controller('MainCtrl', ['$location', '$route', '$routeParams', '$scope', 
-	function($location, $route, $routeParams, $scope) {
+.controller('MainCtrl', ['$cookies', '$location', '$route', '$routeParams', '$scope', 'CurrentUserService',
+	function($cookies, $location, $route, $routeParams, $scope, CurrentUserService) {
 		$scope.$on('$routeChangeSuccess', function() {
 			$scope.currentPath = $location.path();	
 		});
@@ -30,5 +31,18 @@ config(['$routeProvider', function($routeProvider) {
       }
       return true;
     }
-		
+
+    $scope.username;
+
+    $scope.$on('loginSuccess', function() {
+      $scope.username = CurrentUserService.getCurrentUser().name;
+    })
+
+    $scope.$watch(function() {
+      return CurrentUserService.getCurrentUser()
+    }, function(oldVal, newVal) {
+      if (newVal) {
+        $scope.username = newVal.name;
+      }
+    });
 }]);
