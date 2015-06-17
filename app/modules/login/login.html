@@ -5,6 +5,7 @@
 
     <tabset>
         <tab heading="Login" class="login-tab">
+            <p ng-bind="error"></p>
             <form class="login-form" ng-submit="login(returningUser)">
                 <label>Email</label>
                 <input type="email"

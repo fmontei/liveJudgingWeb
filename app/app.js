@@ -13,16 +13,39 @@ angular.module('liveJudgingAdmin', [
   'liveJudgingAdmin.rubrics',
   'liveJudgingAdmin.categories',
   'liveJudgingAdmin.settings'
-]).
-config(['$routeProvider', function($routeProvider) {
+])
+
+.config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/login'});
 }])
 
-.controller('MainCtrl', ['$cookies', '$location', '$route', '$routeParams', '$scope', 'CurrentUserService',
-	function($cookies, $location, $route, $routeParams, $scope, CurrentUserService) {
+.run(function($rootScope, $location, CurrentUserService) {
+  $rootScope.$on('routeChangeStart', function() {
+    console.log(CurrentUserService.isLoggedIn());
+    if (CurrentUserService.isLoggedIn()) {
+      $location.path('/event');
+    }
+  })
+})
+
+.controller('MainCtrl', ['$cookies',
+                         '$location',
+                         '$rootScope',
+                         '$route',
+                         '$routeParams',
+                         '$scope',
+                         'CurrentUserService',
+                         'LogoutService',
+	function($cookies, $location, $rootScope, $route, $routeParams, $scope, CurrentUserService, LogoutService) {
 		$scope.$on('$routeChangeSuccess', function() {
-			$scope.currentPath = $location.path();	
+			$scope.currentPath = $location.path();
 		});
+
+    $scope.$on('$locationChangeStart', function(event, next, current) {
+      if ($location.path() !== '/login' && !$rootScope.isLoggedIn) {
+        event.preventDefault();
+      }
+    });
 
     // Used to determine if the sidebar should be hidden.
     $scope.isDashboard = function() {
@@ -32,17 +55,15 @@ config(['$routeProvider', function($routeProvider) {
       return true;
     }
 
-    $scope.username;
-
-    $scope.$on('loginSuccess', function() {
-      $scope.username = CurrentUserService.getCurrentUser().name;
-    })
+    $scope.$on('loggedIn', function() {
+      $scope.user = CurrentUserService.getCurrentUser();
+    });
 
     $scope.$watch(function() {
       return CurrentUserService.getCurrentUser()
-    }, function(oldVal, newVal) {
-      if (newVal) {
-        $scope.username = newVal.name;
-      }
+    }, function(newVal, oldVal) {
+      $scope.user = newVal;
     });
+
+    $scope.logout = CurrentUserService.logout;
 }]);

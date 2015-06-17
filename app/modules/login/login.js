@@ -16,6 +16,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
                           '$scope',
                           'CurrentUserService',
                           'LoginService',
+                          'LogoutService',
                           'User', 
     function($base64,
              $cookies,
@@ -24,31 +25,32 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
              $scope,
              CurrentUserService,
              LoginService,
+             LogoutService,
              User) {
+
+        /* TODO: Use hash not base64 */
 
         $scope.newUser = {};
         $scope.returningUser = {};
+        $scope.error = '';
 
         $scope.register = function(user) {
             User.register(user).$promise.then(function(user) {
-                $scope.user = user;
+                console.log('User registered.');
+                // TODO: Make a 'thanks for registering' screen? Or just login?'
+                //$location.path('/registrationSuccess');
             });
         };
 
         $scope.login = function(user) {
-            var loginCredentials = 'Basic ' + $base64.encode($scope.returningUser.email + ':' + $scope.returningUser.password);
-            LoginService({'Authorization': loginCredentials}).login().$promise.then(function(resp) {
-                CurrentUserService.setCurrentUser(resp.user);
-                $rootScope.$broadcast('loginSuccess');
-                $location.path('/event');
-            });
+            CurrentUserService.login(user)
+            if (CurrentUserService.hasLoginError) {
+                $scope.error = 'Unable to login.';
+            }
         };
 
         $scope.logout = function() {
-            LoginService({'Authorization': $cookies.get('access_token')}).logout().$promise.then(function(resp) {
-                $cookies.remove('current_user');
-                //CurrentUserService.removeCurrentUser();
-            });
+            CurrentUserService.logout();
         };
     }
 ])
@@ -71,7 +73,14 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
                 method: 'GET',
                 headers: authHeader,
                 withCredentials: true
-            },
+            }
+        });
+    }
+})
+
+.factory('LogoutService', function($resource) {
+    return function(authHeader) {
+        return $resource('http://api.stevedolan.me/logout', {}, {
             logout: {
                 method: 'GET',
                 headers: authHeader
@@ -80,30 +89,71 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
     }
 })
 
-.factory('CurrentUserService', function($cookies, LoginService) {
-    var currentUser;
-    var accessToken;
+.factory('CurrentUserService', function($base64,
+                                        $cookies,
+                                        $location,
+                                        $rootScope,
+                                        LoginService,
+                                        LogoutService) {
+    var service = {
+        currentUser: null,
+        isLoggedIn: false,
+        hasLoginError: false
+    };
 
-    return {
-        isLoggedIn: function() {
-            return (currentUser || $cookies.getObject('current_user')) ? true : false;
-        },
-        getCurrentUser: function() {
-            if (!currentUser) {
-                currentUser = $cookies.getObject('current_user');
-            }
-            return currentUser;
-        },
-        getUserToken: function() {
-            if (!token) {
-                token = $cookies.get('current_user').token.access_token;
-            }
-            return token;
-        },
-        setCurrentUser: function(user) {
-            $cookies.putObject('current_user', user);
-            currentUser = user;
-            accessToken = user.token.access_token;
+    service.isLoggedIn = function() {
+        var hasUser = service.currentUser || $cookies.getObject('current_user') ? true : false;
+        service.isLoggedIn = hasUser;
+        return hasUser;
+    },
+
+    service.login = function(user) {
+        service.hasLoginError = false;
+        LoginService(service.getLoginAuthHeader(user.email, user.password)).login().$promise.then(function(resp) {
+            console.log(service);
+            service.currentUser = resp.user;
+            service.isLoggedIn = true;
+            $cookies.putObject('current_user', resp.user);
+            $rootScope.isLoggedIn = true;
+            $rootScope.$broadcast('loggedIn');
+            $location.path('/event');
+        }).catch(function() {
+            service.hasLoginError = true;
+        });
+    },
+
+    service.logout = function() {
+        LogoutService(service.getAuthHeader()).logout().$promise.catch(function() {
+            console.log("Server failed to logout.");
+        }).finally(function() {
+            $cookies.remove('current_user');
+            service.currentUser = null;
+            $rootScope.isLoggedIn = false;
+            $rootScope.$broadcast('loggedOut');
+            /* TODO: make a logout page to redirect to */
+            $location.path('/login');
+        });
+    },
+
+    service.getAuthHeader = function() {
+        var token = service.getUserToken();
+        return {Authorization: 'Token token=' + token};
+    },
+
+    service.getLoginAuthHeader = function(email, password) {
+        return {Authorization: 'Basic ' + $base64.encode(email + ':' + password)};
+    },
+
+    service.getCurrentUser = function() {
+        if (!service.currentUser) {
+            service.currentUser = $cookies.getObject('current_user');
         }
+        return service.currentUser;
+    },
+
+    service.getUserToken = function() {
+        return service.getCurrentUser().token.access_token;
     }
+
+    return service;
 });
