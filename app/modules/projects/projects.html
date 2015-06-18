@@ -3,9 +3,18 @@
 		<div class="row">
 			<div class="col col-sm-8 col-md-8 col-lg-8">
 			
-				<div class="row">
-					<div class="page-header">
-						<h1>Projects <span class="label label-default">5</span></h1>
+				<div ng-switch on="currentView">
+					<div ng-switch-default>
+						<div class="row">
+							<div class="page-header">
+								<h1>Projects <span class="label label-default">5</span></h1>
+							</div>
+						</div>
+					</div>
+					<div ng-switch-when="currentCategory">
+						<div class="page-header current-category-header">
+							<h1 id="breadcrumb-symbol"><a ng-click='changeView("default")'>Projects</a><span>&nbsp;/</span> {{currentCategory.name}}</h1>
+						</div>
 					</div>
 				</div>
 				
@@ -47,20 +56,20 @@
 						</div>
 						
 						<div ng-repeat="project in projectList" draggable>
-							<div ng-if="$index % 4 == 0" class="row"></div>
-								<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
-									<div class="media draggable-project">
-										<div class="media-left">
-											<a href="#">
-												<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-											</a>
-										</div>
-										<div class="media-body">
-											<h4 class="media-heading">#76</h4>
-											<span class="draggable-project-name">{{project}}</span>
-										</div>
+						<div ng-if="$index % 4 == 0" class="row"></div>
+							<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
+								<div class="media draggable-project">
+									<div class="media-left">
+										<a href="#">
+											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+										</a>
+									</div>
+									<div class="media-body">
+										<h4 class="media-heading">#76</h4>
+										<span class="draggable-project-name">{{project}}</span>
 									</div>
 								</div>
+							</div>
 						</div>
 			
 					</div> <!--ng-switch-default-->
@@ -88,7 +97,7 @@
 										<div class="accordion-inner">
 											<div class="panel-body">
 												
-												<div ng-repeat="project in category.projects">
+												<div ng-repeat="project in category.projects track by $index">
 													<br ng-if="$index % 3 == 0 && $index > 0" />
 													<div class="col col-sm-4 col-md-4 col-lg-4">
 														<div class="media category-accordion-media" >
@@ -113,12 +122,41 @@
 							</div>
 						</div> <!--ng-repeat-->
 					</div> <!--ng-switch-when-->
+
+					<div ng-switch-when="currentCategory">
+
+						<div class="row">
+							<div class="col col-sm-12 col-md-12 col-lg-12">
+								<button class="btn btn-lg btn-success" id="add-project-btn">
+									<span class="glyphicon glyphicon-plus"></span>
+									Add Project to {{currentCategory.name}}
+								</button>
+							</div>
+						</div>
+
+						<div ng-repeat="project in currentCategory.projects track by $index">
+							<div ng-if="$index % 4 == 0" class="row"></div>
+							<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
+								<div class="media category-accordion-media" >
+									<div class="media-left">
+										<a href="#">
+											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+										</a>
+									</div>
+									<div class="media-body">
+										<h4 class="media-heading">#76</h4>
+										<span>{{project}}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div> <!--ng-switch-when-->
 					
 				</div> <!--ng-switch on-->
 			</div> 
 			
 			<div class="col-sm-4 col-md-4 col-lg-4">
-				<div class="text-center">
+				<div class="text-center" id="category-container">
 				
 					<div class="row">
 						<div class="page-header">
@@ -136,11 +174,15 @@
 						<br /><br /> <!--Important: extra room for dragging-->
 						<div ng-repeat="category in categoryList" droppable>
 							<li class="sortable-category">
-				        <button style="background-color: {{category.color}}">
-									<h3 class="sortable-category-header"><span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> {{category.name}}</h3>
+				        <a class="btn" style="background-color: {{category.color}}" ng-click="seeCategoryDetails($event)">
+									<h3 class="sortable-category-header">
+										<span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> 
+										<span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-cog" ng-click="showCategoryModal($event)"></span></span>
+										{{category.name}}
+									</h3>
 									<span ng-if="category.judges.length == 0" class="sortable-category-text">{{category.projects.length}} Projects</span>
 									<span ng-if="category.judges.length > 0" class="sortable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
-								</button>
+								</a>
 					    </li>
 				    </div>
 				    <br /><br /> <!--Important: extra room for dragging-->
@@ -167,7 +209,7 @@
 						<label>Category Name:</label>
 					</div>
 					<div class="col col-lg-7 col-md-7 col-sm-7">
-						<input class="form-control" type="text-area" placeholder="Category Name" />
+						<input class="form-control" type="text-area" placeholder="Category Name" ng-model="categoryName" />
 					</div>
 				</div><br />
 				
@@ -176,7 +218,7 @@
 						<label>Description:</label>
 					</div>
 					<div class="col col-lg-7 col-md-7 col-sm-7">
-						<textarea class="form-control" rows="3"></textarea>
+						<textarea class="form-control" rows="3" ng-model="categoryDesc"></textarea>
 					</div>
 				</div><br />
 				
@@ -187,12 +229,12 @@
 					<div class="col col-lg-5 col-md-5 col-sm-5">
 						<div class="row">
 							<div class="col-sm-8 col-md-8 col-lg-8">
-								<select class="form-control">
+								<select class="form-control" ng-model="categoryTime">
 									<option ng-repeat="time in timeOptions">{{time}}</option>
 								</select>
 							</div>
 							<div class="col col-lg-4 col-md-4 col-sm-4">
-								<input type="checkbox" id="am-pm-switch" checked>
+								<input type="checkbox" id="am-pm-switch" checked />
 							</div>
 						</div>
 					</div>
@@ -204,7 +246,7 @@
 					</div>
 					<div class="col col-lg-5 col-md-5 col-sm-5">
 						<div class="input-group" id="color-picker">
-							<input type="text" value="#000000" class="form-control" />
+							<input type="text" class="form-control" value="#000000" />
 							<span class="input-group-addon"><i></i></span>
 						</div>
 					</div>
@@ -213,7 +255,7 @@
 			</div> <!--Modal-Body-->
 			<div class="modal-footer">
 				<div class="row">
-					<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right">Save</button></span>
+					<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right" ng-click="createNewCategory(categoryAmPm)">Save</button></span>
 					<span class="col col-sm-2"></span>
 					<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
 				</div>

@@ -1,35 +1,6 @@
 'use strict';
 
-angular.module('userListApp', [])
-  
-.service('userListService', function task($http, $q) {
-
-  var task = this;
-
-  task.getAllUsers = function() {
-    var defer = $q.defer();
-
-    $http.get('http://api.stevedolan.me/users', {
-      headers: {'Authorization': 'Token token="86082d56c7d66f7615d27f150b837dcd"'}
-    })
-    .success(function(result) {
-      console.log('success');
-      defer.resolve(result);
-    })
-    .error(function(error, status) {
-      console.log('fail');
-      defer.reject(error);
-    });
-
-    return defer.promise;
-  }
-
-  return task;
-
-});
-
-
-angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute', 'userListApp'])
+angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/event', {
@@ -43,7 +14,7 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute', 'userListApp']
 	$cookies.put("running", "false");
 }])
 
-.controller('EventCtrl', ['$cookies', '$scope', 'userListService', function($cookies, $scope, userListService) {
+.controller('EventCtrl', ['$cookies', '$scope', function($cookies, $scope) {
 	$scope.event = {
 		EVENT_EDIT_VIEW: "event_edit_view",
 		EVENT_READY_VIEW: "event_ready_view",
@@ -63,11 +34,6 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute', 'userListApp']
 	$scope.reveal_event_desc = function(desc) {
 		$('#event-selection-desc').html('<strong>Event Description:</strong><br />' + desc).show();
 	}
-
-  $scope.getAllUsers = function() {
-    userListService.getAllUsers();
-  }
-  //$scope.getAllUsers();
 
   $scope.event_list = [{'name': 'Event 1', 'desc': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}, 
 		{'name': 'Event 1', 'desc': 'Integer posuere erat a ante.'}];
