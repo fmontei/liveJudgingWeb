@@ -13,7 +13,7 @@
 	color: rgb(144, 144, 144);
 }
 
-#breadcrumb-symbol span {
+#breadcrumb-symbol #slash {
 	color: rgb(204, 204, 204);
 }
 
@@ -39,7 +39,7 @@
 	margin-top: -30px;
 }
 
-.sortable-category a {
+.droppable-category a {
 	color: black;
   margin-left: auto;
   margin-right: auto; 
@@ -50,14 +50,14 @@
 	cursor: pointer;
 }
 
-.sortable-category a:hover {
+.droppable-category a:hover {
 	background-color: white !important;
 	border-color: rgba(126, 239, 104, 0.8);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
   outline: 0 none;
 }
 
-.sortable-category h3 {
+.droppable-category h3 {
 	margin-top: 0;
 }
 
@@ -95,4 +95,8 @@
 
 .category-accordion-media {
 	margin-bottom: 10px;
+}
+
+#color-picker {
+	
 }

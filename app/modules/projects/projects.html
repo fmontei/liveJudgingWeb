@@ -13,7 +13,10 @@
 					</div>
 					<div ng-switch-when="currentCategory">
 						<div class="page-header current-category-header">
-							<h1 id="breadcrumb-symbol"><a ng-click='changeView("default")'>Projects</a><span>&nbsp;/</span> {{currentCategory.name}}</h1>
+							<h1 id="breadcrumb-symbol">
+								<a ng-click='changeView("default")'>Projects</a><span id="slash">&nbsp;/</span> {{currentCategory.name}} 
+								<span class="label label-default">{{currentCategory.projects.length}}</span>
+							</h1>
 						</div>
 					</div>
 				</div>
@@ -55,10 +58,10 @@
 							</div>
 						</div>
 						
-						<div ng-repeat="project in projectList" draggable>
+						<div ng-repeat="project in projectList">
 						<div ng-if="$index % 4 == 0" class="row"></div>
 							<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
-								<div class="media draggable-project">
+								<div class="media draggable-project" cng-draggable-project>
 									<div class="media-left">
 										<a href="#">
 											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -170,18 +173,18 @@
 						</button>
 					</ul>
 					
-					<ul id="sortable-category-list">
+					<ul id="sortable-category-list" cng-sortable-list>
 						<br /><br /> <!--Important: extra room for dragging-->
-						<div ng-repeat="category in categoryList" droppable>
-							<li class="sortable-category">
+						<div ng-repeat="category in categoryList">
+							<li class="droppable-category" cng-droppable-category>
 				        <a class="btn" style="background-color: {{category.color}}" ng-click="seeCategoryDetails($event)">
-									<h3 class="sortable-category-header">
+									<h3 class="droppable-category-header">
 										<span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> 
 										<span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-cog" ng-click="showCategoryModal($event)"></span></span>
 										{{category.name}}
 									</h3>
-									<span ng-if="category.judges.length == 0" class="sortable-category-text">{{category.projects.length}} Projects</span>
-									<span ng-if="category.judges.length > 0" class="sortable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
+									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.projects.length}} Projects</span>
+									<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
 								</a>
 					    </li>
 				    </div>
@@ -234,7 +237,7 @@
 								</select>
 							</div>
 							<div class="col col-lg-4 col-md-4 col-sm-4">
-								<input type="checkbox" id="am-pm-switch" checked />
+								<input type="checkbox" id="am-pm-switch" cng-period-switch ng-model="categoryPeriod" />
 							</div>
 						</div>
 					</div>
@@ -245,9 +248,8 @@
 						<label>Color:</label>
 					</div>
 					<div class="col col-lg-5 col-md-5 col-sm-5">
-						<div class="input-group" id="color-picker">
-							<input type="text" class="form-control" value="#000000" />
-							<span class="input-group-addon"><i></i></span>
+						<div class="input-group">
+							<input type="text" class="form-control" cng-color-picker ng-model="categoryColor" />
 						</div>
 					</div>
 				</div><br />
