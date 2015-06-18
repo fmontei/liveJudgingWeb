@@ -42,8 +42,11 @@ angular.module('liveJudgingAdmin', [
 		});
 
     $scope.$on('$locationChangeStart', function(event, next, current) {
-      if ($location.path() !== '/login' && !$rootScope.isLoggedIn) {
+      if ($location.path() !== '/login' && !$cookies.getObject('current_user')) {
         event.preventDefault();
+        // Occassionally preventDefault() would
+        // still allow part of the page to load.
+        $location.path('/login');
       }
     });
 

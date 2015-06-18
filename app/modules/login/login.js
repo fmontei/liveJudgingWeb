@@ -58,10 +58,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
 .factory('User', ['$resource', function($resource) {
     return $resource('http://api.stevedolan.me/users', {}, {
         register: {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain'
-            }
+            method: 'POST'
         }
     }); 
 }])
