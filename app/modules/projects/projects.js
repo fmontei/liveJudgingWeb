@@ -115,7 +115,16 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			}
 		}
 
-		$scope.closeCategoryModal = function(event) {
+		$scope.clearCategoryModal = function() {
+			$scope.categoryName = '';
+			$scope.categoryDesc = '';
+			$scope.categoryTime = '';
+			$scope.categoryPeriod = '';
+			$scope.categoryColor = ''; 
+			$($scope.categoryModalID).modal('hide');
+		}
+
+		$scope.closeCategoryModal = function() {
 			$($scope.categoryModalID).modal('hide');
 		}
 

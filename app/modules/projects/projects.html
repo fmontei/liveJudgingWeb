@@ -331,7 +331,6 @@
 								<div class="col col-lg-5 col-md-5 col-sm-5">
 									<div class="input-group">
 										<input type="text" class="form-control" cng-color-picker ng-model="$parent.updatedCategoryColor" />
-										{{$parent.updatedCategoryColor}}
 									</div>
 								</div>
 							</div><br />
@@ -342,7 +341,7 @@
 							<div class="row">
 								<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right" ng-click="editSelectedCategory()">Save</button></span>
 								<span class="col col-sm-2"></span>
-								<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+								<span class="col col-sm-5"><button type="button" class="btn btn-default" ng-click="clearCategoryModal()" style="float: left">Close</button></span>
 							</div>
 						</div> <!--Modal-Footer-->
 
