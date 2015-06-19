@@ -124,6 +124,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
             console.log("Server failed to logout.");
         }).finally(function() {
             $cookies.remove('current_user');
+            $cookies.remove('view');
             service.currentUser = null;
             $rootScope.isLoggedIn = false;
             $rootScope.$broadcast('loggedOut');

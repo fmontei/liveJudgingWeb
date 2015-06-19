@@ -1,7 +1,7 @@
 <div ng-controller="EventCtrl">
   <div ng-switch on="event.current_view">
 
-		<!--Event Default (Selection) View-->
+    <!--Event Default (Selection) View-->
     <div ng-switch-default>
       <div class="container-fluid">
         <div class="text-center">
@@ -12,17 +12,17 @@
                   <div class="col-sm-3 col-md-3 col-lg-3">
                     <div class="row event-selection-row">
                       <button class="btn btn-lg btn-success" 
-												ng-click="change_view_to(event.EVENT_EDIT_VIEW)">
-												<span class="glyphicon glyphicon-plus"></span> 
-												Create New
-											</button>
+                        ng-click="change_view_to(event.EVENT_EDIT_VIEW)">
+                        <span class="glyphicon glyphicon-plus"></span> 
+                        Create New
+                      </button>
                     </div>
                     <div ng-repeat="event in event_list">
-											<div class="row event-selection-row">
-												<button class="btn btn-lg btn-primary" 
-													ng-click="change_view_to($parent.event.EVENT_READY_VIEW)"
-													ng-mouseover="reveal_event_desc(event.desc)">{{event.name}}</button>
-											</div>
+                      <div class="row event-selection-row">
+                        <button class="btn btn-lg btn-primary" 
+                          ng-click="change_view_to($parent.event.EVENT_READY_VIEW)"
+                          ng-mouseover="reveal_event_desc(event.desc)">{{event.name}}</button>
+                      </div>
                     </div>
                   </div>
                   <div class="col-sm-offset-2 col-md-offset-2 col-lg-offset-2 col-sm-5 col-md-5 col-lg-5">
@@ -34,231 +34,239 @@
       </div>
     </div>
 
-		<!--Event Edit View-->
-  	<div ng-switch-when="event_edit_view">		
-  		<div class="container-fluid">
-  			<div class="row">
-  				<div class="col-md-12">
-  					<div class="well">
-  						<h1 class="page-header">Event Basic Info</h1>
-  					</div>
+    <!--Event Edit View-->
+    <div ng-switch-when="event_edit_view">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="well">
+              <h1 class="page-header">Event Basic Info</h1>
+            </div>
 
-  					<form>
-  						<div class="row">
-  							<div class="col col-lg-2 col-md-2 col-sm-2">
-  								<label>Event Name:</label>
-  							</div>
-  							<div class="col col-lg-3 col-md-3 col-sm-3">
-  								<input class="form-control" type="text" placeholder="Event Name" />
-  							</div>
-  						</div><br />
+            <form>
+              <div class="row">
+                <div class="col col-lg-2 col-md-2 col-sm-2">
+                  <label>Event Name:</label>
+                </div>
+                <div class="col col-lg-3 col-md-3 col-sm-3">
+                  <input class="form-control"
+                         type="text"
+                         placeholder="Event Name"
+                         ng-model="eventForm.name"
+                         required
+                         autofocus />
+                </div>
+              </div><br />
 
-  						<div class="row">
-  								<div class="col col-lg-2 col-md-2 col-sm-2">
-  									<label>Start Date:</label>
-  								</div>
-  								<div class="col col-lg-10 col-md-10 col-sm-10">
-  									<div class="row">
-  										<div class="col col-lg-2 col-md-2 col-sm-3">
-  											<date-widget>
-  												<input class="form-control" type="text" placeholder="Start" id="datepicker-start" />
-  											</date-widget>
-  										</div>
-  										<div class="col col-lg-2 col-md-2 col-sm-3">
-  											<span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
-  										</div>
-  										<div class="col col-lg-4 col-md-4 col-sm-4">
-  											<multi-day-event-widget>
-  												<div class="checkbox">
-  													<label><input type="checkbox" id="multi-day-event-checkbox">Multi-day event?</label>
-  												</div>
-  											<multi-day-event-widget>
-  										</div>
-  									</div>
-  								</div>
-  						</div><br />
-  						
-  						<div id="end-date-optional">
-  							<div class="row">
-  								<div class="col col-lg-2 col-md-2 col-sm-2">
-  									<label>End Date:</label>
-  								</div>
-  								<div class="col col-lg-10 col-md-10 col-sm-10">
-  									<div class="row">
-  										<div class="col col-lg-2 col-md-2 col-sm-3">
-  											<date-widget>
-  												<input class="form-control" type="text" placeholder="End" id="datepicker-end" />
-  											</date-widget>
-  										</div>
-  										<div class="col col-lg-2 col-md-2 col-sm-3">
-  											<span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
-  										</div>
-  									</div>
-  								</div>
-  							</div><br />
-  						</div>
-  						
-  						<div class="row">
-  							<div class="col col-lg-2 col-md-2 col-sm-2">
-  								<label>Start Time:</label>
-  							</div>
-  							<div class="col col-lg-10 col-md-10 col-sm-10">
-  								<div class="row">
-  									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<select class="form-control">
-  											<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
-  										</select>
-  									</span>
-  									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<am-pm-widget>
-  											<input type="checkbox" id="am-pm-start" checked>
-  										</am-pm-widget>
-  									</span>
-  								</div>
-  							</div>
-  						</div><br /><br />
-  						
-  						<div class="row">
-  							<div class="col col-lg-2 col-md-2 col-sm-2">
-  								<label>End Time:</label>
-  							</div>
-  							<div class="col col-lg-10 col-md-10 col-sm-10">
-  								<div class="row">
-  									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<select class="form-control">
-  											<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
-  										</select>
-  									</span>
-  									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<am-pm-widget>
-  											<input type="checkbox" id="am-pm-end" checked>
-  										</am-pm-widget>
-  									</span>
-  								</div>
-  							</div>
-  						</div><br /><br />
-  						
-  						<div class="row">
-  							<div class="col col-lg-2 col-md-2 col-sm-2">
-  							</div>
-  							<div class="col col-lg-4 col-md-4 col-sm-4">
-  								<div ng-switch on="event.running">
-  									<div ng-switch-when="true">
-  										<button class="btn btn-lg btn-primary" ng-click="change_view_to(event.EVENT_IN_PROGRESS_VIEW)">Save</button>
-  										<button class="btn btn-lg btn-default">Cancel</button>
-  									</div>
-  									<div ng-switch-when="false">
-  										<button class="btn btn-lg btn-primary" ng-click="change_view_to(event.EVENT_READY_VIEW)">Save</button>
-  										<button class="btn btn-lg btn-default">Cancel</button>
-  									</div>
-  								</div>
-  							</div>
-  						</div><br />
-  					</form>
-  					
-  				</div>
-  			</div>
-  		</div>
-  	</div>
+              <div class="row">
+                <div class="col col-lg-2 col-md-2 col-sm-2">
+                  <label>Location:</label>
+                </div>
+                <div class="col col-lg-3 col-md-3 col-sm-3">
+                  <input class="form-control"
+                         type="text"
+                         placeholder="Location"
+                         ng-model="eventForm.location"
+                         required
+                         autofocus />
+                </div>
+              </div><br />
 
-  	<div ng-switch-when="event_ready_view">	
-  		<div class="container-fluid">
-  			<div class="well">
-  				<h1 class="page-header">Event Dashboard: GT CIC 2015</h1>
-  			</div>
-  			<div class="row">
-  				<div class="col col-md-3 col-lg-1">
-  				</div>
-  				<div class="col col-md-11 col-lg-11">
-  					<div class="row"> 
-  						<span class="col col-lg-3 col-md-3 col-sm-4">
-  							<button class="btn btn-default" ng-click="change_view_to(event.EVENT_EDIT_VIEW)">
-  								Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
-  							</button>
-  						</span>
-  						<span class="col col-lg-9 col-md-9 col-sm-8">
-  							<div class="row">
-  								<span class="event-ready-span">
-  									<div class="checkbox">
-  										<label><input type="checkbox" value="">Auto-start event at:</label>
-  									</div>
-  								</span>
-  			
-  								<span class="event-ready-span">
-  									<select class="form-control">
-  										<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
-  									</select>
-  								</span>
-  		
-  								<span class="event-ready-span">
-  									<am-pm-widget>
-  										<input type="checkbox" id="am-pm-start" checked>
-  									</am-pm-widget>
-  								</span>
-  							</div>
-  						</span>
-  					</div>
-  				</div>
-  			</div>
-  			<div class="row">
-  				<div class="text-center">
-  					<button class="btn btn-lg btn-default" 
-  						id="begin-event-button" 
-  						ng-click="change_view_to(event.EVENT_IN_PROGRESS_VIEW)">Begin Event</button>
-  				</div>
-  			</div>
-  		</div>
-  	</div>
+              <div class="row">
+                  <div class="col col-lg-2 col-md-2 col-sm-2">
+                    <label>Start Date:</label>
+                  </div>
+                  <div class="col col-lg-10 col-md-10 col-sm-10">
+                    <div class="row">
+                      <div class="col col-lg-2 col-md-2 col-sm-3">
+                        <date-widget>
+                          <input class="form-control" 
+                                 type="text" 
+                                 placeholder="Start" 
+                                 id="datepicker-start"
+                                 required />
+                        </date-widget>
+                      </div>
+                      <div class="col col-lg-2 col-md-2 col-sm-3">
+                        <span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
+                      </div>
+                      <div class="col col-lg-4 col-md-4 col-sm-4">
+                        <multi-day-event-widget>
+                          <div class="checkbox">
+                            <label><input type="checkbox" id="multi-day-event-checkbox">Multi-day event?</label>
+                          </div>
+                        <multi-day-event-widget>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              
+              <div id="end-date-optional">
+                <div class="row">
+                  <div class="col col-lg-2 col-md-2 col-sm-2">
+                    <label>End Date:</label>
+                  </div>
+                  <div class="col col-lg-10 col-md-10 col-sm-10">
+                    <div class="row">
+                      <div class="col col-lg-2 col-md-2 col-sm-3">
+                        <date-widget>
+                          <input class="form-control"
+                                 type="text"
+                                 placeholder="End"
+                                 id="datepicker-end" />
+                        </date-widget>
+                      </div>
+                      <div class="col col-lg-2 col-md-2 col-sm-3">
+                        <span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col col-lg-2 col-md-2 col-sm-2">
+                  <label>Start Time:</label>
+                </div>
+                <div class="col col-lg-10 col-md-10 col-sm-10">
+                  <div class="row">
+                    <span class="col col-lg-2 col-md-2 col-sm-3">
+                     <timepicker ng-model="eventForm.startTime"
+                                 minute-step="15"
+                                 required></timepicker>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col col-lg-2 col-md-2 col-sm-2">
+                  <label>End Time:</label>
+                </div>
+                <div class="col col-lg-10 col-md-10 col-sm-10">
+                  <div class="row">
+                    <span class="col col-lg-2 col-md-2 col-sm-3">
+                      <timepicker ng-model="eventForm.endTime"
+                                  minute-step="15"
+                                  required></timepicker>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col col-lg-2 col-md-2 col-sm-2">
+                </div>
+                <div class="col col-lg-4 col-md-4 col-sm-4">
+                  <button class="btn btn-lg btn-primary" ng-click="saveEvent(eventForm)">Save</button>
+                  <button class="btn btn-lg btn-default">Cancel</button>
+                </div>
+              </div>
+            </form>
+            
+          </div>
+        </div>
+      </div>
+    </div>
 
-  	<div ng-switch-when="event_in_progress_view">
+    <div ng-switch-when="event_ready_view"> 
+      <div class="container-fluid">
+        <div class="well">
+          <h1 class="page-header">Event Dashboard: GT CIC 2015</h1>
+        </div>
+        <div class="row">
+          <div class="col col-md-3 col-lg-1">
+          </div>
+          <div class="col col-md-11 col-lg-11">
+            <div class="row"> 
+              <span class="col col-lg-3 col-md-3 col-sm-4">
+                <button class="btn btn-default" ng-click="change_view_to(event.EVENT_EDIT_VIEW)">
+                  Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
+                </button>
+              </span>
+              <span class="col col-lg-9 col-md-9 col-sm-8">
+                <div class="row">
+                  <span class="event-ready-span">
+                    <div class="checkbox">
+                      <label><input type="checkbox" value="">Auto-start event at:</label>
+                    </div>
+                  </span>
+        
+                  <span class="event-ready-span">
+                    <select class="form-control">
+                      <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+                    </select>
+                  </span>
+      
+                  <span class="event-ready-span">
+                    <am-pm-widget>
+                      <input type="checkbox" id="am-pm-start" checked>
+                    </am-pm-widget>
+                  </span>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="text-center">
+            <button class="btn btn-lg btn-default" 
+              id="begin-event-button" 
+              ng-click="change_view_to(event.EVENT_IN_PROGRESS_VIEW)">Begin Event</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  		<div class="container-fluid">
-  			<div class="row">
-  				<div class="col-md-12">
+    <div ng-switch-when="event_in_progress_view">
 
-  					<div class="well" style="height: 100%">
-  						<h1 class="page-header">Event Dashboard: GT CIC 2015</h1>
-  					</div>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
 
-  					<div style="font-size: 16px">
-  						<p>
+            <div class="well" style="height: 100%">
+              <h1 class="page-header">Event Dashboard: GT CIC 2015</h1>
+            </div>
+
+            <div style="font-size: 16px">
+              <p>
                 <i>In progress</i>
                 <span class="glyphicon glyphicon-repeat rotate"></span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 Time Range: 11:30 am - 6:30 pm
               </p>
-  					</div>
+            </div>
 
-  					<div class="row">
-  						<div class="col col-sm-8"> 
-  							<div class="row">
-  								<span class="col col-sm-6 col-lg-5">
-  									<div class="progress">
-  										<div class="progress-bar progress-bar-success" role="progressbar" 
-  											aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-  											<span class="progress-value">40% overall progress</span>
-  										</div>
-  									</div>
-  								</span>
-  								<span class="col col-sm-6 col-md-5 col-lg-5">
-  									<span style="float: left">32/45 project assignments completed</span>
-  								</span>
-  							</div>
-  						</div>
-  						<div class="col col-sm-4"> 
-  							<button class="btn btn-default" ng-click="change_view_to(event.EVENT_EDIT_VIEW)" style="margin-top: -20px; float: right">
-  								Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
-  							</button>
-  						</div>
-  					</div>
+            <div class="row">
+              <div class="col col-sm-8"> 
+                <div class="row">
+                  <span class="col col-sm-6 col-lg-5">
+                    <div class="progress">
+                      <div class="progress-bar progress-bar-success" role="progressbar" 
+                        aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                        <span class="progress-value">40% overall progress</span>
+                      </div>
+                    </div>
+                  </span>
+                  <span class="col col-sm-6 col-md-5 col-lg-5">
+                    <span style="float: left">32/45 project assignments completed</span>
+                  </span>
+                </div>
+              </div>
+              <div class="col col-sm-4"> 
+                <button class="btn btn-default" ng-click="change_view_to(event.EVENT_EDIT_VIEW)" style="margin-top: -20px; float: right">
+                  Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
+                </button>
+              </div>
+            </div>
 
-  					<change-tab-widget>
-  						<ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
-  							<li class="active" id="judge-progress-tab"><a href="#/event">Judge Progress</a></li>
-  							<li id="project-progress-tab"><a href="#/event">Project Progress</a></li>
-  							<li id="category-progress-tab"><a href="#/event">Category Progress</a></li>
-  						</ul>
-  					<change-tab-widget>
+            <change-tab-widget>
+              <ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
+                <li class="active" id="judge-progress-tab"><a href="#/event">Judge Progress</a></li>
+                <li id="project-progress-tab"><a href="#/event">Project Progress</a></li>
+                <li id="category-progress-tab"><a href="#/event">Category Progress</a></li>
+              </ul>
+            <change-tab-widget>
 
             <!--Judge Tab-->
             <div class="beneath-tab" id="judge-progress-section">
@@ -402,7 +410,7 @@
             </div>
 
             <!--Project Tab-->
-  					<div class="beneath-tab" id="project-progress-section" style="display:none">
+            <div class="beneath-tab" id="project-progress-section" style="display:none">
 
               <span style="margin-right: 20px">Sort by:</span>
               <div class="btn-group">
@@ -545,7 +553,7 @@
             </div>
 
             <!--Category Tab-->
-  					<div class="beneath-tab" id="category-progress-section" style="display:none">
+            <div class="beneath-tab" id="category-progress-section" style="display:none">
 
               <span style="margin-right: 20px">Sort by:</span>
               <div class="btn-group">
@@ -687,10 +695,10 @@
 
             </div>
 
-  				</div>
-  			</div>
-  		</div>
-  	</div> <!--Ng-Switch-When=Event In Progress-->
+          </div>
+        </div>
+      </div>
+    </div> <!--Ng-Switch-When=Event In Progress-->
 
   </div>
 
@@ -698,54 +706,54 @@
 
 <!--Judge Notification Modal-->
 <notification-widget>
-	<div class="modal fade" id="notification-modal" tabindex="-1" role="dialog" aria-labelledby="notification-modal" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content panel-primary">
-	      <div class="modal-header panel-heading">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title" id="notification-modal-label">Send Notification</h4>
-	      </div>
-	      <div class="modal-body">
-	        <div class="row">
-	          <div class="col col-sm-3">
-	            Recipients:
-	          </div>
-	          <div class="col col-sm-9">
-	            <!--Recipient List-->
-	            <div class="row" id="recipients-div" style="margin-bottom: 8px"></div>
-	            <div class="row">
-	              <input type="text" class="form-control" id="judge_search" placeholder="Search by name..." style="width: 50%">
-	            </div>
-	          </div>
-	        </div>
-	        <div class="row">
-	          <div class="col col-sm-3"></div>
-	          <div class="col col-sm-9">
-	            <div class="checkbox" style="margin-left: -12px">
-	              <label style="margin-right: 12px"><input id="send-all-checkbox" type="checkbox" value="">Send to all judges</label>
-	              <label><input id="clear-all-checkbox" type="checkbox" value="">Clear</label>
-	            </div>
-	          </div>
-	        </div>
-	        <div class="row">
-	          <div class="col col-sm-12">
-	            <div class="form-group" style="margin-left: 10%; margin-right: 10%">
-	              <label for="comment">Comment:</label>
-	              <textarea class="form-control" rows="5" id="message-to-judge"></textarea>
-	            </div>
-	          </div>
-	        </div>
-	      </div>
-	      <div class="modal-footer">
-	        <div class="row">
-	          <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Send</button></span>
-	          <span class="col col-sm-2"></span>
-	          <span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
-	        </div>
-	      </div>
-	    </div>
-	  </div>
-	</div>
+  <div class="modal fade" id="notification-modal" tabindex="-1" role="dialog" aria-labelledby="notification-modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="notification-modal-label">Send Notification</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col col-sm-3">
+              Recipients:
+            </div>
+            <div class="col col-sm-9">
+              <!--Recipient List-->
+              <div class="row" id="recipients-div" style="margin-bottom: 8px"></div>
+              <div class="row">
+                <input type="text" class="form-control" id="judge_search" placeholder="Search by name..." style="width: 50%">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-sm-3"></div>
+            <div class="col col-sm-9">
+              <div class="checkbox" style="margin-left: -12px">
+                <label style="margin-right: 12px"><input id="send-all-checkbox" type="checkbox" value="">Send to all judges</label>
+                <label><input id="clear-all-checkbox" type="checkbox" value="">Clear</label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-sm-12">
+              <div class="form-group" style="margin-left: 10%; margin-right: 10%">
+                <label for="comment">Comment:</label>
+                <textarea class="form-control" rows="5" id="message-to-judge"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="row">
+            <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Send</button></span>
+            <span class="col col-sm-2"></span>
+            <span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 <notification-widget>
 
 <!--Judge Completed Scoring Team Modal-->

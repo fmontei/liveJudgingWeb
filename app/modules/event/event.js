@@ -11,23 +11,75 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
 .run(['$cookies', function($cookies) {
 	$cookies.put("view", undefined);
-	$cookies.put("running", "false");
 }])
 
-.controller('EventCtrl', ['$cookies', '$scope', function($cookies, $scope) {
+.controller('EventCtrl', ['$cookies', '$filter', '$scope', 'EventService', 
+	function($cookies, $filter, $scope, EventService) {
 	$scope.event = {
 		EVENT_EDIT_VIEW: "event_edit_view",
 		EVENT_READY_VIEW: "event_ready_view",
 		EVENT_IN_PROGRESS_VIEW: "event_in_progress_view",
-		current_view: $cookies.get("view"),
-		running: $cookies.get("running")
+		current_view: $cookies.get("view")/*,
+		running: $cookies.get("running")*/
 	};
+
+	$scope.eventForm = {
+		startTime: new Date(0, 0, 0, 12, 0),
+		endTime: new Date(0, 0, 0, 12, 0)
+	};
+
+	$scope.saveEvent = function(eventForm) {
+		addDateTimesToEvent(eventForm);
+		EventService.events.create(eventForm).$promise.then(function(resp) {
+			var isRunning = isEventRunning(resp.event);
+			var view;
+			if (isRunning) {
+				view = $scope.event.EVENT_IN_PROGRESS_VIEW;
+			} else {
+				view = $scope.event.EVENT_READY_VIEW;
+			}
+			$scope.change_view_to(view);
+		}).catch(function() {
+			console.log('Failed to create event.');
+			$scope.errorMessage = 'Error creating event.';
+		});
+	}
+
+	// Combines the four dates from the time & date pickers into two datetimes.
+	var addDateTimesToEvent = function(eventForm) {
+		var startDate = $('#datepicker-start').datepicker('getDate');
+		var endDate = $('#datepicker-end').datepicker('getDate') ? $('#datepicker-end').datepicker('getDate') : startDate;
+		var startTime = eventForm.startTime;
+		var endTime = eventForm.endTime;
+
+		var startDateTime = new Date(startDate.getYear(), startDate.getMonth(), startDate.getDay(),
+									 startTime.getHours(), startTime.getMinutes(), startTime.getSeconds());
+		var endDateTime = new Date(endDate.getYear(), endDate.getMonth(), endDate.getDay(),
+								   endTime.getHours(), endTime.getMinutes(), endTime.getSeconds());
+
+		eventForm.start_time = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss Z');
+		eventForm.end_time = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss Z');
+	}
+
+	var isEventRunning = function(event) {
+		var startDateTime = new Date(Date.parse(event.start_time));
+		if (startDateTime <= Date()) {
+			$cookies.put("event" + event.id + "_running", "true");
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	$scope.change_view_to = function(view) {
 		$cookies.put("view", view);
 		$scope.event.current_view = view;
 		if (view === $scope.event.EVENT_IN_PROGRESS_VIEW) {
+			/* Commenting this out for now. Want to add
+			event ids to these cookies, would make it easier
+			to know which event is running.
 			$cookies.put("running", "true");
-			$scope.event.running = "true";
+			$scope.event.running = "true";*/
 		} 
 		console.log("Event view switched to: " + view);
 	}
@@ -50,6 +102,17 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 		}
 	}
 }])
+
+.factory('EventService', function($resource, CurrentUserService) {
+	return {
+		events: $resource('http://api.stevedolan.me/events', {}, {
+			create: {
+				method: 'POST',
+				headers: CurrentUserService.getAuthHeader()
+			}
+		})
+	};
+})
 
 .directive('changeTabWidget', function() {
 
