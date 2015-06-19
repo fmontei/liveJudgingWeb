@@ -39,22 +39,54 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}];
 		$cookies.projectList = ["Lemur", "Turtle", "Fish", "Cheetah", "Bear"];
 
-		$scope.categoryModalID = '#edit-category-modal';
+		$scope.categoryModalID = '#category-modal';
+		$scope.projectModalID = '#project-modal';
 		$scope.currentView = "default";
-		$scope.categoryList = $cookies.categoryList;
-		$scope.projectList = $cookies.projectList;
+
+		$scope.$watchCollection(function() {
+			return $cookies.categoryList;
+		}, function(newValue) {
+			$scope.categoryList = newValue;
+		});
+
+		$scope.$watchCollection(function() {
+			return $cookies.projectList;
+		}, function(newValue) {
+			$scope.projectList = newValue;
+		});
+
+		$scope.$watch(function() {
+			return $cookies.selectedCategory;
+		}, function(newValue) {
+			$scope.selectedCategory = newValue;
+		});
+		
 
 		$scope.getTimeOptions = function() {
 			var times = [];
-			for (var i = 1; i <= 12; i++) {
+			var i = 12;
+			// 12 goes first
+			for (var j = 0; j <= 45; j += 15) {
+				if (j == 0) times.push(i + ":" + j + j);
+				else times.push(i + ":" + j);
+			}
+			for (var i = 1; i < 12; i++) {
 				for (var j = 0; j <= 45; j += 15) {
 					if (j == 0) times.push(i + ":" + j + j);
-					else	times.push(i + ":" + j);
+					else times.push(i + ":" + j);
 				}
 			}
 			return times;
 		}
+
+		$scope.getProjectNumberOptions = function() { // TODO: remove numbers that are unavailable
+			var numbers = [];
+			for (var i = 10; i < 100; i++) numbers.push(i);
+			return numbers;
+		}
+
 		$scope.timeOptions = $scope.getTimeOptions();
+		$scope.projectNumberOptions = $scope.getProjectNumberOptions();
 
 		$scope.changeView = function(view) {
 			$scope.currentView = view;
@@ -77,6 +109,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$cookies.categoryList.push(newCategory);
 			$scope.closeCategoryModal();
 			console.log("New category created: " + JSON.stringify(newCategory));
+			console.log("Category list updated: " + $scope.categoryList.length);
 		}
 
 		$scope.changeCategoryModalViewToCreate = function() {
@@ -99,7 +132,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				judges: $scope.selectedCategory.judges // Judges have not changed
 			}
 			$scope.closeCategoryModal();
-			$scope.updateCategoryCookie($scope.selectedCategory.name, updatedCategory);
+			$scope.editCurrentCategoryCookie($scope.selectedCategory.name, updatedCategory);
 			console.log("Category edited: " + JSON.stringify(updatedCategory));
 		}
 
@@ -132,20 +165,27 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 		$scope.seeCategoryDetails = function(event) {
 			var category = $(event.currentTarget);
-			var categoryName = category.find('h3').text().trim();
-			$cookies.currentCategory = $scope.getCategoryByName(categoryName);
-			$scope.currentCategory = $cookies.currentCategory;
-			$scope.changeView('currentCategory');
+			var categoryName = category.parent().attr('category-name');
+			$cookies.selectedCategory = $scope.getCategoryByName(categoryName);
+			$scope.changeView('selectedCategory');
 		}
 
 		/*
 		 * Category Helper Methods
 		 */ 
 
-		$scope.updateCategoryCookie = function(value, newObject) {
+		$scope.addProjectToCategoryCookie = function(categoryName, projectName) {
+			var category = $scope.getCategoryByName(categoryName);
+			category.projects.push(projectName);
+			$scope.$apply(); // Reflect increased project length in UI
+			console.log("Added " + projectName + " to " + "category " + categoryName + ": " + category.projects);
+		}
+
+		$scope.editCurrentCategoryCookie = function(value, newObject) {
 			for (var i = 0; i < $cookies.categoryList.length; i++) {
-				if ($cookies.categoryList[i].name == value) {
+				if ($cookies.categoryList[i].name === value) {
 					$cookies.categoryList[i] = newObject;
+					return;
 				}
 			}
 		}
@@ -157,7 +197,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}
 
 		$scope.closeCategoryModal = function() {
-			// Create 'blank slate' every time new category button is clicked
+			// Create 'blank slate' every time add category button is clicked
 			$scope.categoryName = '';
 			$scope.categoryDesc = '';
 			$scope.categoryTime = '';
@@ -165,6 +205,13 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$scope.categoryColor = ''; 
 
 			$($scope.categoryModalID).modal('hide');
+		}
+
+		/* 
+		 * Project Modal
+		 */
+		$scope.openCategoryModal = function() {
+			$($scope.projectModalID).modal('show');
 		}
 
 }])
@@ -188,32 +235,14 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 }])
 
-.directive('cngSortableList', function() {
-
-	return {
-		restrict: 'A',
-		link: function(scope, elem, attrs) {
-			elem.sortable({
-				axis: 'y',
-				containment: 'parent',
-				cursor: 'grab',
-				cursorAt: { left: 5 },
-				handle: '.glyphicon-sort',
-				cancel: ''
-			});
-		}
-	};
-
-})
-
 .directive('cngDroppableCategory', ['$cookies', function($cookies) {
 
 	var link = function(scope, elem, attrs) {
 		elem.droppable({
 			drop: function(event, ui) {
 				var droppedProject = ui.draggable;
-
 				if (droppedProject.is('[cng-draggable-project]')) {
+
 		    	droppedProject.fadeOut(400);
 		    	var categoryContainer = $(event.target).find('a');
 		    	var originalColor = categoryContainer.css('backgroundColor');
@@ -224,34 +253,32 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 	          backgroundColor: originalColor
 					}, 400);
 
-		    	var categoryName = $(event.target).find('.droppable-category-header').text().trim();
-		    	var projectName = droppedProject.find('.draggable-project-name').text().trim();
-		    	droppedProjectCallback(scope, categoryName, projectName);
+					var projectName = droppedProject.attr('projectName');
+					scope.callback({categoryName: scope.categoryName, projectName: projectName});
 		  	}
 			}
 		});
 
-		elem.find('.btn').mouseenter(function() {
-			var cog = $(this).find('.glyphicon-cog'), sort = $(this).find('.glyphicon-sort');
+		var category = elem.find('.btn'), cog = elem.find('.glyphicon-cog'),
+			sort = elem.find('.glyphicon-sort');
+
+		category.mouseenter(function() {
 			cog.show();
 			sort.show();
 		});
 
-		elem.find('.btn').mouseleave(function() {
-			var cog = $(this).find('.glyphicon-cog'), sort = $(this).find('.glyphicon-sort');
+		category.mouseleave(function() {
 			cog.hide();
 			sort.hide();
 		});
 	}
 
-	var droppedProjectCallback = function(scope, categoryName, projectName) {
-		var category = scope.getCategoryByName(categoryName);
-		category.projects.push(projectName);
-		scope.$apply();
-	}
-
 	return {
 		restrict: 'A',
+		scope: {
+			callback: '&',
+			categoryName: '@'
+		},
 		link: link	
 	};
 
@@ -259,20 +286,23 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 .directive('cngColorPicker', function() {
 
+	var link = function(scope, elem, attrs) {
+		elem.colorPicker({colors: ["FF0000", "FFFF00", "00FF00", "00FFFF", "FF00FF", "FF6347", "C0C0C0", "A0522D", 
+			"FA8072", "FFA500", "FFE4C4", "FFFFFF", "F0E68C", "B00000", "A0522D", "DDA0DD", "EEDD82", "8470FF"]});
+
+		scope.$watch('color', function(value) {
+			elem.val(value);
+			elem.change();
+		});
+	}
+
 	return {
 		restrict: 'A',
 		require: '^ngModel',
 		scope: {
 			color: '@text'
 		},
-		link: function(scope, elem, attrs) {
-			elem.colorPicker({colors: ["FF0000", "FFFF00", "00FF00", "00FFFF", "FF00FF", "FF6347", "C0C0C0", "A0522D", 
-				"FA8072", "FFA500", "FFE4C4", "FFFFFF", "F0E68C", "B00000", "A0522D", "DDA0DD", "EEDD82", "8470FF"]});
-			scope.$watch('color', function(value) {
-				elem.val(value);
-				elem.change();
-			});
-		}
+		link: link
 	};
 
 });
