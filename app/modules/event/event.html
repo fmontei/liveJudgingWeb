@@ -17,11 +17,13 @@
                         Create New
                       </button>
                     </div>
-                    <div ng-repeat="event in event_list">
+                    <div ng-repeat="event in eventList">
                       <div class="row event-selection-row">
-                        <button class="btn btn-lg btn-primary" 
-                          ng-click="change_view_to($parent.event.EVENT_READY_VIEW)"
-                          ng-mouseover="reveal_event_desc(event.desc)">{{event.name}}</button>
+                        <button class="btn btn-lg btn-primary"
+                                ng-click="selectEvent(event)"
+                                ng-mouseover="reveal_event_desc(event.desc)">
+                          {{event.name}}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -39,11 +41,9 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-12">
-            <div class="well">
-              <h1 class="page-header">Event Basic Info</h1>
-            </div>
+            <h1>Event Basic Info</h1>
 
-            <form>
+            <form class="edit-event-form">
               <div class="row">
                 <div class="col col-lg-2 col-md-2 col-sm-2">
                   <label>Event Name:</label>
@@ -78,22 +78,28 @@
                   </div>
                   <div class="col col-lg-10 col-md-10 col-sm-10">
                     <div class="row">
-                      <div class="col col-lg-2 col-md-2 col-sm-3">
-                        <date-widget>
-                          <input class="form-control" 
-                                 type="text" 
-                                 placeholder="Start" 
-                                 id="datepicker-start"
-                                 required />
-                        </date-widget>
-                      </div>
-                      <div class="col col-lg-2 col-md-2 col-sm-3">
-                        <span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
+                      <div class="col col-lg-3 col-md-4 col-sm-4">
+                        <p class="input-group">
+                          <input type="text"
+                                 class="form-control"
+                                 datepicker-popup
+                                 ng-model="eventForm.startDate"
+                                 is-open="datePicker.startOpened"
+                                 required
+                                 close-text="Close" />
+                          <span class="input-group-btn">
+                            <button type="button"
+                                    class="btn btn-default"
+                                    ng-click="toggleDatePicker($event, 'start')">
+                              <i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                          </span>
+                        </p>
                       </div>
                       <div class="col col-lg-4 col-md-4 col-sm-4">
                         <multi-day-event-widget>
                           <div class="checkbox">
-                            <label><input type="checkbox" id="multi-day-event-checkbox">Multi-day event?</label>
+                            <label><input type="checkbox" id="multi-day-event-checkbox" ng-model="eventForm.isMultiDay">Multi-day event?</label>
                           </div>
                         <multi-day-event-widget>
                       </div>
@@ -108,16 +114,23 @@
                   </div>
                   <div class="col col-lg-10 col-md-10 col-sm-10">
                     <div class="row">
-                      <div class="col col-lg-2 col-md-2 col-sm-3">
-                        <date-widget>
-                          <input class="form-control"
-                                 type="text"
-                                 placeholder="End"
-                                 id="datepicker-end" />
-                        </date-widget>
-                      </div>
-                      <div class="col col-lg-2 col-md-2 col-sm-3">
-                        <span class="glyphicon glyphicon-calendar" id="calendar-icon"></span>
+                      <div class="col col-lg-3 col-md-4 col-sm-4">
+                        <p class="input-group">
+                            <input type="text"
+                                   class="form-control"
+                                   datepicker-popup
+                                   ng-model="eventForm.endDate"
+                                   is-open="datePicker.endOpened"
+                                   required
+                                   close-text="Close" />
+                            <span class="input-group-btn">
+                              <button type="button"
+                                      class="btn btn-default"
+                                      ng-click="toggleDatePicker($event, 'end')">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                              </button>
+                            </span>
+                          </p>
                       </div>
                     </div>
                   </div>
@@ -159,7 +172,8 @@
                 </div>
                 <div class="col col-lg-4 col-md-4 col-sm-4">
                   <button class="btn btn-lg btn-primary" ng-click="saveEvent(eventForm)">Save</button>
-                  <button class="btn btn-lg btn-default">Cancel</button>
+                  <button class="btn btn-lg btn-default"
+                          ng-click="change_view_to(cookies.get('prev_event_view'))">Cancel</button>
                 </div>
               </div>
             </form>
@@ -178,10 +192,9 @@
           <div class="col col-md-3 col-lg-1">
           </div>
           <div class="col col-md-11 col-lg-11">
-            <div class="row"> 
-
-              <span class="col col-lg-3 col-md-3 col-sm-4 col-xs-4 event-ready">
-                <button class="btn btn-default" ng-click="change_view_to(event.EVENT_EDIT_VIEW)">
+            <div class="row">
+              <span class="col col-lg-3 col-md-3 col-sm-4  col-xs-4 event-ready">
+                <button class="btn btn-default" ng-click="editEvent()">
                   Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
                 </button>
               </span>
