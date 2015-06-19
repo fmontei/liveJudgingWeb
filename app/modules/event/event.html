@@ -179,34 +179,31 @@
           </div>
           <div class="col col-md-11 col-lg-11">
             <div class="row"> 
-              <span class="col col-lg-3 col-md-3 col-sm-4">
+
+              <span class="col col-lg-3 col-md-3 col-sm-4 col-xs-4 event-ready">
                 <button class="btn btn-default" ng-click="change_view_to(event.EVENT_EDIT_VIEW)">
                   Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
                 </button>
               </span>
-              <span class="col col-lg-9 col-md-9 col-sm-8">
+              <span class="col col-lg-9 col-md-9 col-sm-8 col-xs-8">
                 <div class="row">
-                  <span class="event-ready-span">
+                  <div class="col col-xs-4 col-sm-4 col-md-4 col-lg-2 event-ready">
                     <div class="checkbox">
                       <label><input type="checkbox" value="">Auto-start event at:</label>
                     </div>
-                  </span>
-        
-                  <span class="event-ready-span">
-                    <select class="form-control">
-                      <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
-                    </select>
-                  </span>
-      
-                  <span class="event-ready-span">
-                    <am-pm-widget>
-                      <input type="checkbox" id="am-pm-start" checked>
-                    </am-pm-widget>
-                  </span>
+                  </div>
+                  <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <!-- This ng-model is just temporary -->
+                    <timepicker ng-model="autoStart" 
+                                minute-step="15"
+                                required>
+                    </timepicker>
+                  </div>
                 </div>
               </span>
             </div>
           </div>
+
         </div>
         <div class="row">
           <div class="text-center">

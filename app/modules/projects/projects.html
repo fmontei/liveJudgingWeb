@@ -226,7 +226,11 @@
 									<label>Category Name:</label>
 								</div>
 								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<input class="form-control" type="text" ng-model="$parent.categoryName" />
+									<input class="form-control" 
+									       type="text" 
+									       ng-model="$parent.categoryName"
+									       required
+									       autofocus />
 								</div>
 							</div><br />
 							
@@ -235,7 +239,9 @@
 									<label>Description:</label>
 								</div>
 								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<textarea class="form-control" rows="3" ng-model="$parent.categoryDesc"></textarea>
+									<textarea class="form-control" 
+									          rows="3" 
+									          ng-model="$parent.categoryDesc"></textarea>
 								</div>
 							</div><br />
 							
@@ -270,7 +276,10 @@
 								</div>
 								<div class="col col-lg-5 col-md-5 col-sm-5">
 									<div class="input-group">
-										<input type="text" class="form-control" cng-color-picker ng-model="$parent.categoryColor" />
+										<input type="text" 
+										       class="form-control" 
+										       cng-color-picker 
+										       ng-model="$parent.categoryColor" />
 									</div>
 								</div>
 							</div><br />
@@ -292,7 +301,11 @@
 									<label>Category Name:</label>
 								</div>
 								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<input class="form-control" type="text" ng-model="$parent.categoryName" />
+									<input class="form-control" 
+									       type="text" 
+									       ng-model="$parent.categoryName"
+									       required
+									       autofocus />
 								</div>
 							</div><br />
 							
@@ -379,7 +392,11 @@
 							<label>Project Name:</label>
 						</div>
 						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<input class="form-control" type="text" ng-model="$parent.categoryName" />
+							<input class="form-control" 
+										 type="text" 
+										 ng-model="$parent.categoryName"
+										 required
+										 autofocus />
 						</div>
 					</div><br />
 
@@ -406,9 +423,13 @@
 								<div class="col col-lg-12 col-md-12 col-sm-12">
 									<div class="input-group">
 										<span class="input-group-btn">
-							        <button class="btn btn-sm btn-default" type="button">Select file...</button>
+							        <button class="btn btn-sm btn-default" 
+							                type="button">Select file...</button>
 							      </span>
-									  <input type="text" class="form-control input-sm" placeholder="File" style="width: 115%">
+									  <input type="text" 
+									         class="form-control input-sm" 
+									         placeholder="File" 
+									         style="width: 115%">
 									</div>
 								</div>
 							</div>
@@ -425,7 +446,10 @@
 							<label>Description:</label>
 						</div>
 						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<textarea class="form-control" rows="3" ng-model="$parent.categoryDesc"></textarea>
+							<textarea class="form-control" 
+							          rows="3" 
+							          ng-model="$parent.categoryDesc"
+							          required></textarea>
 						</div>
 					</div><br />
 

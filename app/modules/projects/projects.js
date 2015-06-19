@@ -9,11 +9,9 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
   });
 }])
 
-.controller('ProjectsCtrl', ['$scope', '$cookies', 'CurrentUserService', function($scope, 
-																																									$cookies, 
-																																									CurrentUserService) {
-
-		$cookies.categoryList = [{
+.run(['$cookies', function($cookies) {
+	// Populate cookies with data from server
+	$cookies.categoryList = [{
 			'name': "Uncategorized",
 			'desc': "Sample description for Uncategorized",
 			'time': "1:00am",
@@ -38,11 +36,20 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			'judges': ["Superman", "Hulk"]
 		}];
 		$cookies.projectList = ["Lemur", "Turtle", "Fish", "Cheetah", "Bear"];
+		$cookies.currentView = "default";
+}])
 
+.controller('ProjectsCtrl', ['$scope', '$cookies', 'CurrentUserService', function($scope, 
+																																									$cookies, 
+																																									CurrentUserService) {
+
+		// Constants
 		$scope.categoryModalID = '#category-modal';
 		$scope.projectModalID = '#project-modal';
-		$scope.currentView = "default";
-
+		
+		//===========================================================//
+		// Automatically synchronize scope and cookies via listeners //
+		//===========================================================//
 		$scope.$watchCollection(function() {
 			return $cookies.categoryList;
 		}, function(newValue) {
@@ -60,8 +67,13 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}, function(newValue) {
 			$scope.selectedCategory = newValue;
 		});
-		
 
+		$scope.$watch(function() {
+			return $cookies.currentView;
+		}, function(newValue) {
+			$scope.currentView = newValue;
+		});
+		
 		$scope.getTimeOptions = function() {
 			var times = [];
 			var i = 12;
@@ -89,7 +101,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		$scope.projectNumberOptions = $scope.getProjectNumberOptions();
 
 		$scope.changeView = function(view) {
-			$scope.currentView = view;
+			$cookies.currentView = view;
 		}
 
 		/*
@@ -109,7 +121,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$cookies.categoryList.push(newCategory);
 			$scope.closeCategoryModal();
 			console.log("New category created: " + JSON.stringify(newCategory));
-			console.log("Category list updated: " + $scope.categoryList.length);
+			console.log("Category list updated: " + $cookies.categoryList.length);
 		}
 
 		$scope.changeCategoryModalViewToCreate = function() {
@@ -138,7 +150,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 		$scope.changeCategoryModalViewToEdit = function(event, category) {
 			$scope.categoryModalView = 'edit';
-			$scope.selectedCategory = category;
+			$cookies.selectedCategory = category;
 
 			var time, period;
 			if (category.time.search('a') !== -1) {
