@@ -247,7 +247,14 @@
 											</select>
 										</div>
 										<div class="col col-lg-4 col-md-4 col-sm-4">
-											<input type="checkbox" id="am-pm-switch" cng-period-switch ng-model="$parent.categoryPeriod" />
+											<div class="onoffswitch">
+								        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" 
+								        	ng-checked="true" ng-model="$parent.categoryPeriod">
+								        <label class="onoffswitch-label" for="myonoffswitch">
+							            <span class="onoffswitch-inner"></span>
+							            <span class="onoffswitch-switch"></span>
+								        </label>
+									    </div>
 										</div>
 									</div>
 								</div>
@@ -270,7 +277,7 @@
 							<div class="row">
 								<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right" ng-click="createNewCategory()">Save</button></span>
 								<span class="col col-sm-2"></span>
-								<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+								<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: left" ng-click="closeCategoryModal()">Cancel</button></span>
 							</div>
 						</div> <!--Modal-Footer-->
 
@@ -284,7 +291,7 @@
 									<label>Category Name:</label>
 								</div>
 								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<input class="form-control" type="text" ng-model="$parent.updatedCategoryName" />
+									<input class="form-control" type="text" ng-model="$parent.categoryName" />
 								</div>
 							</div><br />
 							
@@ -293,7 +300,7 @@
 									<label>Description:</label>
 								</div>
 								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<textarea class="form-control" rows="3" ng-model="$parent.updatedCategoryDesc"></textarea>
+									<textarea class="form-control" rows="3" ng-model="$parent.categoryDesc"></textarea>
 								</div>
 							</div><br />
 							
@@ -304,7 +311,7 @@
 								<div class="col col-lg-5 col-md-5 col-sm-5">
 									<div class="row">
 										<div class="col-sm-8 col-md-8 col-lg-8">
-											<select class="form-control" ng-model="$parent.updatedCategoryTime">
+											<select class="form-control" ng-model="$parent.categoryTime">
 												<option ng-repeat="time in timeOptions">{{time}}</option>
 											</select>
 										</div>
@@ -312,7 +319,7 @@
 
 									    <div class="onoffswitch">
 								        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" 
-								        	ng-checked="$parent.updatedCategoryPeriod" ng-model="$parent.updatedCategoryPeriod">
+								        	ng-checked="$parent.categoryPeriod" ng-model="$parent.categoryPeriod">
 								        <label class="onoffswitch-label" for="myonoffswitch">
 							            <span class="onoffswitch-inner"></span>
 							            <span class="onoffswitch-switch"></span>
@@ -330,7 +337,7 @@
 								</div>
 								<div class="col col-lg-5 col-md-5 col-sm-5">
 									<div class="input-group">
-										<input type="text" class="form-control" cng-color-picker ng-model="$parent.updatedCategoryColor" />
+										<input type="text" class="form-control" cng-color-picker ng-model="$parent.categoryColor" />
 									</div>
 								</div>
 							</div><br />
@@ -341,7 +348,7 @@
 							<div class="row">
 								<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right" ng-click="editSelectedCategory()">Save</button></span>
 								<span class="col col-sm-2"></span>
-								<span class="col col-sm-5"><button type="button" class="btn btn-default" ng-click="clearCategoryModal()" style="float: left">Close</button></span>
+								<span class="col col-sm-5"><button type="button" class="btn btn-default" ng-click="closeCategoryModal()" style="float: left">Cancel</button></span>
 							</div>
 						</div> <!--Modal-Footer-->
 

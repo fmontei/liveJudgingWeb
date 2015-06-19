@@ -43,7 +43,6 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		$scope.currentView = "default";
 		$scope.categoryList = $cookies.categoryList;
 		$scope.projectList = $cookies.projectList;
-		$scope.categoryModalView = "";
 
 		$scope.getTimeOptions = function() {
 			var times = [];
@@ -61,8 +60,12 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$scope.currentView = view;
 		}
 
+		/*
+		 * Create Category Functionality
+		 */
+
 		$scope.createNewCategory = function() {
-			var categoryPeriod = ($scope.categoryPeriod === 'on') ? 'am' : 'pm';
+			var categoryPeriod = ($scope.categoryPeriod === true) ? 'am' : 'pm';
 			var newCategory = {
 				name: $scope.categoryName,
 				desc: $scope.categoryDesc,
@@ -76,66 +79,33 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			console.log("New category created: " + JSON.stringify(newCategory));
 		}
 
-		$scope.editSelectedCategory = function() {
-			var updatedCategoryPeriod = ($scope.updatedCategoryPeriod === true) ? 'am' : 'pm';
-			var updatedCategory = {
-				name: $scope.updatedCategoryName,
-				desc: $scope.updatedCategoryDesc,
-				time: $scope.updatedCategoryTime + updatedCategoryPeriod,
-				color: $scope.updatedCategoryColor,
-				projects: $scope.categoryToEdit.projects,
-				judges: $scope.categoryToEdit.judges
-			}
-			$scope.closeCategoryModal();
-			$scope.updateCategoryCookie('name', $scope.categoryName, updatedCategory);
-			console.log("Category edited: " + JSON.stringify(updatedCategory));
-		}
-
-		$scope.seeCategoryDetails = function(event) {
-			var category = $(event.currentTarget);
-			var categoryName = category.find('h3').text().trim();
-			$cookies.currentCategory = $scope.getCategoryByName(categoryName);
-			$scope.currentCategory = $cookies.currentCategory;
-			$scope.changeView('currentCategory');
-		}
-
-		$scope.getCategoryByName = function(value) {
-			for (var i = 0; i < $cookies.categoryList.length; i++) {
-				if ($cookies.categoryList[i].name == value) return $cookies.categoryList[i];
-			}
-		}
-
-		$scope.updateCategoryCookie = function(param, value, newObject) {
-			if (param === 'name') {
-				for (var i = 0; i < $cookies.categoryList.length; i++) {
-					if ($cookies.categoryList[i].name == value) {
-						$cookies.categoryList[i] = newObject;
-					}
-				}
-			}
-		}
-
-		$scope.clearCategoryModal = function() {
-			$scope.categoryName = '';
-			$scope.categoryDesc = '';
-			$scope.categoryTime = '';
-			$scope.categoryPeriod = '';
-			$scope.categoryColor = ''; 
-			$($scope.categoryModalID).modal('hide');
-		}
-
-		$scope.closeCategoryModal = function() {
-			$($scope.categoryModalID).modal('hide');
-		}
-
 		$scope.changeCategoryModalViewToCreate = function() {
 			$scope.categoryModalView = 'create';
 			$($scope.categoryModalID).modal('show');
 		}
 
+		/*
+		 * Edit Category Functionality
+		 */
+
+		$scope.editSelectedCategory = function() {
+			var categoryPeriod = ($scope.categoryPeriod === true) ? 'am' : 'pm';
+			var updatedCategory = {
+				name: $scope.categoryName,
+				desc: $scope.categoryDesc,
+				time: $scope.categoryTime + categoryPeriod,
+				color: $scope.categoryColor,
+				projects: $scope.selectedCategory.projects, // Projects have not changed
+				judges: $scope.selectedCategory.judges // Judges have not changed
+			}
+			$scope.closeCategoryModal();
+			$scope.updateCategoryCookie($scope.selectedCategory.name, updatedCategory);
+			console.log("Category edited: " + JSON.stringify(updatedCategory));
+		}
+
 		$scope.changeCategoryModalViewToEdit = function(event, category) {
 			$scope.categoryModalView = 'edit';
-			$scope.categoryToEdit = category;
+			$scope.selectedCategory = category;
 
 			var time, period;
 			if (category.time.search('a') !== -1) {
@@ -156,21 +126,46 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$($scope.categoryModalID).modal('show'); // Show the modal
 		}
 
-		$scope.$watch('categoryName', function(value) {
-      $scope.updatedCategoryName = value
-    });
-    $scope.$watch('categoryDesc', function(value) {
-    	$scope.updatedCategoryDesc = value
-    });
-    $scope.$watch('categoryTime', function(value) {
-    	$scope.updatedCategoryTime = value
-    });
-    $scope.$watch('categoryPeriod', function(value) {
-    	$scope.updatedCategoryPeriod = value
-    });
-    $scope.$watch('categoryColor', function(value) {
-    	$scope.updatedCategoryColor = value
-    });
+		/*
+		 * Detailed Category Functionality
+		 */
+
+		$scope.seeCategoryDetails = function(event) {
+			var category = $(event.currentTarget);
+			var categoryName = category.find('h3').text().trim();
+			$cookies.currentCategory = $scope.getCategoryByName(categoryName);
+			$scope.currentCategory = $cookies.currentCategory;
+			$scope.changeView('currentCategory');
+		}
+
+		/*
+		 * Category Helper Methods
+		 */ 
+
+		$scope.updateCategoryCookie = function(value, newObject) {
+			for (var i = 0; i < $cookies.categoryList.length; i++) {
+				if ($cookies.categoryList[i].name == value) {
+					$cookies.categoryList[i] = newObject;
+				}
+			}
+		}
+
+		$scope.getCategoryByName = function(value) {
+			for (var i = 0; i < $cookies.categoryList.length; i++) {
+				if ($cookies.categoryList[i].name == value) return $cookies.categoryList[i];
+			}
+		}
+
+		$scope.closeCategoryModal = function() {
+			// Create 'blank slate' every time new category button is clicked
+			$scope.categoryName = '';
+			$scope.categoryDesc = '';
+			$scope.categoryTime = '';
+			$scope.categoryPeriod = '';
+			$scope.categoryColor = ''; 
+
+			$($scope.categoryModalID).modal('hide');
+		}
 
 }])
 
@@ -261,30 +256,6 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 	};
 
 }])
-
-.directive('cngPeriodSwitch', function() {
-
-	return {
-		restrict: 'A',
-		require: '^ngModel',
-		scope: {
-			state: '@text'
-		},
-		link: function(scope, elem, attrs) {
-			elem.bootstrapSwitch({
-				onText: 'am',
-				offText: 'pm', 
-				state: true
-			});
-			scope.$watch('state', function(value) {
-				var booleanVal = value === 'true';
-				console.log(value);
-			
-			});
-		}
-	};
-
-})
 
 .directive('cngColorPicker', function() {
 
