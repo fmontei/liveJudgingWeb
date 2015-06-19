@@ -168,7 +168,7 @@
 					</div>
 				
 					<ul>
-						<button class="btn btn-lg btn-success" id="add-category-btn" data-toggle="modal" data-target="#edit-category-modal">
+						<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalViewToCreate()">
 							<span class="glyphicon glyphicon-plus"></span> Add Category
 						</button>
 					</ul>
@@ -180,7 +180,7 @@
 				        <a class="btn" style="background-color: {{category.color}}" ng-click="seeCategoryDetails($event)">
 									<h3 class="droppable-category-header">
 										<span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-sort"></span></span> 
-										<span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-cog" ng-click="showCategoryModal($event)"></span></span>
+										<span class="glyphicon-sort-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalViewToEdit($event, category)"></span></span>
 										{{category.name}}
 									</h3>
 									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.projects.length}} Projects</span>
@@ -196,72 +196,161 @@
 
 		</div> <!--Row-->
 	</div> <!--Container-Fluid-->
-</div> <!--ProjectsCtrl-->
 
-<div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog" aria-labelledby="edit-category-modal" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content panel-success">
-			<div class="modal-header panel-heading">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="edit-category-modal-label">Edit Category</h4>
-			</div>
-			<div class="modal-body">
-			
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
-						<label>Category Name:</label>
-					</div>
-					<div class="col col-lg-7 col-md-7 col-sm-7">
-						<input class="form-control" type="text-area" placeholder="Category Name" ng-model="categoryName" />
-					</div>
-				</div><br />
-				
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
-						<label>Description:</label>
-					</div>
-					<div class="col col-lg-7 col-md-7 col-sm-7">
-						<textarea class="form-control" rows="3" ng-model="categoryDesc"></textarea>
-					</div>
-				</div><br />
-				
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
-						<label>Due by:</label>
-					</div>
-					<div class="col col-lg-5 col-md-5 col-sm-5">
-						<div class="row">
-							<div class="col-sm-8 col-md-8 col-lg-8">
-								<select class="form-control" ng-model="categoryTime">
-									<option ng-repeat="time in timeOptions">{{time}}</option>
-								</select>
-							</div>
-							<div class="col col-lg-4 col-md-4 col-sm-4">
-								<input type="checkbox" id="am-pm-switch" cng-period-switch ng-model="categoryPeriod" />
-							</div>
+	<div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog" aria-labelledby="edit-category-modal" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content panel-success">
+				<div class="modal-header panel-heading">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<div ng-switch on="categoryModalView">
+						<div ng-switch-when="create">
+							<h4 class="modal-title" id="edit-category-modal-label">Add New Category</h4>
+						</div>
+						<div ng-switch-when="edit">
+							<h4 class="modal-title" id="edit-category-modal-label">Edit Category: {{categoryName}}</h4>
 						</div>
 					</div>
-				</div><br />
-				
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
-						<label>Color:</label>
-					</div>
-					<div class="col col-lg-5 col-md-5 col-sm-5">
-						<div class="input-group">
-							<input type="text" class="form-control" cng-color-picker ng-model="categoryColor" />
-						</div>
-					</div>
-				</div><br />
-				
-			</div> <!--Modal-Body-->
-			<div class="modal-footer">
-				<div class="row">
-					<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right" ng-click="createNewCategory(categoryAmPm)">Save</button></span>
-					<span class="col col-sm-2"></span>
-					<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
 				</div>
+
+				<div ng-switch on="categoryModalView">
+					<div ng-switch-when="create">
+
+						<div class="modal-body">
+						
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Category Name:</label>
+								</div>
+								<div class="col col-lg-7 col-md-7 col-sm-7">
+									<input class="form-control" type="text" ng-model="$parent.categoryName" />
+								</div>
+							</div><br />
+							
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Description:</label>
+								</div>
+								<div class="col col-lg-7 col-md-7 col-sm-7">
+									<textarea class="form-control" rows="3" ng-model="$parent.categoryDesc"></textarea>
+								</div>
+							</div><br />
+							
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Due by:</label>
+								</div>
+								<div class="col col-lg-5 col-md-5 col-sm-5">
+									<div class="row">
+										<div class="col-sm-8 col-md-8 col-lg-8">
+											<select class="form-control" ng-model="$parent.categoryTime">
+												<option ng-repeat="time in timeOptions">{{time}}</option>
+											</select>
+										</div>
+										<div class="col col-lg-4 col-md-4 col-sm-4">
+											<input type="checkbox" id="am-pm-switch" cng-period-switch ng-model="$parent.categoryPeriod" />
+										</div>
+									</div>
+								</div>
+							</div><br />
+							
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Color:</label>
+								</div>
+								<div class="col col-lg-5 col-md-5 col-sm-5">
+									<div class="input-group">
+										<input type="text" class="form-control" cng-color-picker ng-model="$parent.categoryColor" />
+									</div>
+								</div>
+							</div><br />
+							
+						</div> <!--Modal-Body-->
+
+						<div class="modal-footer">
+							<div class="row">
+								<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right" ng-click="createNewCategory()">Save</button></span>
+								<span class="col col-sm-2"></span>
+								<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+							</div>
+						</div> <!--Modal-Footer-->
+
+					</div>
+					<div ng-switch-when="edit">
+
+						<div class="modal-body">
+						
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Category Name:</label>
+								</div>
+								<div class="col col-lg-7 col-md-7 col-sm-7">
+									<input class="form-control" type="text" ng-model="$parent.updatedCategoryName" />
+								</div>
+							</div><br />
+							
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Description:</label>
+								</div>
+								<div class="col col-lg-7 col-md-7 col-sm-7">
+									<textarea class="form-control" rows="3" ng-model="$parent.updatedCategoryDesc"></textarea>
+								</div>
+							</div><br />
+							
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Due by:</label>
+								</div>
+								<div class="col col-lg-5 col-md-5 col-sm-5">
+									<div class="row">
+										<div class="col-sm-8 col-md-8 col-lg-8">
+											<select class="form-control" ng-model="$parent.updatedCategoryTime">
+												<option ng-repeat="time in timeOptions">{{time}}</option>
+											</select>
+										</div>
+										<div class="col col-lg-4 col-md-4 col-sm-4">
+
+									    <div class="onoffswitch">
+								        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" 
+								        	ng-checked="$parent.updatedCategoryPeriod" ng-model="$parent.updatedCategoryPeriod">
+								        <label class="onoffswitch-label" for="myonoffswitch">
+							            <span class="onoffswitch-inner"></span>
+							            <span class="onoffswitch-switch"></span>
+								        </label>
+									    </div>
+
+										</div>
+									</div>
+								</div>
+							</div><br />
+							
+							<div class="row">
+								<div class="col col-lg-3 col-md-3 col-sm-3 category-modal-col">
+									<label>Color:</label>
+								</div>
+								<div class="col col-lg-5 col-md-5 col-sm-5">
+									<div class="input-group">
+										<input type="text" class="form-control" cng-color-picker ng-model="$parent.updatedCategoryColor" />
+										{{$parent.updatedCategoryColor}}
+									</div>
+								</div>
+							</div><br />
+							
+						</div> <!--Modal-Body-->
+
+						<div class="modal-footer">
+							<div class="row">
+								<span class="col col-sm-5"><button type="button" class="btn btn-default" style="float: right" ng-click="editSelectedCategory()">Save</button></span>
+								<span class="col col-sm-2"></span>
+								<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+							</div>
+						</div> <!--Modal-Footer-->
+
+					</div>
+				</div> 
+
 			</div>
 		</div>
 	</div>
-</div>
+
+</div> <!--ProjectsCtrl-->
