@@ -35,7 +35,7 @@
     </div>
 
 		<!--Event Edit View-->
-  	<div ng-switch-when="event_edit_view">		
+    <div ng-switch-when="event_edit_view">
   		<div class="container-fluid">
   			<div class="row">
   				<div class="col-md-12">
@@ -49,9 +49,28 @@
   								<label>Event Name:</label>
   							</div>
   							<div class="col col-lg-3 col-md-3 col-sm-3">
-  								<input class="form-control" type="text" placeholder="Event Name" />
+  								<input class="form-control"
+                         type="text"
+                         placeholder="Event Name"
+                         ng-model="eventForm.name"
+                         required
+                         autofocus />
   							</div>
   						</div><br />
+
+              <div class="row">
+                <div class="col col-lg-2 col-md-2 col-sm-2">
+                  <label>Location:</label>
+                </div>
+                <div class="col col-lg-3 col-md-3 col-sm-3">
+                  <input class="form-control"
+                         type="text"
+                         placeholder="Location"
+                         ng-model="eventForm.location"
+                         required
+                         autofocus />
+                </div>
+              </div><br />
 
   						<div class="row">
   								<div class="col col-lg-2 col-md-2 col-sm-2">
@@ -61,7 +80,11 @@
   									<div class="row">
   										<div class="col col-lg-2 col-md-2 col-sm-3">
   											<date-widget>
-  												<input class="form-control" type="text" placeholder="Start" id="datepicker-start" />
+  												<input class="form-control" 
+                                 type="text" 
+                                 placeholder="Start" 
+                                 id="datepicker-start"
+                                 required />
   											</date-widget>
   										</div>
   										<div class="col col-lg-2 col-md-2 col-sm-3">
@@ -76,7 +99,7 @@
   										</div>
   									</div>
   								</div>
-  						</div><br />
+  						</div>
   						
   						<div id="end-date-optional">
   							<div class="row">
@@ -87,7 +110,10 @@
   									<div class="row">
   										<div class="col col-lg-2 col-md-2 col-sm-3">
   											<date-widget>
-  												<input class="form-control" type="text" placeholder="End" id="datepicker-end" />
+  												<input class="form-control"
+                                 type="text"
+                                 placeholder="End"
+                                 id="datepicker-end" />
   											</date-widget>
   										</div>
   										<div class="col col-lg-2 col-md-2 col-sm-3">
@@ -95,7 +121,7 @@
   										</div>
   									</div>
   								</div>
-  							</div><br />
+  							</div>
   						</div>
   						
   						<div class="row">
@@ -104,19 +130,14 @@
   							</div>
   							<div class="col col-lg-10 col-md-10 col-sm-10">
   								<div class="row">
-  									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<select class="form-control">
-  											<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
-  										</select>
-  									</span>
-  									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<am-pm-widget>
-  											<input type="checkbox" id="am-pm-start" checked>
-  										</am-pm-widget>
-  									</span>
+                    <span class="col col-lg-2 col-md-2 col-sm-3">
+  									 <timepicker ng-model="eventForm.startTime"
+                                 minute-step="15"
+                                 required></timepicker>
+                    </span>
   								</div>
   							</div>
-  						</div><br /><br />
+  						</div>
   						
   						<div class="row">
   							<div class="col col-lg-2 col-md-2 col-sm-2">
@@ -125,35 +146,22 @@
   							<div class="col col-lg-10 col-md-10 col-sm-10">
   								<div class="row">
   									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<select class="form-control">
-  											<option ng-repeat="time in times" value="{{time}}">{{time}}</option>
-  										</select>
-  									</span>
-  									<span class="col col-lg-2 col-md-2 col-sm-3">
-  										<am-pm-widget>
-  											<input type="checkbox" id="am-pm-end" checked>
-  										</am-pm-widget>
+  										<timepicker ng-model="eventForm.endTime"
+                                  minute-step="15"
+                                  required></timepicker>
   									</span>
   								</div>
   							</div>
-  						</div><br /><br />
+  						</div>
   						
   						<div class="row">
   							<div class="col col-lg-2 col-md-2 col-sm-2">
   							</div>
   							<div class="col col-lg-4 col-md-4 col-sm-4">
-  								<div ng-switch on="event.running">
-  									<div ng-switch-when="true">
-  										<button class="btn btn-lg btn-primary" ng-click="change_view_to(event.EVENT_IN_PROGRESS_VIEW)">Save</button>
-  										<button class="btn btn-lg btn-default">Cancel</button>
-  									</div>
-  									<div ng-switch-when="false">
-  										<button class="btn btn-lg btn-primary" ng-click="change_view_to(event.EVENT_READY_VIEW)">Save</button>
-  										<button class="btn btn-lg btn-default">Cancel</button>
-  									</div>
-  								</div>
+  								<button class="btn btn-lg btn-primary" ng-click="saveEvent(eventForm)">Save</button>
+                  <button class="btn btn-lg btn-default">Cancel</button>
   							</div>
-  						</div><br />
+  						</div>
   					</form>
   					
   				</div>
