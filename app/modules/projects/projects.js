@@ -262,8 +262,16 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 	return {
 		restrict: 'A',
 		require: '^ngModel',
+		scope: {
+			color: '@text'
+		},
 		link: function(scope, elem, attrs) {
-			elem.colorPicker();
+			elem.colorPicker({colors: ["FF0000", "FFFF00", "00FF00", "00FFFF", "FF00FF", "FF6347", "C0C0C0", "A0522D", 
+				"FA8072", "FFA500", "FFE4C4", "FFFFFF", "F0E68C", "B00000", "A0522D", "DDA0DD", "EEDD82", "8470FF"]});
+			scope.$watch('color', function(value) {
+				elem.val(value);
+				elem.change();
+			});
 		}
 	};
 
