@@ -179,7 +179,7 @@
 						<br /><br /> <!--Important: extra room for dragging-->
 						<div ng-repeat="category in categoryList">
 							<li class="droppable-category" cng-droppable-category callback="$parent.addProjectToCategoryCookie(categoryName, projectName)" category-name="{{category.name}}">
-				        <a class="btn" style="background-color: {{category.color}}" ng-click="seeCategoryDetails($event)">
+				        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
 				        	<h3>
 										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalViewToEdit($event, category)"></span></span>
 									</h3>
@@ -252,19 +252,10 @@
 								<div class="col col-lg-5 col-md-5 col-sm-5">
 									<div class="row">
 										<div class="col-sm-8 col-md-8 col-lg-8">
-											<select class="form-control" ng-model="$parent.categoryTime">
-												<option ng-repeat="time in timeOptions">{{time}}</option>
-											</select>
-										</div>
-										<div class="col col-lg-4 col-md-4 col-sm-4">
-											<div class="onoffswitch">
-								        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" 
-								        	ng-checked="true" ng-model="$parent.categoryPeriod">
-								        <label class="onoffswitch-label" for="myonoffswitch">
-							            <span class="onoffswitch-inner"></span>
-							            <span class="onoffswitch-switch"></span>
-								        </label>
-									    </div>
+											<timepicker minute-step="1"
+																  ng-model="$parent.categoryTime"
+																  required>
+											</timepicker>
 										</div>
 									</div>
 								</div>
@@ -325,21 +316,11 @@
 								<div class="col col-lg-5 col-md-5 col-sm-5">
 									<div class="row">
 										<div class="col-sm-8 col-md-8 col-lg-8">
-											<select class="form-control" ng-model="$parent.categoryTime">
-												<option ng-repeat="time in timeOptions">{{time}}</option>
-											</select>
-										</div>
-										<div class="col col-lg-4 col-md-4 col-sm-4">
-
-									    <div class="onoffswitch">
-								        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" 
-								        	ng-checked="$parent.categoryPeriod" ng-model="$parent.categoryPeriod">
-								        <label class="onoffswitch-label" for="myonoffswitch">
-							            <span class="onoffswitch-inner"></span>
-							            <span class="onoffswitch-switch"></span>
-								        </label>
-									    </div>
-
+											<timepicker minute-step="1"
+																  ng-model="$parent.categoryTime"
+																  required>
+											</timepicker>
+											{{$parent.categoryTime}}
 										</div>
 									</div>
 								</div>

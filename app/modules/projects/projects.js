@@ -10,11 +10,15 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 }])
 
 .run(['$cookies', function($cookies) {
-	// Populate cookies with data from server
+
+	/* 
+	 * Initial values 
+	 */ 
+
 	$cookies.categoryList = [{
 			'name': "Uncategorized",
 			'desc': "Sample description for Uncategorized",
-			'time': "1:00am",
+			'time': "1915-06-20T11:13:00.000Z",
 			'color': "#f0ad4e",
 			'projects': ["Tiger"],
 			'judges': []
@@ -22,7 +26,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		{
 			'name': "Cat A.",
 			'desc': "Sample description for Cat A.",
-			'time': "2:00pm",
+			'time': "1915-07-20T12:14:00.000Z",
 			'color': "#5bc0de",
 			'projects': ["Lemur"], 
 		  'judges': ["Batman"]
@@ -30,26 +34,25 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		{
 			'name': "Cat B.",
 			'desc': "Sample description for Cat B.",
-			'time': "3:00pm",
+			'time': "1915-08-20T13:15:00.000Z",
 			'color': "#d9534f",
 			'projects': ["Lion", "Monkey"], 
 			'judges': ["Superman", "Hulk"]
 		}];
 		$cookies.projectList = ["Lemur", "Turtle", "Fish", "Cheetah", "Bear"];
 		$cookies.currentView = "default";
+		$cookies.categoryTime = Date();
 }])
 
-.controller('ProjectsCtrl', ['$scope', '$cookies', 'CurrentUserService', function($scope, 
-																																									$cookies, 
-																																									CurrentUserService) {
+.controller('ProjectsCtrl', ['$scope', '$cookies', 'CategoryManagementService', 'ProjectManagementService',
+	function($scope, $cookies, CategoryManagementService, ProjectManagementService) {
 
-		// Constants
-		$scope.categoryModalID = '#category-modal';
-		$scope.projectModalID = '#project-modal';
-		
-		//===========================================================//
-		// Automatically synchronize scope and cookies via listeners //
-		//===========================================================//
+		$scope.projectNumberOptions = ProjectManagementService.getProjectNumberOptions();
+
+		/*
+		 * Automatic synchronization between scope and cookies
+		 */
+
 		$scope.$watchCollection(function() {
 			return $cookies.categoryList;
 		}, function(newValue) {
@@ -73,118 +76,16 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}, function(newValue) {
 			$scope.currentView = newValue;
 		});
-		
-		$scope.getTimeOptions = function() {
-			var times = [];
-			var i = 12;
-			// 12 goes first
-			for (var j = 0; j <= 45; j += 15) {
-				if (j == 0) times.push(i + ":" + j + j);
-				else times.push(i + ":" + j);
-			}
-			for (var i = 1; i < 12; i++) {
-				for (var j = 0; j <= 45; j += 15) {
-					if (j == 0) times.push(i + ":" + j + j);
-					else times.push(i + ":" + j);
-				}
-			}
-			return times;
-		}
 
-		$scope.getProjectNumberOptions = function() { // TODO: remove numbers that are unavailable
-			var numbers = [];
-			for (var i = 10; i < 100; i++) numbers.push(i);
-			return numbers;
-		}
-
-		$scope.timeOptions = $scope.getTimeOptions();
-		$scope.projectNumberOptions = $scope.getProjectNumberOptions();
-
-		$scope.changeView = function(view) {
-			$cookies.currentView = view;
-		}
+		$scope.$watch(function() { 
+			return $cookies.categoryTime;
+		}, function(newValue) {
+			$scope.categoryTime = newValue;
+		});
 
 		/*
-		 * Create Category Functionality
+		 * Category Cookie Management
 		 */
-
-		$scope.createNewCategory = function() {
-			var categoryPeriod = ($scope.categoryPeriod === true) ? 'am' : 'pm';
-			var newCategory = {
-				name: $scope.categoryName,
-				desc: $scope.categoryDesc,
-				time: $scope.categoryTime + categoryPeriod,
-				color: $scope.categoryColor,
-				projects: [],
-				judges: []
-			}
-			$cookies.categoryList.push(newCategory);
-			$scope.closeCategoryModal();
-			console.log("New category created: " + JSON.stringify(newCategory));
-			console.log("Category list updated: " + $cookies.categoryList.length);
-		}
-
-		$scope.changeCategoryModalViewToCreate = function() {
-			$scope.categoryModalView = 'create';
-			$($scope.categoryModalID).modal('show');
-		}
-
-		/*
-		 * Edit Category Functionality
-		 */
-
-		$scope.editSelectedCategory = function() {
-			var categoryPeriod = ($scope.categoryPeriod === true) ? 'am' : 'pm';
-			var updatedCategory = {
-				name: $scope.categoryName,
-				desc: $scope.categoryDesc,
-				time: $scope.categoryTime + categoryPeriod,
-				color: $scope.categoryColor,
-				projects: $scope.selectedCategory.projects, // Projects have not changed
-				judges: $scope.selectedCategory.judges // Judges have not changed
-			}
-			$scope.closeCategoryModal();
-			$scope.editCurrentCategoryCookie($scope.selectedCategory.name, updatedCategory);
-			console.log("Category edited: " + JSON.stringify(updatedCategory));
-		}
-
-		$scope.changeCategoryModalViewToEdit = function(event, category) {
-			$scope.categoryModalView = 'edit';
-			$cookies.selectedCategory = category;
-
-			var time, period;
-			if (category.time.search('a') !== -1) {
-				period = true; // true == am
-				time = category.time.split('a')[0];
-			} else {
-				period = false; // false == pm
-				time = category.time.split('p')[0];
-			}
-			
-			$scope.categoryName = category.name;
-			$scope.categoryDesc = category.desc;
-			$scope.categoryTime = time;
-			$scope.categoryPeriod = period;
-			$scope.categoryColor = category.color; 
-
-			event.stopPropagation(); // Prevent button behind it from redirecting the page
-			$($scope.categoryModalID).modal('show'); // Show the modal
-		}
-
-		/*
-		 * Detailed Category Functionality
-		 */
-
-		$scope.seeCategoryDetails = function(event) {
-			var category = $(event.currentTarget);
-			var categoryName = category.parent().attr('category-name');
-			$cookies.selectedCategory = $scope.getCategoryByName(categoryName);
-			$scope.changeView('selectedCategory');
-		}
-
-		/*
-		 * Category Helper Methods
-		 */ 
 
 		$scope.addProjectToCategoryCookie = function(categoryName, projectName) {
 			var category = $scope.getCategoryByName(categoryName);
@@ -208,6 +109,51 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			}
 		}
 
+		/*
+		 * Category Management Functionality
+		 */
+
+		$scope.createNewCategory = function() {
+			CategoryManagementService.createNewCategory($scope, $cookies);
+		}
+
+		$scope.editSelectedCategory = function() {
+			CategoryManagementService.editCategory($scope, $cookies);
+		}
+
+		/*
+		 * Change View Functionality
+		 */
+
+		$scope.changeView = function(view) {
+			$cookies.currentView = view;
+		}
+
+		$scope.viewCategoryDetails = function(event) {
+			var category = $(event.currentTarget);
+			var categoryName = category.parent().attr('category-name');
+			$cookies.selectedCategory = $scope.getCategoryByName(categoryName);
+			$scope.changeView('selectedCategory');
+		}
+
+		$scope.changeCategoryModalViewToCreate = function() {
+			$scope.categoryModalView = 'create';
+			$('#category-modal').modal('show');
+		}
+
+		$scope.changeCategoryModalViewToEdit = function(event, category) {
+			$cookies.selectedCategory = category;
+
+			$scope.categoryModalView = 'edit';
+			$scope.categoryName = category.name;
+			$scope.categoryDesc = category.desc;
+			$scope.categoryTime = category.time;
+			$scope.categoryColor = category.color; 
+
+			event.stopPropagation(); // Prevent button behind it from redirecting the page
+			$('#category-modal').modal('show'); // Show the modal
+		}
+
 		$scope.closeCategoryModal = function() {
 			// Create 'blank slate' every time add category button is clicked
 			$scope.categoryName = '';
@@ -216,16 +162,73 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$scope.categoryPeriod = '';
 			$scope.categoryColor = ''; 
 
-			$($scope.categoryModalID).modal('hide');
+			$('#category-modal').modal('hide');
 		}
 
-		/* 
-		 * Project Modal
-		 */
 		$scope.openCategoryModal = function() {
-			$($scope.projectModalID).modal('show');
+			$('#project-modal').modal('show');
 		}
 
+}])
+
+.factory('CategoryManagementService', ['$filter', function($filter) {
+	var categoryManagement = {};
+
+	categoryManagement.createNewCategory = function($scope, $cookies) {
+		var newCategory = {
+			name: $scope.categoryName,
+			desc: $scope.categoryDesc,
+			time: $scope.categoryTime,
+			color: $scope.categoryColor,
+			projects: [],
+			judges: []
+		}
+		$cookies.categoryList.push(newCategory);
+		$scope.closeCategoryModal();
+		console.log("New category created: " + JSON.stringify(newCategory));
+		console.log("Category list updated: " + $cookies.categoryList.length);
+	}
+
+	categoryManagement.editCategory = function($scope, $cookies) {
+		var updatedCategory = {
+			name: $scope.categoryName,
+			desc: $scope.categoryDesc,
+			time: $scope.categoryTime,
+			color: $scope.categoryColor,
+			projects: $scope.selectedCategory.projects, // Projects have not changed
+			judges: $scope.selectedCategory.judges // Judges have not changed
+		}
+		$scope.closeCategoryModal();
+		$scope.editCurrentCategoryCookie($scope.selectedCategory.name, updatedCategory);
+		console.log("Category edited: " + JSON.stringify(updatedCategory));
+	}
+
+	return categoryManagement;
+}])
+
+.factory('ProjectManagementService', function() {
+	var projectManagement = {};
+
+	projectManagement.getProjectNumberOptions = function() { // TODO: remove numbers that are unavailable
+		var numbers = [];
+		for (var i = 10; i < 100; i++) numbers.push(i);
+		return numbers;
+	}
+
+	return projectManagement;
+})
+
+.factory('TimeParseTool', ['$filter', function($filter) {
+	var timeParseTool = {};
+
+	timeParseTool.parseTimeModel = function(timeString) {
+		var timeObject = new Date(timeString);
+		var shortDate = $filter('date')(timeObject, 'shortDate');
+		var shortTime = $filter('date')(timeObject, 'shortTime');
+		return shortDate.toString() + ' ' + shortTime.toString();
+	}
+
+	return timeParseTool;
 }])
 
 .directive('cngDraggableProject', [function() { 

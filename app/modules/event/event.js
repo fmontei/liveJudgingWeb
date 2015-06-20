@@ -59,6 +59,7 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
 		eventForm.start_time = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss Z');
 		eventForm.end_time = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss Z');
+		alert('eventForm.start_time = ' + eventForm.start_time + ', eventForm.end_time = ' + eventForm.end_time);
 	}
 
 	var isEventRunning = function(event) {
