@@ -37,7 +37,7 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 	}
 	if ($cookies.get("view") == $scope.event.EVENT_EDIT_VIEW) {
 		if ($scope.event.getSelectedEvent()) {
-			EventService(CurrentUserService.getAuthHeader()).event.get({id: $scope.event.getSelectedEvent()}).$promise.then(function(resp) {
+			EventService(CurrentUserService.getAuthHeader()).event.get({id: $scope.event.getSelectedEvent().id}).$promise.then(function(resp) {
 				loadEventForm(resp.event);
 			}).catch(function() {
 				console.log('Unable to retrieve event.');
