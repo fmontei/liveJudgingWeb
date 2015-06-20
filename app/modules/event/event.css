@@ -193,3 +193,7 @@ h4.modal-title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.edit-event-form {
+  margin-left: 10%;
+}

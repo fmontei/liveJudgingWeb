@@ -41,8 +41,8 @@
 .page-content-wrapper {
     width: 100%;
     position: absolute;
-    padding: 15px;
     top: 40px;
+    padding: 10px;
 }
 
 .login-page-content-wrapper {
@@ -126,7 +126,6 @@
     }
 
     .page-content-wrapper {
-        padding: 20px;
         position: relative;
     }
 

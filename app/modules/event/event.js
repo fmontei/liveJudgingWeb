@@ -13,24 +13,98 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 	$cookies.put("view", undefined);
 }])
 
-.controller('EventCtrl', ['$cookies', '$filter', '$scope', 'EventService', 
-	function($cookies, $filter, $scope, EventService) {
+.controller('EventCtrl', ['$cookies', '$filter', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 
+	function($cookies, $filter, $rootScope, $scope, CurrentUserService, EventService) {	
+
+	$scope.cookies = $cookies;
+
 	$scope.event = {
 		EVENT_EDIT_VIEW: "event_edit_view",
 		EVENT_READY_VIEW: "event_ready_view",
 		EVENT_IN_PROGRESS_VIEW: "event_in_progress_view",
-		current_view: $cookies.get("view")/*,
+		current_view: $cookies.get("view"),
+		getSelectedEvent: function() {
+			return $cookies.getObject('selected_event');
+		}/*,
 		running: $cookies.get("running")*/
 	};
+
+	if ($cookies.get("view") == undefined) {
+		EventService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
+			console.log(resp);
+			$scope.eventList = resp.events;
+		});
+	}
+	if ($cookies.get("view") == $scope.event.EVENT_EDIT_VIEW) {
+		if ($scope.event.getSelectedEvent()) {
+			EventService(CurrentUserService.getAuthHeader()).event.get({id: $scope.event.getSelectedEvent().id}).$promise.then(function(resp) {
+				loadEventForm(resp.event);
+			}).catch(function() {
+				console.log('Unable to retrieve event.');
+			})
+		}
+	}	
 
 	$scope.eventForm = {
 		startTime: new Date(0, 0, 0, 12, 0),
 		endTime: new Date(0, 0, 0, 12, 0)
 	};
 
+	$scope.datePicker = {
+		tartOpened: false,
+		endOpened: false
+	};
+
+	$scope.selectEvent = function(event) {
+		$cookies.putObject('selected_event', event);
+		/* Need to include the following in change_view_to, 
+		   keep having to reuse it. */
+		var view;
+		var isRunning = isEventRunning(event);
+		if (isRunning) {
+			view = $scope.event.EVENT_IN_PROGRESS_VIEW;
+		} else {
+			view = $scope.event.EVENT_READY_VIEW;
+		}
+		$scope.change_view_to(view);
+	}
+
+	$scope.editEvent = function() {
+		$scope.change_view_to($scope.event.EVENT_EDIT_VIEW);
+		loadEventForm($cookies.getObject('selected_event'));
+	}
+
+	var loadEventForm = function(event) {
+		$scope.eventForm = {
+			name: event.name,
+			location: event.location,
+		};
+		addDateTimesToForm(event);
+	}
+
+	$scope.toggleDatePicker = function($event, picker) {
+    	$event.preventDefault();
+    	$event.stopPropagation();
+
+    	if (picker === 'start') {
+    		$scope.datePicker.startOpened = !$scope.datePicker.startOpened;	
+    	} else if (picker === 'end') {
+    		$scope.datePicker.endOpened = !$scope.datePicker.endOpened;	
+    	}
+    	console.log($scope.eventForm);    	
+	}
+
 	$scope.saveEvent = function(eventForm) {
 		addDateTimesToEvent(eventForm);
-		EventService.events.create(eventForm).$promise.then(function(resp) {
+
+		var eventReq = {
+			name: eventForm.name,
+			location: eventForm.location,
+			start_time: eventForm.startDateTime,
+			end_time: eventForm.endDateTime
+		}
+		
+		EventService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
 			var isRunning = isEventRunning(resp.event);
 			var view;
 			if (isRunning) {
@@ -40,26 +114,44 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 			}
 			$scope.change_view_to(view);
 		}).catch(function() {
-			console.log('Failed to create event.');
 			$scope.errorMessage = 'Error creating event.';
+			console.log($scope.errorMessage);
 		});
 	}
 
 	// Combines the four dates from the time & date pickers into two datetimes.
+	// Used to create request for creating/editing an event.
 	var addDateTimesToEvent = function(eventForm) {
-		var startDate = $('#datepicker-start').datepicker('getDate');
-		var endDate = $('#datepicker-end').datepicker('getDate') ? $('#datepicker-end').datepicker('getDate') : startDate;
+		var startDate = eventForm.startDate;
+		var endDate = (eventForm.isMultiDay && eventForm.endDate) ? eventForm.endDate : startDate;
 		var startTime = eventForm.startTime;
 		var endTime = eventForm.endTime;
 
-		var startDateTime = new Date(startDate.getYear(), startDate.getMonth(), startDate.getDay(),
+		var startDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(),
 									 startTime.getHours(), startTime.getMinutes(), startTime.getSeconds());
-		var endDateTime = new Date(endDate.getYear(), endDate.getMonth(), endDate.getDay(),
+		var endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(),
 								   endTime.getHours(), endTime.getMinutes(), endTime.getSeconds());
 
-		eventForm.start_time = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss Z');
-		eventForm.end_time = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss Z');
-		alert('eventForm.start_time = ' + eventForm.start_time + ', eventForm.end_time = ' + eventForm.end_time);
+		eventForm.startDateTime = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss Z');
+		eventForm.endDateTime = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss Z');
+	}
+
+	// Populates the form date & time data with the event response from server.
+	// Used when selecting an already-created event.
+	var addDateTimesToForm = function(event) {
+		var start = new Date(Date.parse(event.start_time));
+		var end = new Date(Date.parse(event.end_time));
+
+		$scope.eventForm.startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+		$scope.eventForm.endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+		if ($scope.eventForm.startDate != $scope.eventForm.endDate) {
+			$scope.eventForm.isMultiDay = true;
+		}
+
+		$scope.eventForm.startTime = new Date(0, 0, 0, start.getHours(), start.getMinutes(), 0);
+		$scope.eventForm.endTime = new Date(0, 0, 0, end.getHours(), end.getMinutes(), 0);
+>>>>>>> dd3eb49d2b909661174791e7e6b5893878d9347a
 	}
 
 	var isEventRunning = function(event) {
@@ -73,6 +165,8 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 	}
 
 	$scope.change_view_to = function(view) {
+		// This tells us where to go if Cancel is clicked on the event form.
+		$cookies.put('prev_event_view', $cookies.get('view'));
 		$cookies.put("view", view);
 		$scope.event.current_view = view;
 		if (view === $scope.event.EVENT_IN_PROGRESS_VIEW) {
@@ -88,8 +182,6 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 		$('#event-selection-desc').html('<strong>Event Description:</strong><br />' + desc).show();
 	}
 
-  $scope.event_list = [{'name': 'Event 1', 'desc': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}, 
-		{'name': 'Event 1', 'desc': 'Integer posuere erat a ante.'}];
   $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
   $scope.recipient_list = []; // Contains list of judges to be notified
   $scope.project_list = ["Sample Project 1", "Sample Project 2"];
@@ -105,14 +197,32 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 }])
 
 .factory('EventService', function($resource, CurrentUserService) {
-	return {
-		events: $resource('http://api.stevedolan.me/events', {}, {
-			create: {
-				method: 'POST',
-				headers: CurrentUserService.getAuthHeader()
-			}
-		})
-	};
+	return function(authHeader) {
+		return {
+			events: $resource('http://api.stevedolan.me/events', {}, {
+				create: {
+					method: 'POST',
+					headers: authHeader
+				},
+				get: {
+					method: 'GET',
+					headers: authHeader
+				}
+			}),
+			event: $resource('http://api.stevedolan.me/events/:id', {
+				id: '@id'
+			}, {
+				get: {
+					method: 'GET',
+					headers: authHeader
+				},
+				update: {
+					method: 'PUT',
+					headers: authHeader
+				}
+			})
+		}
+	}
 })
 
 .directive('changeTabWidget', function() {

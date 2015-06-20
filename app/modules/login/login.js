@@ -125,6 +125,8 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
         }).finally(function() {
             $cookies.remove('current_user');
             $cookies.remove('view');
+            $cookies.remove('selected_event');
+            $cookies.remove('prev_event_view');
             service.currentUser = null;
             $rootScope.isLoggedIn = false;
             $rootScope.$broadcast('loggedOut');
