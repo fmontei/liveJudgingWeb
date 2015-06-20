@@ -35,7 +35,7 @@
 	border-radius: 0;
 }
 
-#sortable-category-list {
+#category-list {
 	list-style-type: none;
 	margin-top: -30px;
 }
@@ -81,6 +81,10 @@
 
 .project-col {
 	margin-bottom: 20px;
+}
+
+.project-accordion {
+	padding-top: 20px;
 }
 
 .draggable-project {

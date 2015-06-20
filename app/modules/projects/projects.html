@@ -7,7 +7,7 @@
 					<div ng-switch-default>
 						<div class="row">
 							<div class="page-header">
-								<h1>Projects <span class="label label-default">5</span></h1>
+								<h1>Projects <span class="label label-default">{{projectList.length}}</span></h1>
 							</div>
 						</div>
 					</div>
@@ -53,25 +53,25 @@
 					<div ng-switch-default>
 						<div class="row">
 							<div class="col col-sm-12 col-md-12 col-lg-12">
-								<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="openCategoryModal()">
+								<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
 									<span class="glyphicon glyphicon-plus"></span>
 									Add Project
 								</button>
 							</div>
 						</div><br />
 						
-						<div ng-repeat="project in projectList">
+						<div ng-repeat="project in uncategorized.projects">
 						<div ng-if="$index % 4 == 0" class="row"></div>
 							<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
-								<div class="media draggable-project" cng-draggable-project projectName="{{project}}">
+								<div class="media draggable-project" cng-draggable-project projectName="{{project.name}}">
 									<div class="media-left">
 										<a href="#">
 											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 										</a>
 									</div>
 									<div class="media-body">
-										<h4 class="media-heading">#76</h4>
-										<span>{{project}}</span>
+										<h4 class="media-heading">{{project.number}}</h4>
+										<span>{{project.name}}</span>
 									</div>
 								</div>
 							</div>
@@ -81,7 +81,7 @@
 					
 					<div ng-switch-when="category">
 						<div ng-repeat="category in categoryList">
-							<div class="accordion" style="padding-top: 20px">
+							<div class="accordion project-accordion">
 								<div class="panel panel-default accordion-group" style="border-color: {{category.color}}">
 
 									<div class="panel-heading" style="background-color: {{category.color}}; border-color: {{category.color}}">
@@ -112,8 +112,8 @@
 																</a>
 															</div>
 															<div class="media-body">
-																<h4 class="media-heading">#76</h4>
-																<span>{{project}}</span>
+																<h4 class="media-heading">{{project.number}}</h4>
+																<span>{{project.name}}</span>
 															</div>
 														</div>
 													</div>
@@ -132,12 +132,12 @@
 
 						<div class="row">
 							<div class="col col-sm-12 col-md-12 col-lg-12">
-								<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="openCategoryModal()">
+								<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
 									<span class="glyphicon glyphicon-plus"></span>
 									Add Project to {{selectedCategory.name}}
 								</button>
 							</div>
-						</div>
+						</div><br />
 
 						<div ng-repeat="project in selectedCategory.projects track by $index">
 							<div ng-if="$index % 4 == 0" class="row"></div>
@@ -149,8 +149,8 @@
 										</a>
 									</div>
 									<div class="media-body">
-										<h4 class="media-heading">#76</h4>
-										<span>{{project}}</span>
+										<h4 class="media-heading">{{project.number}}</h4>
+										<span>{{project.name}}</span>
 									</div>
 								</div>
 							</div>
@@ -170,18 +170,27 @@
 					</div>
 				
 					<ul>
-						<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalViewToCreate()">
+						<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalView('create')">
 							<span class="glyphicon glyphicon-plus"></span> Add Category
 						</button>
 					</ul>
 					
-					<ul id="sortable-category-list">
-						<br /><br /> <!--Important: extra room for dragging-->
-						<div ng-repeat="category in categoryList">
+					<ul id="category-list">
+						<br /><br />
+						<li class="droppable-category">
+			        <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails('uncategorized')">
+			         	<h3></h3>
+								<div>
+									<div><u>{{uncategorized.name}}</u></div>
+									<span class="droppable-category-text">{{uncategorized.projects.length}} Projects</span>
+								</div>
+							</a>
+				    </li>
+						<div ng-repeat="category in categoryList" ng-if="category.name != 'Uncategorized'">
 							<li class="droppable-category" cng-droppable-category callback="$parent.addProjectToCategoryCookie(categoryName, projectName)" category-name="{{category.name}}">
 				        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
 				        	<h3>
-										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalViewToEdit($event, category)"></span></span>
+										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
 									</h3>
 									<div>
 										<div><u>{{category.name}}</u></div>
@@ -191,7 +200,7 @@
 								</a>
 					    </li>
 				    </div>
-				    <br /><br /> <!--Important: extra room for dragging-->
+				    <br /><br /> 
 					</ul>
 					
 				</div> <!--Text-Center-->
@@ -216,136 +225,75 @@
 					</div>
 				</div>
 
+				<div class="modal-body">
+					<div class="row">
+						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+							<label>Category Name:</label>
+						</div>
+						<div class="col col-lg-7 col-md-7 col-sm-7">
+							<input class="form-control" 
+							       type="text" 
+							       ng-model="categoryName"
+							       required
+							       autofocus />
+						</div>
+					</div><br />
+					<div class="row">
+						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+							<label>Description:</label>
+						</div>
+						<div class="col col-lg-7 col-md-7 col-sm-7">
+							<textarea class="form-control" 
+							          rows="3" 
+							          ng-model="categoryDesc"></textarea>
+						</div>
+					</div><br />
+					<div class="row">
+						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+							<label>Due by:</label>
+						</div>
+						<div class="col col-lg-5 col-md-5 col-sm-5">
+							<div class="row">
+								<div class="col-sm-8 col-md-8 col-lg-8">
+									<timepicker minute-step="1"
+														  ng-model="categoryTime"
+														  required>
+									</timepicker>
+								</div>
+							</div>
+						</div>
+					</div><br />
+					<div class="row">
+						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+							<label>Color:</label>
+						</div>
+						<div class="col col-lg-5 col-md-5 col-sm-5">
+							<div class="input-group">
+								<input type="text" 
+								       class="form-control" 
+								       cng-color-picker 
+								       color="{{categoryColor}}"
+								       ng-model="categoryColor" />
+							</div>
+						</div>
+					</div>
+					<br />
+				</div> <!-- /.modal-body -->
+
 				<div ng-switch on="categoryModalView">
 					<div ng-switch-when="create">
-
-						<div class="modal-body">
-						
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Category Name:</label>
-								</div>
-								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<input class="form-control" 
-									       type="text" 
-									       ng-model="$parent.categoryName"
-									       required
-									       autofocus />
-								</div>
-							</div><br />
-							
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Description:</label>
-								</div>
-								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<textarea class="form-control" 
-									          rows="3" 
-									          ng-model="$parent.categoryDesc"></textarea>
-								</div>
-							</div><br />
-							
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Due by:</label>
-								</div>
-								<div class="col col-lg-5 col-md-5 col-sm-5">
-									<div class="row">
-										<div class="col-sm-8 col-md-8 col-lg-8">
-											<timepicker minute-step="1"
-																  ng-model="$parent.categoryTime"
-																  required>
-											</timepicker>
-										</div>
-									</div>
-								</div>
-							</div><br />
-							
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Color:</label>
-								</div>
-								<div class="col col-lg-5 col-md-5 col-sm-5">
-									<div class="input-group">
-										<input type="text" 
-										       class="form-control" 
-										       cng-color-picker 
-										       ng-model="$parent.categoryColor" />
-									</div>
-								</div>
-							</div><br />
-							
-						</div> <!--Modal-Body-->
-
 						<div class="modal-footer">
         			<button type="button" class="btn btn-success" ng-click="createNewCategory()">Save changes</button>
         			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
-						</div> <!--Modal-Footer-->
-
-					</div>
+						</div> <!-- ./modal-footer -->
+					</div> <!-- ng-switch-when-"ceate" -->
 					<div ng-switch-when="edit">
-
-						<div class="modal-body">
-						
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Category Name:</label>
-								</div>
-								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<input class="form-control" 
-									       type="text" 
-									       ng-model="$parent.categoryName"
-									       required
-									       autofocus />
-								</div>
-							</div><br />
-							
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Description:</label>
-								</div>
-								<div class="col col-lg-7 col-md-7 col-sm-7">
-									<textarea class="form-control" rows="3" ng-model="$parent.categoryDesc"></textarea>
-								</div>
-							</div><br />
-							
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Due by:</label>
-								</div>
-								<div class="col col-lg-5 col-md-5 col-sm-5">
-									<div class="row">
-										<div class="col-sm-8 col-md-8 col-lg-8">
-											<timepicker minute-step="1"
-																  ng-model="$parent.categoryTime"
-																  required>
-											</timepicker>
-											{{$parent.categoryTime}}
-										</div>
-									</div>
-								</div>
-							</div><br />
-							
-							<div class="row">
-								<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-									<label>Color:</label>
-								</div>
-								<div class="col col-lg-5 col-md-5 col-sm-5">
-									<div class="input-group">
-										<input type="text" class="form-control" cng-color-picker text="{{$parent.categoryColor}}" ng-model="$parent.categoryColor" />
-									</div>
-								</div>
-							</div><br />
-							
-						</div> <!-- /.modal-body -->
-
 						<div class="modal-footer">
         			<button type="button" class="btn btn-success" ng-click="editSelectedCategory()">Save changes</button>
         			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
 						</div> <!-- /.modal-footer-->
-
-					</div>
-				</div> 
+					</div> <!-- ng-switch-when-"edit" -->
+				</div> <!-- ng-switch on="categoryModalView" -->
 
 			</div>
 		</div>
@@ -362,12 +310,12 @@
 	        		<h4 class="modal-title">Add New Project</h4>
         		</div>
         		<div ng-switch-when="selectedCategory">
-        			<h4 class="modal-title">Add New Project in {{selectedCategory.name}}</h4>
+        			<h4 class="modal-title">Add New Project to {{selectedCategory.name}}</h4>
         		</div>
       		</div>
 	      </div>
+
 	      <div class="modal-body">
-	        
 	      	<div class="row">
 						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 							<label>Project Name:</label>
@@ -375,7 +323,7 @@
 						<div class="col col-lg-7 col-md-7 col-sm-7">
 							<input class="form-control" 
 										 type="text" 
-										 ng-model="$parent.categoryName"
+										 ng-model="projectName"
 										 required
 										 autofocus />
 						</div>
@@ -386,7 +334,7 @@
 							<label>Project #:</label>
 						</div>
 						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<select>
+							<select ng-model="projectNumber" required>
 								<option ng-repeat="number in projectNumberOptions">{{number}}</option>
 							</select>
 						</div>
@@ -410,7 +358,8 @@
 									  <input type="text" 
 									         class="form-control input-sm" 
 									         placeholder="File" 
-									         style="width: 115%">
+									         style="width: 115%"
+									         ng-model="projectLogo">
 									</div>
 								</div>
 							</div>
@@ -429,16 +378,28 @@
 						<div class="col col-lg-7 col-md-7 col-sm-7">
 							<textarea class="form-control" 
 							          rows="3" 
-							          ng-model="$parent.categoryDesc"
-							          required></textarea>
+							          ng-model="projectDesc"
+							          required>
+		          </textarea>
 						</div>
 					</div><br />
+	      </div> <!-- ./modal-body -->
 
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-success">Save changes</button>
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	      </div>
+	      <div ng-switch on="projectModalView">
+					<div ng-switch-when="create">
+						<div class="modal-footer">
+        			<button type="button" class="btn btn-success" ng-click="createNewProject()">Save changes</button>
+        			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
+						</div> <!-- ./modal-footer -->
+					</div> <!-- ng-switch-when-"ceate" -->
+					<div ng-switch-when="edit">
+						<div class="modal-footer">
+        			<button type="button" class="btn btn-success" ng-click="editSelectedProject()">Save changes</button>
+        			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
+						</div> <!-- /.modal-footer-->
+					</div> <!-- ng-switch-when-"edit" -->
+				</div> <!-- ng-switch on="categoryModalView" -->
+
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
