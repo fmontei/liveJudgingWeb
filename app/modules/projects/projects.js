@@ -171,7 +171,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 }])
 
-.factory('CategoryManagementService', ['$filter', function($filter) {
+.factory('CategoryManagementService', ['$log', function($log) {
 	var categoryManagement = {};
 
 	categoryManagement.createNewCategory = function($scope, $cookies) {
@@ -185,8 +185,8 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}
 		$cookies.categoryList.push(newCategory);
 		$scope.closeCategoryModal();
-		console.log("New category created: " + JSON.stringify(newCategory));
-		console.log("Category list updated: " + $cookies.categoryList.length);
+		$log.log("New category created: " + JSON.stringify(newCategory));
+		$log.log("Category list updated: " + $cookies.categoryList.length);
 	}
 
 	categoryManagement.editCategory = function($scope, $cookies) {
@@ -200,7 +200,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}
 		$scope.closeCategoryModal();
 		$scope.editCurrentCategoryCookie($scope.selectedCategory.name, updatedCategory);
-		console.log("Category edited: " + JSON.stringify(updatedCategory));
+		$log.log("Category edited: " + JSON.stringify(updatedCategory));
 	}
 
 	return categoryManagement;

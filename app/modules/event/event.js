@@ -151,7 +151,6 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
 		$scope.eventForm.startTime = new Date(0, 0, 0, start.getHours(), start.getMinutes(), 0);
 		$scope.eventForm.endTime = new Date(0, 0, 0, end.getHours(), end.getMinutes(), 0);
->>>>>>> dd3eb49d2b909661174791e7e6b5893878d9347a
 	}
 
 	var isEventRunning = function(event) {
