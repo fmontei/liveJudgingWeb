@@ -70,7 +70,10 @@
 										</a>
 									</div>
 									<div class="media-body">
-										<h4 class="media-heading">{{project.number}}</h4>
+										<h4 class="media-heading">
+											{{project.number}}
+											<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+										</h4>
 										<span>{{project.name}}</span>
 									</div>
 								</div>
@@ -82,9 +85,12 @@
 					<div ng-switch-when="category">
 						<div ng-repeat="category in categoryList">
 							<div class="accordion project-accordion">
-								<div class="panel panel-default accordion-group" style="border-color: {{category.color}}">
+								<div class="panel panel-default accordion-group" 
+								     cng-category-accordion color="{{category.color}}" 
+										 category-name="{{category.name}}" 
+										 change-category="updateSelectedCategory(category)">
 
-									<div class="panel-heading" style="background-color: {{category.color}}; border-color: {{category.color}}">
+									<div class="panel-heading">
 										<div class="row">
 											<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
 												<div class="truncate">
@@ -102,17 +108,20 @@
 										<div class="accordion-inner">
 											<div class="panel-body">
 												
-												<div ng-repeat="project in category.projects track by $index">
+												<div ng-repeat="project in category.projects">
 													<br ng-if="$index % 3 == 0 && $index > 0" />
 													<div class="col col-sm-4 col-md-4 col-lg-4">
-														<div class="media category-accordion-media" >
+														<div class="media category-accordion-media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
 															<div class="media-left">
 																<a href="#">
 																	<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 																</a>
 															</div>
 															<div class="media-body">
-																<h4 class="media-heading">{{project.number}}</h4>
+																<h4 class="media-heading">
+																	{{project.number}}
+																	<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+																</h4>
 																<span>{{project.name}}</span>
 															</div>
 														</div>
@@ -142,14 +151,17 @@
 						<div ng-repeat="project in selectedCategory.projects track by $index">
 							<div ng-if="$index % 4 == 0" class="row"></div>
 							<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
-								<div class="media category-accordion-media" >
+								<div class="media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
 									<div class="media-left">
 										<a href="#">
 											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 										</a>
 									</div>
 									<div class="media-body">
-										<h4 class="media-heading">{{project.number}}</h4>
+										<h4 class="media-heading">
+											{{project.number}}
+											<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+										</h4>
 										<span>{{project.name}}</span>
 									</div>
 								</div>
@@ -305,14 +317,23 @@
 	    <div class="modal-content panel-success">
 	      <div class="modal-header panel-heading">
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <div ng-switch on="currentView">
-	        	<div ng-switch-when="default">
-	        		<h4 class="modal-title">Add New Project</h4>
-        		</div>
-        		<div ng-switch-when="selectedCategory">
-        			<h4 class="modal-title">Add New Project to {{selectedCategory.name}}</h4>
-        		</div>
-      		</div>
+
+	   			<div ng-switch on="projectModalView">
+	   				<div ng-switch-when="create">
+			        <div ng-switch on="currentView">
+			        	<div ng-switch-when="default">
+			        		<h4 class="modal-title">Add New Project</h4>
+		        		</div>
+		        		<div ng-switch-when="selectedCategory">
+		        			<h4 class="modal-title">Add New Project to {{selectedCategory.name}}</h4>
+		        		</div>
+		      		</div>
+	      		</div> <!-- ng-switch-when="create" -->
+	      		<div ng-switch-when="edit">
+	      			<h4 class="modal-title">Edit Project: {{projectName}}</h4>
+	      		</div> <!-- ng-switch-when="edit" -->
+      		</div> <!-- ng-switch on="projectModalView" -->
+
 	      </div>
 
 	      <div class="modal-body">

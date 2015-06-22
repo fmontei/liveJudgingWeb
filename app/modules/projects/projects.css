@@ -66,11 +66,20 @@
 	margin-top: 0;
 }
 
-.glyphicon-wrapper .glyphicon-cog {
+.draggable-project .glyphicon-cog, .droppable-category .glyphicon-cog {
 	margin-right: 5px;
 	float: right;
 	color: #398439;
 	display: none;
+	cursor: pointer;
+	font-size: 15px;
+}
+
+.category-specific-project .glyphicon-cog {
+	margin-right: 5px;
+	float: right;
+	display: none;
+	color: #398439;
 	cursor: pointer;
 	font-size: 15px;
 }
@@ -91,6 +100,14 @@
 	position: relative;
 	z-index: 2;
 	background-color: white;
+	cursor: grab;
+}
+
+.draggable-project:hover, .category-specific-project:hover {
+	background-color: white !important;
+	border-color: rgba(126, 239, 104, 0.8);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+  outline: 0 none;
 }
 
 .category-accordion-media {
