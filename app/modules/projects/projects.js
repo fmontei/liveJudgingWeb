@@ -20,80 +20,39 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		cookieInitService.initDefaultCookies();
 		cookieInitService.initCategories();
 		cookieInitService.initTeams();
-		ScopeInitService($scope, $cookies).init();
-		$scope.projectNumberOptions = TeamManagementService($scope, $cookies).getProjectNumberOptions();
 
-		/*
-		 * Category Cookie Management -- these methods need to be organized elsewhere
-		 */
+		var scopeInitService = ScopeInitService($scope, $cookies);
+		scopeInitService.init();
 
-		$scope.addProjectToCategoryCookie = function(categoryName, projectName) {
-			var category = $scope.getCategoryByName(categoryName);
-			var projectInfo = $scope.getProjectFromUncategorized(projectName);
-			var projectIndex = projectInfo.index, project = projectInfo.project;
-			category.projects.push(project);
-			$cookies.uncategorized.projects.splice(projectInfo.index, projectInfo.index + 1);
-			$scope.$apply(); // Reflect increased project length in UI
-			console.log("Added " + projectName + " to " + "category " + categoryName + ": " + category.projects);
-		}
-
-		$scope.editCurrentCategoryCookie = function(value, newObject) {
-			for (var i = 0; i < $cookies.categoryList.length; i++) {
-				if ($cookies.categoryList[i].name === value) {
-					$cookies.categoryList[i] = newObject;
-					return;
-				}
-			}
-		}
-
-		$scope.getCategoryByName = function(name) {
-			for (var i = 0; i < $cookies.categoryList.length; i++) {
-				if ($cookies.categoryList[i].name == name) {
-					return $cookies.categoryList[i];
-				}
-			}
-		}
-
-		$scope.getCategoryByID = function(id) {
-			for (var i = 0; i < $cookies.categoryList.length; i++) {
-				if ($cookies.categoryList[i].id == id) {
-					return $cookies.categoryList[i];
-				}
-			}
-		}
-
-		$scope.getProjectFromUncategorized = function(value) {
-			for (var i = 0; i < $cookies.uncategorized.projects.length; i++) {
-				if ($cookies.uncategorized.projects[i].name == value) { 
-					return {
-						index: i,
-						project: $cookies.uncategorized.projects[i]
-					}
-				}
-			}
-		}
+		var categoryManagementService = CategoryManagementService($scope, $cookies);
+		var teamManagementService = TeamManagementService($scope, $cookies);
+		$scope.projectNumberOptions = teamManagementService.getProjectNumberOptions();
 
 		/*
 		 * Category Management Functionality
 		 */
 
 		$scope.createNewCategory = function() {
-			CategoryManagementService($scope, $cookies).createNewCategory();
+			categoryManagementService.createNewCategory();
 		}
 
 		$scope.editSelectedCategory = function() {
-			CategoryManagementService($scope, $cookies).editCategory();
+			categoryManagementService.editCategory();
 		}
 
 		/*
 		 * Project Management Functionality
 		 */ 
 		$scope.createNewProject = function() {
-			TeamManagementService($scope, $cookies).createNewTeam();
+			teamManagementService.createNewTeam();
 		}
 
 		$scope.editSelectedProject = function() {
-			TeamManagementService($scope, $cookies).editTeam();
+			teamManagementService.editTeam();
+		}
+
+		$scope.transferTeamToCategory = function(categoryName, projectName) {
+			teamManagementService.transferTeamToCategory(categoryName, projectName);
 		}
 
 		/*
@@ -108,7 +67,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			if (typeof category === 'object') // Category is an object
 				$cookies.selectedCategory = category;
 			else if (typeof category === 'string') // Category is a name
-				$cookies.selectedCategory = $scope.getCategoryByName(category);
+				$cookies.selectedCategory = $cookies.categories.getByName(category);
 		}
 
 		$scope.viewCategoryDetails = function(event) {
@@ -201,6 +160,19 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 	return function($scope, $cookies) {
 		var cookieInitService = {};
 		var selectedEvent = $cookies.getObject('selected_event') || {id: 0};
+		$cookies.categories = {
+			list: [],
+			getByName: function(name) {
+				for (var i = 0; i < this.list.length; i++)
+					if (this.list[i].name === name)
+						return this.list[i];
+			},
+			getByID: function(id) {
+				for (var i = 0; i < this.list.length; i++)
+					if (this.list[i].id === id)
+						return this.list[i];
+			}
+		};
 
 		cookieInitService.initDefaultCookies = function() {
 			$cookies.currentView = 'default';
@@ -218,7 +190,6 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}
 
 		var initCategoryList = function(serverCategories) {
-			$cookies.categoryList = [];
 			angular.forEach(serverCategories, function(serverCategory) {
 				var category = {
 					id: serverCategory.id,
@@ -229,10 +200,10 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 					projects: [],
 					judges: []
 				}
-				$cookies.categoryList.push(category);
+				$cookies.categories.list.push(category);
 			});
-			$cookies.uncategorized = $cookies.categoryList[0];
-			$cookies.selectedCategory = $cookies.categoryList[0];
+			$cookies.uncategorized = $cookies.categories.list[0];
+			$cookies.selectedCategory = $cookies.categories.list[0];
 		}
 
 		var convertColorToHex = function(decimalColor) {
@@ -261,7 +232,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			connection.team_categories.get().$promise.then(function(resp) {
 				angular.forEach(resp.team_categories, function(team_category) {
 					var categoryID = team_category.category.id;
-					var category = $scope.getCategoryByID(categoryID);
+					var category = $cookies.categories.getByID(categoryID);
 					category.projects.push(team_category.team);
 				});
 			}).catch(function() {
@@ -280,7 +251,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 		initService.init = function() {
 			$scope.$watchCollection(function() {
-				return $cookies.categoryList;
+				return $cookies.categories.list;
 			}, function(newValue) {
 				$scope.categoryList = newValue;
 			});
@@ -338,10 +309,10 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				}
 				var connection = CategoryRESTService(CurrentUserService.getAuthHeader(), $scope.selectedEvent.id);
 				connection.new_category.create(categoryReq).$promise.then(function(resp) {
-					$cookies.categoryList.push(newCategory);
+					$cookies.categories.list.push(newCategory);
 					$scope.closeCategoryModal();
 					$log.log("New category created: " + JSON.stringify(newCategory));
-					$log.log("Category list updated: " + $cookies.categoryList.length);
+					$log.log("Category list updated: " + $cookies.categories.list.length);
 				}).catch(function() {
 					$scope.closeCategoryModal();
 					$scope.errorMessage = 'Error creating category on server.';
@@ -367,7 +338,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				}
 				var connection = CategoryRESTService(CurrentUserService.getAuthHeader(), updatedCategory.id);
 				connection.category.update(categoryReq).$promise.then(function(resp) {
-					$scope.editCurrentCategoryCookie($scope.selectedCategory.name, updatedCategory);
+					editCurrentCategoryCookie($scope.selectedCategory.name, updatedCategory);
 					$scope.closeCategoryModal();
 					$log.log("Category successfully edited: " + JSON.stringify(updatedCategory));
 				}).catch(function() {
@@ -380,6 +351,15 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			var convertColorToDecimal = function(hexColor) {
 				hexColor = hexColor.substring(1, hexColor.length);
 				return parseInt(hexColor, 16);
+			}
+
+			var editCurrentCategoryCookie = function(value, newObject) {
+				for (var i = 0; i < $cookies.categories.list.length; i++) {
+					if ($cookies.categories.list[i].name === value) {
+						$cookies.categories.list[i] = newObject;
+						return;
+					}
+				}
 			}
 
 			return categoryManagement;
@@ -443,6 +423,16 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$scope.closeProjectModal();
 			$log.log("Project edited: " + JSON.stringify($cookies.selectedProject));
 			$log.log(JSON.stringify($cookies.uncategorized));
+		}
+
+		teamManagement.transferTeamToCategory = function(categoryName, projectName) {
+			var category = $cookies.categories.getByName(categoryName);
+			var projectInfo = $.grep($cookies.uncategorized, function(project) {return program.name === projectName});
+			var projectIndex = projectInfo.index, project = projectInfo.project;
+			category.projects.push(project);
+			$cookies.uncategorized.projects.splice(projectInfo.index, projectInfo.index + 1); // TODO: remove to support teams being in multiple categories
+			$scope.$apply(); // Reflect increased project length in UI
+			$log.log("Added " + projectName + " to " + categoryName + ".");
 		}
 
 		teamManagement.getProjectNumberOptions = function() { // TODO: remove numbers that are unavailable

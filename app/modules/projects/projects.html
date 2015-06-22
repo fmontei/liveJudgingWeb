@@ -199,7 +199,7 @@
 						</a>
 			    </li>
 					<div ng-repeat="category in categoryList" ng-if="category.name != 'Uncategorized'">
-						<li class="droppable-category" cng-droppable-category callback="$parent.addProjectToCategoryCookie(categoryName, projectName)" category-name="{{category.name}}">
+						<li class="droppable-category" cng-droppable-category callback="$parent.transferTeamToCategory(categoryName, projectName)" category-name="{{category.name}}">
 			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
 			        	<h3>
 									<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
