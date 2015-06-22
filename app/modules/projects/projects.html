@@ -1,428 +1,426 @@
-<div ng-controller="ProjectsCtrl">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col col-sm-8 col-md-8 col-lg-8">
-			
-				<div ng-switch on="currentView">
-					<div ng-switch-default>
-						<div class="row">
-							<div class="page-header">
-								<h1>Projects <span class="label label-default">{{projectList.length}}</span></h1>
-							</div>
-						</div>
-					</div>
-					<div ng-switch-when="selectedCategory">
-						<div class="row">
-							<div class="page-header current-category-header">
-								<h1 id="breadcrumb-symbol">
-									<a ng-click="changeView('default')">Projects</a><span id="slash">&nbsp;/</span> {{selectedCategory.name}} 
-									<span class="label label-default">{{selectedCategory.projects.length}}</span>
-								</h1>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<div class="row">
-					<div class="col-sm-8 col-md-8 col-lg-8">
-						<em>Drag-'n-drop projects into categories.</em>
-					</div>
-					<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
-						<div class="row">
-							<div class="col-sm-5 col-md-5 col-lg-5">
-							</div>
-							<div class="col-sm-7 col-md-7 col-lg-7">
-								<div class="dropdown" id="projects-tab-dropdown">
-									<button class="btn btn-default dropdown-toggle" type="button" 
-										data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-										Sort by
-										<span class="caret"></span>
-									</button>
-									<ul class="dropdown-menu" aria-labelledby="projects-dropdown">
-										<li><a href="#/projects" ng-click="changeView('default')">Name</a></li>
-										<li><a href="#/projects" ng-click="changeView('category')">Category</a></li>
-										<li><a href="#/projects">Number</a></li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<div ng-switch on="currentView">
-					<div ng-switch-default>
-						<div class="row">
-							<div class="col col-sm-12 col-md-12 col-lg-12">
-								<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
-									<span class="glyphicon glyphicon-plus"></span>
-									Add Project
-								</button>
-							</div>
-						</div><br />
-						
-						<div ng-repeat="project in uncategorized.projects">
-						<div ng-if="$index % 4 == 0" class="row"></div>
-							<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
-								<div class="media draggable-project" cng-draggable-project projectName="{{project.name}}">
-									<div class="media-left">
-										<a href="#">
-											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-										</a>
-									</div>
-									<div class="media-body">
-										<h4 class="media-heading">
-											{{project.number}}
-											<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
-										</h4>
-										<span>{{project.name}}</span>
-									</div>
-								</div>
-							</div>
-						</div>
-			
-					</div> <!--ng-switch-default-->
-					
-					<div ng-switch-when="category">
-						<div ng-repeat="category in categoryList">
-							<div class="accordion project-accordion">
-								<div class="panel panel-default accordion-group" 
-								     cng-category-accordion color="{{category.color}}" 
-										 category-name="{{category.name}}" 
-										 change-category="updateSelectedCategory(category)">
 
-									<div class="panel-heading">
-										<div class="row">
-											<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
-												<div class="truncate">
-													<div class="accordion-heading">
-														<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
-															<span class="glyphicon glyphicon-chevron-right"></span> {{category.name}} 
-														</a>
-													</div>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col col-sm-8 col-md-8 col-lg-8">
+		
+			<div ng-switch on="currentView">
+				<div ng-switch-default>
+					<div class="row">
+						<div class="page-header">
+							<h1>Projects <span class="label label-default">{{projectList.length}}</span></h1>
+						</div>
+					</div>
+				</div>
+				<div ng-switch-when="selectedCategory">
+					<div class="row">
+						<div class="page-header current-category-header">
+							<h1 id="breadcrumb-symbol">
+								<a ng-click="changeView('default')">Projects</a><span id="slash">&nbsp;/</span> {{selectedCategory.name}} 
+								<span class="label label-default">{{selectedCategory.projects.length}}</span>
+							</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-8 col-md-8 col-lg-8">
+					<em>Drag-'n-drop projects into categories.</em>
+				</div>
+				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
+					<div class="row">
+						<div class="col-sm-5 col-md-5 col-lg-5">
+						</div>
+						<div class="col-sm-7 col-md-7 col-lg-7">
+							<div class="dropdown" id="projects-tab-dropdown">
+								<button class="btn btn-default dropdown-toggle" type="button" 
+									data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+									Sort by
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu" aria-labelledby="projects-dropdown">
+									<li><a href="#/projects" ng-click="changeView('default')">Name</a></li>
+									<li><a href="#/projects" ng-click="changeView('category')">Category</a></li>
+									<li><a href="#/projects">Number</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div ng-switch on="currentView">
+				<div ng-switch-default>
+					<div class="row">
+						<div class="col col-sm-12 col-md-12 col-lg-12">
+							<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
+								<span class="glyphicon glyphicon-plus"></span>
+								Add Project
+							</button>
+						</div>
+					</div><br />
+					
+					<div ng-repeat="project in uncategorized.projects | orderBy: '+name'">
+					<div ng-if="$index % 4 == 0" class="row"></div>
+						<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
+							<div class="media draggable-project" cng-draggable-project projectName="{{project.name}}">
+								<div class="media-left">
+									<a href="#">
+										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+									</a>
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">
+										{{project.number}}
+										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+									</h4>
+									<span>{{project.name}}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+		
+				</div> <!--ng-switch-default-->
+				
+				<div ng-switch-when="category">
+					<div ng-repeat="category in categoryList">
+						<div class="accordion project-accordion">
+							<div class="panel panel-default accordion-group" 
+							     cng-category-accordion color="{{category.color}}" 
+									 category-name="{{category.name}}" 
+									 change-category="updateSelectedCategory(category)">
+
+								<div class="panel-heading">
+									<div class="row">
+										<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
+											<div class="truncate">
+												<div class="accordion-heading">
+													<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
+														<span class="glyphicon glyphicon-chevron-right"></span> {{category.name}} 
+													</a>
 												</div>
-											</span>
-										</div> 
-									</div>
-						
-									<div id="category{{$index}}" class="accordion-body collapse">
-										<div class="accordion-inner">
-											<div class="panel-body">
-												
-												<div ng-repeat="project in category.projects">
-													<br ng-if="$index % 3 == 0 && $index > 0" />
-													<div class="col col-sm-4 col-md-4 col-lg-4">
-														<div class="media category-accordion-media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
-															<div class="media-left">
-																<a href="#">
-																	<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-																</a>
-															</div>
-															<div class="media-body">
-																<h4 class="media-heading">
-																	{{project.number}}
-																	<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
-																</h4>
-																<span>{{project.name}}</span>
-															</div>
+											</div>
+										</span>
+									</div> 
+								</div>
+					
+								<div id="category{{$index}}" class="accordion-body collapse">
+									<div class="accordion-inner">
+										<div class="panel-body">
+											
+											<div ng-repeat="project in category.projects">
+												<br ng-if="$index % 3 == 0 && $index > 0" />
+												<div class="col col-sm-4 col-md-4 col-lg-4">
+													<div class="media category-accordion-media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
+														<div class="media-left">
+															<a href="#">
+																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+															</a>
+														</div>
+														<div class="media-body">
+															<h4 class="media-heading">
+																{{project.number}}
+																<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+															</h4>
+															<span>{{project.name}}</span>
 														</div>
 													</div>
 												</div>
-
 											</div>
+
 										</div>
 									</div>
-									
 								</div>
-							</div>
-						</div> <!--ng-repeat-->
-					</div> <!--ng-switch-when-->
-
-					<div ng-switch-when="selectedCategory">
-
-						<div class="row">
-							<div class="col col-sm-12 col-md-12 col-lg-12">
-								<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
-									<span class="glyphicon glyphicon-plus"></span>
-									Add Project to {{selectedCategory.name}}
-								</button>
-							</div>
-						</div><br />
-
-						<div ng-repeat="project in selectedCategory.projects track by $index">
-							<div ng-if="$index % 4 == 0" class="row"></div>
-							<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
-								<div class="media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
-									<div class="media-left">
-										<a href="#">
-											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-										</a>
-									</div>
-									<div class="media-body">
-										<h4 class="media-heading">
-											{{project.number}}
-											<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
-										</h4>
-										<span>{{project.name}}</span>
-									</div>
-								</div>
+								
 							</div>
 						</div>
-					</div> <!--ng-switch-when-->
-					
-				</div> <!--ng-switch on-->
-			</div> 
-			
-			<div class="col-sm-4 col-md-4 col-lg-4">
-				<div class="text-center" id="category-container">
-				
+					</div> <!--ng-repeat-->
+				</div> <!--ng-switch-when-->
+
+				<div ng-switch-when="selectedCategory">
+
 					<div class="row">
-						<div class="page-header">
-							<h1>Categories <span class="label label-default">3</span></h1>
+						<div class="col col-sm-12 col-md-12 col-lg-12">
+							<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
+								<span class="glyphicon glyphicon-plus"></span>
+								Add Project to {{selectedCategory.name}}
+							</button>
+						</div>
+					</div><br />
+
+					<div ng-repeat="project in selectedCategory.projects track by $index">
+						<div ng-if="$index % 4 == 0" class="row"></div>
+						<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
+							<div class="media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
+								<div class="media-left">
+									<a href="#">
+										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+									</a>
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">
+										{{project.number}}
+										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+									</h4>
+									<span>{{project.name}}</span>
+								</div>
+							</div>
 						</div>
 					</div>
+				</div> <!--ng-switch-when-->
 				
-					<ul>
-						<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalView('create')">
-							<span class="glyphicon glyphicon-plus"></span> Add Category
-						</button>
-					</ul>
-					
-					<ul id="category-list">
-						<br /><br />
-						<li class="droppable-category">
-			        <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails('uncategorized')">
-			         	<h3></h3>
+			</div> <!--ng-switch on-->
+		</div> 
+		
+		<div class="col-sm-4 col-md-4 col-lg-4">
+			<div class="text-center" id="category-container">
+			
+				<div class="row">
+					<div class="page-header">
+						<h1>Categories <span class="label label-default">3</span></h1>
+					</div>
+				</div>
+			
+				<ul>
+					<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalView('create')">
+						<span class="glyphicon glyphicon-plus"></span> Add Category
+					</button>
+				</ul>
+				
+				<ul id="category-list">
+					<br /><br />
+					<li class="droppable-category">
+		        <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails('uncategorized')">
+		         	<h3></h3>
+							<div>
+								<div><u>{{uncategorized.name}}</u></div>
+								<span class="droppable-category-text">{{uncategorized.projects.length}} Projects</span>
+							</div>
+						</a>
+			    </li>
+					<div ng-repeat="category in categoryList" ng-if="category.name != 'Uncategorized'">
+						<li class="droppable-category" cng-droppable-category callback="$parent.addProjectToCategoryCookie(categoryName, projectName)" category-name="{{category.name}}">
+			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
+			        	<h3>
+									<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
+								</h3>
 								<div>
-									<div><u>{{uncategorized.name}}</u></div>
-									<span class="droppable-category-text">{{uncategorized.projects.length}} Projects</span>
+									<div><u>{{category.name}}</u></div>
+									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.projects.length}} Projects</span>
+									<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
 								</div>
 							</a>
 				    </li>
-						<div ng-repeat="category in categoryList" ng-if="category.name != 'Uncategorized'">
-							<li class="droppable-category" cng-droppable-category callback="$parent.addProjectToCategoryCookie(categoryName, projectName)" category-name="{{category.name}}">
-				        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
-				        	<h3>
-										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
-									</h3>
-									<div>
-										<div><u>{{category.name}}</u></div>
-										<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.projects.length}} Projects</span>
-										<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
-									</div>
-								</a>
-					    </li>
-				    </div>
-				    <br /><br /> 
-					</ul>
-					
-				</div> <!--Text-Center-->
-			</div> <!--Col-->
+			    </div>
+			    <br /><br /> 
+				</ul>
+				
+			</div> <!--Text-Center-->
+		</div> <!--Col-->
 
-		</div> <!--Row-->
-	</div> <!--Container-Fluid-->
+	</div> <!--Row-->
+</div> <!--Container-Fluid-->
 
-	<!-- Category Modal -->
-	<div class="modal fade" id="category-modal" tabindex="-1" role="dialog" aria-labelledby="category-modal" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content panel-success">
-				<div class="modal-header panel-heading">
-					<button type="button" class="close" aria-label="Close" ng-click="closeCategoryModal()"><span aria-hidden="true">&times;</span></button>
-					<div ng-switch on="categoryModalView">
-						<div ng-switch-when="create">
-							<h4 class="modal-title" id="category-modal-label">Add New Category</h4>
+<!-- Category Modal -->
+<div class="modal fade" id="category-modal" tabindex="-1" role="dialog" aria-labelledby="category-modal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content panel-success">
+			<div class="modal-header panel-heading">
+				<button type="button" class="close" aria-label="Close" ng-click="closeCategoryModal()"><span aria-hidden="true">&times;</span></button>
+				<div ng-switch on="categoryModalView">
+					<div ng-switch-when="create">
+						<h4 class="modal-title" id="category-modal-label">Add New Category</h4>
+					</div>
+					<div ng-switch-when="edit">
+						<h4 class="modal-title" id="category-modal-label">Edit Category: {{categoryName}}</h4>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-body">
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Category Name:</label>
+					</div>
+					<div class="col col-lg-7 col-md-7 col-sm-7">
+						<input class="form-control" 
+						       type="text" 
+						       ng-model="categoryName"
+						       required
+						       autofocus />
+					</div>
+				</div><br />
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Description:</label>
+					</div>
+					<div class="col col-lg-7 col-md-7 col-sm-7">
+						<textarea class="form-control" 
+						          rows="3" 
+						          ng-model="categoryDesc"></textarea>
+					</div>
+				</div><br />
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Due by:</label>
+					</div>
+					<div class="col col-lg-5 col-md-5 col-sm-5">
+						<div class="row">
+							<div class="col-sm-8 col-md-8 col-lg-8">
+								<timepicker minute-step="1"
+													  ng-model="categoryTime"
+													  required>
+								</timepicker>
+							</div>
 						</div>
-						<div ng-switch-when="edit">
-							<h4 class="modal-title" id="category-modal-label">Edit Category: {{categoryName}}</h4>
+					</div>
+				</div><br />
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Color:</label>
+					</div>
+					<div class="col col-lg-5 col-md-5 col-sm-5">
+						<div class="input-group">
+							<input type="text" 
+							       class="form-control" 
+							       cng-color-picker 
+							       color="{{categoryColor}}"
+							       ng-model="categoryColor" />
 						</div>
 					</div>
 				</div>
+				<br />
+			</div> <!-- /.modal-body -->
 
-				<div class="modal-body">
-					<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Category Name:</label>
-						</div>
-						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<input class="form-control" 
-							       type="text" 
-							       ng-model="categoryName"
-							       required
-							       autofocus />
-						</div>
-					</div><br />
-					<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Description:</label>
-						</div>
-						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<textarea class="form-control" 
-							          rows="3" 
-							          ng-model="categoryDesc"></textarea>
-						</div>
-					</div><br />
-					<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Due by:</label>
-						</div>
-						<div class="col col-lg-5 col-md-5 col-sm-5">
-							<div class="row">
-								<div class="col-sm-8 col-md-8 col-lg-8">
-									<timepicker minute-step="1"
-														  ng-model="categoryTime"
-														  required>
-									</timepicker>
+			<div ng-switch on="categoryModalView">
+				<div ng-switch-when="create">
+					<div class="modal-footer">
+      			<button type="button" class="btn btn-success" ng-click="createNewCategory()">Save changes</button>
+      			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
+					</div> <!-- ./modal-footer -->
+				</div> <!-- ng-switch-when-"ceate" -->
+				<div ng-switch-when="edit">
+					<div class="modal-footer">
+      			<button type="button" class="btn btn-success" ng-click="editSelectedCategory()">Save changes</button>
+      			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
+					</div> <!-- /.modal-footer-->
+				</div> <!-- ng-switch-when-"edit" -->
+			</div> <!-- ng-switch on="categoryModalView" -->
+
+		</div>
+	</div>
+</div>
+
+<!-- Project Modal -->
+<div class="modal fade" id="project-modal" tabindex="-1" role="dialog" aria-labelledby="project-modal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content panel-success">
+      <div class="modal-header panel-heading">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+   			<div ng-switch on="projectModalView">
+   				<div ng-switch-when="create">
+		        <div ng-switch on="currentView">
+		        	<div ng-switch-when="default">
+		        		<h4 class="modal-title">Add New Project</h4>
+	        		</div>
+	        		<div ng-switch-when="selectedCategory">
+	        			<h4 class="modal-title">Add New Project to {{selectedCategory.name}}</h4>
+	        		</div>
+	      		</div>
+      		</div> <!-- ng-switch-when="create" -->
+      		<div ng-switch-when="edit">
+      			<h4 class="modal-title">Edit Project: {{projectName}}</h4>
+      		</div> <!-- ng-switch-when="edit" -->
+    		</div> <!-- ng-switch on="projectModalView" -->
+
+      </div>
+
+      <div class="modal-body">
+      	<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Project Name:</label>
+					</div>
+					<div class="col col-lg-7 col-md-7 col-sm-7">
+						<input class="form-control" 
+									 type="text" 
+									 ng-model="projectName"
+									 required
+									 autofocus />
+					</div>
+				</div><br />
+
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Project #:</label>
+					</div>
+					<div class="col col-lg-7 col-md-7 col-sm-7">
+						<select ng-model="projectNumber" required>
+							<option ng-repeat="number in projectNumberOptions">{{number}}</option>
+						</select>
+					</div>
+				</div><br />
+				
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Logo:</label>
+					</div>
+					<div class="col col-lg-2 col-md-2 col-sm-2">
+						<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+					</div>
+					<div class="col col-lg-5 col-md-5 col-sm-5" style="margin-left: -20px">
+						<div class="row">
+							<div class="col col-lg-12 col-md-12 col-sm-12">
+								<div class="input-group">
+									<span class="input-group-btn">
+						        <button class="btn btn-sm btn-default" 
+						                type="button">Select file...</button>
+						      </span>
+								  <input type="text" 
+								         class="form-control input-sm" 
+								         placeholder="File" 
+								         style="width: 115%"
+								         ng-model="projectLogo">
 								</div>
 							</div>
 						</div>
-					</div><br />
-					<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Color:</label>
-						</div>
-						<div class="col col-lg-5 col-md-5 col-sm-5">
-							<div class="input-group">
-								<input type="text" 
-								       class="form-control" 
-								       cng-color-picker 
-								       color="{{categoryColor}}"
-								       ng-model="categoryColor" />
+						<div class="row" style="margin-top: 4px">
+							<div class="col col-lg-12 col-md-12 col-sm-12">
+								<button class="btn btn-sm btn-default">Upload</button>
 							</div>
 						</div>
 					</div>
-					<br />
-				</div> <!-- /.modal-body -->
+				</div><br />
 
-				<div ng-switch on="categoryModalView">
-					<div ng-switch-when="create">
-						<div class="modal-footer">
-        			<button type="button" class="btn btn-success" ng-click="createNewCategory()">Save changes</button>
-        			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
-						</div> <!-- ./modal-footer -->
-					</div> <!-- ng-switch-when-"ceate" -->
-					<div ng-switch-when="edit">
-						<div class="modal-footer">
-        			<button type="button" class="btn btn-success" ng-click="editSelectedCategory()">Save changes</button>
-        			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
-						</div> <!-- /.modal-footer-->
-					</div> <!-- ng-switch-when-"edit" -->
-				</div> <!-- ng-switch on="categoryModalView" -->
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+						<label>Description:</label>
+					</div>
+					<div class="col col-lg-7 col-md-7 col-sm-7">
+						<textarea class="form-control" 
+						          rows="3" 
+						          ng-model="projectDesc"
+						          required>
+	          </textarea>
+					</div>
+				</div><br />
+      </div> <!-- ./modal-body -->
 
-			</div>
-		</div>
-	</div>
+      <div ng-switch on="projectModalView">
+				<div ng-switch-when="create">
+					<div class="modal-footer">
+      			<button type="button" class="btn btn-success" ng-click="createNewProject()">Save changes</button>
+      			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
+					</div> <!-- ./modal-footer -->
+				</div> <!-- ng-switch-when-"ceate" -->
+				<div ng-switch-when="edit">
+					<div class="modal-footer">
+      			<button type="button" class="btn btn-success" ng-click="editSelectedProject()">Save changes</button>
+      			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
+					</div> <!-- /.modal-footer-->
+				</div> <!-- ng-switch-when-"edit" -->
+			</div> <!-- ng-switch on="categoryModalView" -->
 
-	<!-- Project Modal -->
-	<div class="modal fade" id="project-modal" tabindex="-1" role="dialog" aria-labelledby="project-modal" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content panel-success">
-	      <div class="modal-header panel-heading">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
-	   			<div ng-switch on="projectModalView">
-	   				<div ng-switch-when="create">
-			        <div ng-switch on="currentView">
-			        	<div ng-switch-when="default">
-			        		<h4 class="modal-title">Add New Project</h4>
-		        		</div>
-		        		<div ng-switch-when="selectedCategory">
-		        			<h4 class="modal-title">Add New Project to {{selectedCategory.name}}</h4>
-		        		</div>
-		      		</div>
-	      		</div> <!-- ng-switch-when="create" -->
-	      		<div ng-switch-when="edit">
-	      			<h4 class="modal-title">Edit Project: {{projectName}}</h4>
-	      		</div> <!-- ng-switch-when="edit" -->
-      		</div> <!-- ng-switch on="projectModalView" -->
-
-	      </div>
-
-	      <div class="modal-body">
-	      	<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Project Name:</label>
-						</div>
-						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<input class="form-control" 
-										 type="text" 
-										 ng-model="projectName"
-										 required
-										 autofocus />
-						</div>
-					</div><br />
-
-					<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Project #:</label>
-						</div>
-						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<select ng-model="projectNumber" required>
-								<option ng-repeat="number in projectNumberOptions">{{number}}</option>
-							</select>
-						</div>
-					</div><br />
-					
-					<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Logo:</label>
-						</div>
-						<div class="col col-lg-2 col-md-2 col-sm-2">
-							<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-						</div>
-						<div class="col col-lg-5 col-md-5 col-sm-5" style="margin-left: -20px">
-							<div class="row">
-								<div class="col col-lg-12 col-md-12 col-sm-12">
-									<div class="input-group">
-										<span class="input-group-btn">
-							        <button class="btn btn-sm btn-default" 
-							                type="button">Select file...</button>
-							      </span>
-									  <input type="text" 
-									         class="form-control input-sm" 
-									         placeholder="File" 
-									         style="width: 115%"
-									         ng-model="projectLogo">
-									</div>
-								</div>
-							</div>
-							<div class="row" style="margin-top: 4px">
-								<div class="col col-lg-12 col-md-12 col-sm-12">
-									<button class="btn btn-sm btn-default">Upload</button>
-								</div>
-							</div>
-						</div>
-					</div><br />
-
-					<div class="row">
-						<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-							<label>Description:</label>
-						</div>
-						<div class="col col-lg-7 col-md-7 col-sm-7">
-							<textarea class="form-control" 
-							          rows="3" 
-							          ng-model="projectDesc"
-							          required>
-		          </textarea>
-						</div>
-					</div><br />
-	      </div> <!-- ./modal-body -->
-
-	      <div ng-switch on="projectModalView">
-					<div ng-switch-when="create">
-						<div class="modal-footer">
-        			<button type="button" class="btn btn-success" ng-click="createNewProject()">Save changes</button>
-        			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
-						</div> <!-- ./modal-footer -->
-					</div> <!-- ng-switch-when-"ceate" -->
-					<div ng-switch-when="edit">
-						<div class="modal-footer">
-        			<button type="button" class="btn btn-success" ng-click="editSelectedProject()">Save changes</button>
-        			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
-						</div> <!-- /.modal-footer-->
-					</div> <!-- ng-switch-when-"edit" -->
-				</div> <!-- ng-switch on="categoryModalView" -->
-
-	    </div><!-- /.modal-content -->
-	  </div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
-
-</div> <!--ProjectsCtrl-->
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
