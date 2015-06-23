@@ -211,7 +211,13 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}
 
 		var convertColorToHex = function(decimalColor) {
-			return '#' + decimalColor.toString(16);
+			var hexColor = decimalColor.toString(16);
+			if (hexColor.length == 4)
+				return '#00' + hexColor;
+			else if (hexColor.length == 5)
+				return '#0' + hexColor;
+			else if (hexColor.length == 6)
+				return '#' + hexColor;
 		}
 
 		cookieInitService.initTeams = function() {
@@ -255,9 +261,9 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 		initService.init = function() {
 			$scope.$watchCollection(function() {
-				return $cookies.categories.list;
+				return $cookies.categories;
 			}, function(newValue) {
-				$scope.categoryList = newValue;
+				$scope.categories = newValue;
 			});
 
 			$scope.$watchCollection(function() { 
@@ -404,8 +410,8 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 		var addNewTeamToUncategorized = function(newTeam, teamID) {
 			var teamCategoryConnection = TeamRESTService(authHeader, teamID);
-			var teamCategoryResp = {category_id: $cookies.uncategorized.id};
-			teamCategoryConnection.team_categories.add_team(teamCategoryResp).$promise.then(function(resp) {
+			var teamCategoryReq = {category_id: $cookies.uncategorized.id};
+			teamCategoryConnection.team_categories.add_team(teamCategoryReq).$promise.then(function(resp) {
 				if ($scope.currentView === 'default') {
 					$cookies.uncategorized.projects.push(newTeam);
 				} else if ($scope.currentView === 'selectedCategory') {
@@ -419,7 +425,8 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			});
 		}
 
-		teamManagement.editTeam = function() {
+		// TODO
+		teamManagement.editTeam = function() { 
 			$cookies.selectedProject.name = $scope.projectName;
 			$cookies.selectedProject.number = $scope.projectNumber;
 			$cookies.selectedProject.logo = $scope.projectLogo;
@@ -431,10 +438,15 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 		teamManagement.transferTeamToCategory = function(categoryName, projectName) {
 			var category = $cookies.categories.getByName(categoryName);
-			var project = $cookies.categories.getProjectByName('Uncategorized', projectName);	
-			category.projects.push(project);
-			$scope.$apply(); // Reflect increased project length in UI
-			$log.log("Added " + projectName + " to " + categoryName + ".");
+			var team = $cookies.categories.getProjectByName('Uncategorized', projectName);	
+			var transferConnection = TeamRESTService(authHeader, team.id);
+			var req = {category_id: category.id};
+			transferConnection.team_categories.add_team(req).$promise.then(function(resp) {
+				category.projects.push(team);
+				$log.log("Added " + projectName + " to " + categoryName + ".");
+			}).catch(function() {
+				$scope.error = 'Error transferring team to category.'
+			});
 		}
 
 		teamManagement.getProjectNumberOptions = function() { // TODO: remove numbers that are unavailable
@@ -570,25 +582,21 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				var droppedProject = ui.draggable;
 				var projectName = droppedProject.attr('projectName').trim();
 				var categoryName = scope.categoryName.trim();
-				var projectAlreadyExists = scope.checkCategory({categoryName: categoryName, projectName: projectName});
-				if (droppedProject.is('[cng-draggable-project]')) {
-					moveProjectBack(droppedProject);
-					if (!projectAlreadyExists) {
-						var categoryContainer = $(event.target).find('a');
-						performFlashAnimation(categoryContainer);
-						scope.updateCategory({categoryName: categoryName, projectName: projectName});
-					}
-		  	}
+				var alreadyExists = scope.checkCategory({categoryName: categoryName, projectName: projectName});
+				dragProjectBack(droppedProject);
+				if (!alreadyExists) {
+					var categoryContainer = $(event.target).find('a');
+					performFlashAnimation(categoryContainer);
+					scope.updateCategory({categoryName: categoryName, projectName: projectName});
+				}
 			}
 		});
 
-		var moveProjectBack = function(droppedProject) {
+		var dragProjectBack = function(droppedProject) {
 			var originalPosition = droppedProject.data('originalPosition');
 			var leftDifference = droppedProject.offset().left - originalPosition.left;
-			leftDifference = (leftDifference < 0) ? leftDifference * -1 : leftDifference;
 			var leftDecrement = '-=' + leftDifference;
 			var topDifference = droppedProject.offset().top - originalPosition.top;
-			topDifference = (topDifference < 0) ? topDifference * -1 : topDifference;
 			var topDecrement = '-=' + topDifference;
 			droppedProject.animate({
     		'left': leftDecrement,

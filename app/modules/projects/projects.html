@@ -62,7 +62,7 @@
 					
 					<div ng-repeat="project in uncategorized.projects | orderBy: '+name'">
 					<div ng-if="$index % 4 == 0" class="row"></div>
-						<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
+						<div class="col col-sm-4 col-md-4 col-lg-4 project-col">
 							<div class="media draggable-project" cng-draggable-project projectName="{{project.name}}">
 								<div class="media-left">
 									<a href="#">
@@ -83,7 +83,7 @@
 				</div> <!--ng-switch-default-->
 				
 				<div ng-switch-when="category">
-					<div ng-repeat="category in categoryList">
+					<div ng-repeat="category in categories.list">
 						<div class="accordion project-accordion">
 							<div class="panel panel-default accordion-group" 
 							     cng-category-accordion color="{{category.color}}" 
@@ -198,11 +198,11 @@
 							</div>
 						</a>
 			    </li>
-					<div ng-repeat="category in categoryList" ng-if="category.name != 'Uncategorized'">
+					<div ng-repeat="category in categories.list" ng-if="category.name != 'Uncategorized'">
 						<li class="droppable-category" 
 							  cng-droppable-category 
 							  category-name="{{category.name}}"
-							  check-category="$parent.isProjectAlreadyInCategory(categoryName, projectName)" 
+							  check-category="$parent.categories.getProjectByName(categoryName, projectName)" 
 							  update-category="$parent.transferTeamToCategory(categoryName, projectName)">
 			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
 			        	<h3>
