@@ -1,0 +1,32 @@
+<!--Event Selection View-->
+<div class="container-fluid">
+  <div class="text-center">
+      <div class="jumbotron custom-jumbotron">
+        <div class="row" >
+            <div class="col-sm-2 col-md-2 col-lg-2"></div>
+            <h1 id="event-selection-h1">Event Selection</h1>
+            <div class="col-sm-3 col-md-3 col-lg-3">
+              <div class="row event-selection-row">
+                <button class="btn btn-lg btn-success" 
+                        ng-click="showCreateEventForm()">
+                  <span class="glyphicon glyphicon-plus"></span> 
+                  Create New
+                </button>
+              </div>
+              <div ng-repeat="event in eventList">
+                <div class="row event-selection-row">
+                  <button class="btn btn-lg btn-primary"
+                          ng-click="selectEvent(event)"
+                          ng-mouseover="reveal_event_desc(event.desc)">
+                    {{event.name}}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-offset-2 col-md-offset-2 col-lg-offset-2 col-sm-5 col-md-5 col-lg-5">
+              <div id="event-selection-desc"></div>
+            </div>
+        </div>
+      </div> <!--Jumbotron-->
+  </div> <!--Text-Center-->
+</div>

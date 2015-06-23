@@ -52,7 +52,7 @@ angular.module('liveJudgingAdmin', [
 
     // Used to determine if the sidebar should be hidden.
     $scope.isDashboard = function() {
-      if ($scope.currentPath === '/login' || $scope.currentPath === '/eventSelect') {
+      if ($scope.currentPath === '/login' || $scope.currentPath === '/eventSelect' || !$cookies.get('selected_event')) {
         return false;
       }
       return true;

@@ -37,8 +37,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
         $scope.register = function(user) {
             User.register(user).$promise.then(function(user) {
                 console.log('User registered.');
-                // TODO: Make a 'thanks for registering' screen? Or just login?'
-                //$location.path('/registrationSuccess');
+                alert("Successfully registered.");
             });
         };
 
@@ -113,7 +112,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
             $cookies.putObject('current_user', resp.user);
             $rootScope.isLoggedIn = true;
             $rootScope.$broadcast('loggedIn');
-            $location.path('/event');
+            $location.path('/eventSelect');
         }).catch(function() {
             service.hasLoginError = true;
         });
@@ -124,9 +123,10 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
             console.log("Server failed to logout.");
         }).finally(function() {
             $cookies.remove('current_user');
-            $cookies.remove('view');
+            $cookies.remove('event_view');
             $cookies.remove('selected_event');
             $cookies.remove('prev_event_view');
+
             service.currentUser = null;
             $rootScope.isLoggedIn = false;
             $rootScope.$broadcast('loggedOut');

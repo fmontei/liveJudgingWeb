@@ -1,0 +1,152 @@
+<!--Event Edit View-->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 ng-if="isCreation">Create New Event</h1>
+      <h1 ng-if="!isCreation">Edit Event Info</h1>
+      <hr>
+
+      <form class="edit-event-form">
+        <div class="row">
+          <div class="col col-lg-2 col-md-2 col-sm-2">
+            <label>Event Name:</label>
+          </div>
+          <div class="col col-lg-3 col-md-3 col-sm-3">
+            <input class="form-control"
+                   type="text"
+                   placeholder="Event Name"
+                   ng-model="eventForm.name"
+                   required
+                   autofocus />
+          </div>
+        </div><br />
+
+        <div class="row">
+          <div class="col col-lg-2 col-md-2 col-sm-2">
+            <label>Location:</label>
+          </div>
+          <div class="col col-lg-3 col-md-3 col-sm-3">
+            <input class="form-control"
+                   type="text"
+                   placeholder="Location"
+                   ng-model="eventForm.location"
+                   required
+                   autofocus />
+          </div>
+        </div><br />
+
+        <div class="row">
+            <div class="col col-lg-2 col-md-2 col-sm-2">
+              <label>Start Date:</label>
+            </div>
+            <div class="col col-lg-10 col-md-10 col-sm-10">
+              <div class="row">
+                <div class="col col-lg-3 col-md-4 col-sm-4">
+                  <p class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           datepicker-popup
+                           ng-model="eventForm.startDate"
+                           is-open="datePicker.startOpened"
+                           required
+                           close-text="Close" />
+                    <span class="input-group-btn">
+                      <button type="button"
+                              class="btn btn-default"
+                              ng-click="toggleDatePicker($event, 'start')">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                      </button>
+                    </span>
+                  </p>
+                </div>
+                <div class="col col-lg-4 col-md-4 col-sm-4">
+                  <multi-day-event-widget>
+                    <div class="checkbox">
+                      <label><input type="checkbox" id="multi-day-event-checkbox" ng-model="eventForm.isMultiDay">Multi-day event?</label>
+                    </div>
+                  <multi-day-event-widget>
+                </div>
+              </div>
+            </div>
+        </div>
+        
+        <div id="end-date-optional">
+          <div class="row">
+            <div class="col col-lg-2 col-md-2 col-sm-2">
+              <label>End Date:</label>
+            </div>
+            <div class="col col-lg-10 col-md-10 col-sm-10">
+              <div class="row">
+                <div class="col col-lg-3 col-md-4 col-sm-4">
+                  <p class="input-group">
+                      <input type="text"
+                             class="form-control"
+                             datepicker-popup
+                             ng-model="eventForm.endDate"
+                             is-open="datePicker.endOpened"
+                             required
+                             close-text="Close" />
+                      <span class="input-group-btn">
+                        <button type="button"
+                                class="btn btn-default"
+                                ng-click="toggleDatePicker($event, 'end')">
+                          <i class="glyphicon glyphicon-calendar"></i>
+                        </button>
+                      </span>
+                    </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col col-lg-2 col-md-2 col-sm-2">
+            <label>Start Time:</label>
+          </div>
+          <div class="col col-lg-10 col-md-10 col-sm-10">
+            <div class="row">
+              <span class="col col-lg-2 col-md-2 col-sm-3">
+               <timepicker ng-model="eventForm.startTime"
+                           minute-step="15"
+                           required></timepicker>
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col col-lg-2 col-md-2 col-sm-2">
+            <label>End Time:</label>
+          </div>
+          <div class="col col-lg-10 col-md-10 col-sm-10">
+            <div class="row">
+              <span class="col col-lg-2 col-md-2 col-sm-3">
+                <timepicker ng-model="eventForm.endTime"
+                            minute-step="15"
+                            required></timepicker>
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col col-lg-2 col-md-2 col-sm-2">
+          </div>
+          <div class="col col-lg-4 col-md-4 col-sm-4">
+            <button class="btn btn-lg btn-primary"
+                    ng-click="saveEvent(eventForm)">
+              Save
+            </button>
+
+            <button class="btn btn-lg btn-default"
+                    ng-click="cancel()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
