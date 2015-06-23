@@ -430,7 +430,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			var projectInfo = $.grep($cookies.uncategorized, function(project) {return program.name === projectName});
 			var projectIndex = projectInfo.index, project = projectInfo.project;
 			category.projects.push(project);
-			$cookies.uncategorized.projects.splice(projectInfo.index, projectInfo.index + 1); // TODO: remove to support teams being in multiple categories
+			//$cookies.uncategorized.projects.splice(projectInfo.index, projectInfo.index + 1); // TODO: remove to support teams being in multiple categories
 			$scope.$apply(); // Reflect increased project length in UI
 			$log.log("Added " + projectName + " to " + categoryName + ".");
 		}
@@ -540,6 +540,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				    left: Math.floor(ui.helper.width() / 2),
 				    top: Math.floor(ui.helper.height() / 2)
 				  }); 
+				  elem.data('originalPosition', elem.offset());
 				}	
 			});
 
@@ -564,8 +565,17 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			drop: function(event, ui) {
 				var droppedProject = ui.draggable;
 				if (droppedProject.is('[cng-draggable-project]')) {
-
-		    	droppedProject.fadeOut(400);
+					var originalPosition = droppedProject.data('originalPosition');
+					var leftDifference = droppedProject.offset().left - originalPosition.left;
+					leftDifference = (leftDifference < 0) ? leftDifference * -1 : leftDifference;
+					var leftDecrement = '-=' + leftDifference;
+					var topDifference = droppedProject.offset().top - originalPosition.top;
+					topDifference = (topDifference < 0) ? topDifference * -1 : topDifference;
+					var topDecrement = '-=' + topDifference;
+		    	droppedProject.animate({
+		    		'left': leftDecrement,
+		    		'top': topDecrement
+		    	}, 500);
 		    	var categoryContainer = $(event.target).find('a');
 		    	var originalColor = categoryContainer.css('backgroundColor');
 					categoryContainer.animate({
