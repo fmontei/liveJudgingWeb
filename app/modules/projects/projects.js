@@ -55,6 +55,11 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			teamManagementService.transferTeamToCategory(categoryName, projectName);
 		}
 
+		$scope.isProjectAlreadyInCategory = function(categoryName, projectName) {
+			var project = $cookies.categories.getProjectByName(categoryName, projectName);
+			return project !== undefined;
+		}
+
 		/*
 		 * Change Category View
 		 */
@@ -122,7 +127,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$scope.openProjectModal();
 			if (view === 'edit') {
 				$scope.populateProjectModal(project);
-				$cookies.selectedProject = $scope.getProjectByName(project.name);
+				$cookies.selectedProject = $cookies.categories.getProjectByName(project.name);
 			}
 		}
 
@@ -145,14 +150,6 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			$('#project-modal').modal('hide');
 		}
 
-		$scope.getProjectByName = function(projectName) {
-			for (var i = 0; i < $cookies.selectedCategory.projects.length; i++) {
-				if ($cookies.selectedCategory.projects[i].name === projectName) {
-					return $cookies.selectedCategory.projects[i];
-				}
-			}
-		}
-
 }])
 
 .factory('CookieInitService', ['$log', 'CategoryRESTService', 'TeamRESTService', 'CurrentUserService', 
@@ -163,14 +160,21 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		$cookies.categories = {
 			list: [],
 			getByName: function(name) {
-				for (var i = 0; i < this.list.length; i++)
+				for (var i = 0; i < this.list.length; i++) {
 					if (this.list[i].name === name)
 						return this.list[i];
+				}
 			},
 			getByID: function(id) {
 				for (var i = 0; i < this.list.length; i++)
 					if (this.list[i].id === id)
 						return this.list[i];
+			},
+			getProjectByName: function(categoryName, projectName) {
+				var category = this.getByName(categoryName);
+				for (var i = 0; i < category.projects.length; i++) 
+					if (category.projects[i].name === projectName)
+						return category.projects[i];
 			}
 		};
 
@@ -427,10 +431,8 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 
 		teamManagement.transferTeamToCategory = function(categoryName, projectName) {
 			var category = $cookies.categories.getByName(categoryName);
-			var projectInfo = $.grep($cookies.uncategorized, function(project) {return program.name === projectName});
-			var projectIndex = projectInfo.index, project = projectInfo.project;
+			var project = $cookies.categories.getProjectByName('Uncategorized', projectName);	
 			category.projects.push(project);
-			//$cookies.uncategorized.projects.splice(projectInfo.index, projectInfo.index + 1); // TODO: remove to support teams being in multiple categories
 			$scope.$apply(); // Reflect increased project length in UI
 			$log.log("Added " + projectName + " to " + categoryName + ".");
 		}
@@ -536,11 +538,13 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			elem.draggable({
 				cursor: 'grab',
 				start: function(event, ui) { 
+					if (elem.data('originalPosition') === undefined) {
+						elem.data('originalPosition', elem.offset());
+					}
 				  $(this).draggable('option', 'cursorAt', {
 				    left: Math.floor(ui.helper.width() / 2),
 				    top: Math.floor(ui.helper.height() / 2)
 				  }); 
-				  elem.data('originalPosition', elem.offset());
 				}	
 			});
 
@@ -564,32 +568,43 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		elem.droppable({
 			drop: function(event, ui) {
 				var droppedProject = ui.draggable;
+				var projectName = droppedProject.attr('projectName').trim();
+				var categoryName = scope.categoryName.trim();
+				var projectAlreadyExists = scope.checkCategory({categoryName: categoryName, projectName: projectName});
 				if (droppedProject.is('[cng-draggable-project]')) {
-					var originalPosition = droppedProject.data('originalPosition');
-					var leftDifference = droppedProject.offset().left - originalPosition.left;
-					leftDifference = (leftDifference < 0) ? leftDifference * -1 : leftDifference;
-					var leftDecrement = '-=' + leftDifference;
-					var topDifference = droppedProject.offset().top - originalPosition.top;
-					topDifference = (topDifference < 0) ? topDifference * -1 : topDifference;
-					var topDecrement = '-=' + topDifference;
-		    	droppedProject.animate({
-		    		'left': leftDecrement,
-		    		'top': topDecrement
-		    	}, 500);
-		    	var categoryContainer = $(event.target).find('a');
-		    	var originalColor = categoryContainer.css('backgroundColor');
-					categoryContainer.animate({
-	          backgroundColor: "#fff"
-					}, 400);
-					categoryContainer.animate({
-	          backgroundColor: originalColor
-					}, 400);
-
-					var projectName = droppedProject.attr('projectName').trim();
-					scope.callback({categoryName: scope.categoryName.trim(), projectName: projectName});
+					moveProjectBack(droppedProject);
+					if (!projectAlreadyExists) {
+						var categoryContainer = $(event.target).find('a');
+						performFlashAnimation(categoryContainer);
+						scope.updateCategory({categoryName: categoryName, projectName: projectName});
+					}
 		  	}
 			}
 		});
+
+		var moveProjectBack = function(droppedProject) {
+			var originalPosition = droppedProject.data('originalPosition');
+			var leftDifference = droppedProject.offset().left - originalPosition.left;
+			leftDifference = (leftDifference < 0) ? leftDifference * -1 : leftDifference;
+			var leftDecrement = '-=' + leftDifference;
+			var topDifference = droppedProject.offset().top - originalPosition.top;
+			topDifference = (topDifference < 0) ? topDifference * -1 : topDifference;
+			var topDecrement = '-=' + topDifference;
+			droppedProject.animate({
+    		'left': leftDecrement,
+    		'top': topDecrement
+    	}, 500);
+		}
+
+		var performFlashAnimation = function(categoryContainer) {
+    	var originalColor = categoryContainer.css('backgroundColor');
+			categoryContainer.animate({
+        backgroundColor: "#fff"
+			}, 400);
+			categoryContainer.animate({
+        backgroundColor: originalColor
+			}, 400);
+		}
 
 		var category = elem.find('.btn'), cog = elem.find('.glyphicon-cog');
 
@@ -605,7 +620,8 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 	return {
 		restrict: 'A',
 		scope: {
-			callback: '&',
+			checkCategory: '&',
+			updateCategory: '&',
 			categoryName: '@'
 		},
 		link: link	

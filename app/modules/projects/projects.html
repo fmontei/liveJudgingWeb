@@ -108,7 +108,7 @@
 									<div class="accordion-inner">
 										<div class="panel-body">
 											
-											<div ng-repeat="project in category.projects">
+											<div ng-repeat="project in category.projects | orderBy: '+name'"">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
 												<div class="col col-sm-4 col-md-4 col-lg-4">
 													<div class="media category-accordion-media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
@@ -148,7 +148,7 @@
 						</div>
 					</div><br />
 
-					<div ng-repeat="project in selectedCategory.projects track by $index">
+					<div ng-repeat="project in selectedCategory.projects | orderBy: '+name'">
 						<div ng-if="$index % 4 == 0" class="row"></div>
 						<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
 							<div class="media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
@@ -199,7 +199,11 @@
 						</a>
 			    </li>
 					<div ng-repeat="category in categoryList" ng-if="category.name != 'Uncategorized'">
-						<li class="droppable-category" cng-droppable-category callback="$parent.transferTeamToCategory(categoryName, projectName)" category-name="{{category.name}}">
+						<li class="droppable-category" 
+							  cng-droppable-category 
+							  category-name="{{category.name}}"
+							  check-category="$parent.isProjectAlreadyInCategory(categoryName, projectName)" 
+							  update-category="$parent.transferTeamToCategory(categoryName, projectName)">
 			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
 			        	<h3>
 									<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
