@@ -5,7 +5,7 @@
 	border-radius: 24px	;
 }
 
-#projects-tab-dropdown {
+#project-buttons {
 	margin-top: -5px;
 	float: right;
 }
@@ -101,6 +101,8 @@
 	z-index: 2;
 	background-color: white;
 	cursor: grab;
+	margin-right: 10px;
+	margin-bottom: 20px;
 }
 
 .draggable-project:hover, .category-specific-project:hover {

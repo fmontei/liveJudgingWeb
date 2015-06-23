@@ -29,20 +29,24 @@
 				</div>
 				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
 					<div class="row">
-						<div class="col-sm-5 col-md-5 col-lg-5">
-						</div>
-						<div class="col-sm-7 col-md-7 col-lg-7">
-							<div class="dropdown" id="projects-tab-dropdown">
-								<button class="btn btn-default dropdown-toggle" type="button" 
-									data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-									Sort by
-									<span class="caret"></span>
+						<div class="col-sm-12 col-md-12 col-lg-12">
+							<div class="btn-group" role="group" id="project-buttons">
+								<button class="btn btn-default" type="button" cng-organize-projects>
+									Organize
+									<span class="glyphicon glyphicon-th-large"></span>
 								</button>
-								<ul class="dropdown-menu" aria-labelledby="projects-dropdown">
-									<li><a href="#/projects" ng-click="changeView('default')">Name</a></li>
-									<li><a href="#/projects" ng-click="changeView('category')">Category</a></li>
-									<li><a href="#/projects">Number</a></li>
-								</ul>
+								<div class="btn-group" role="group">
+									<button class="btn btn-default dropdown-toggle" type="button" 
+										data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										Sort by
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="projects-dropdown">
+										<li><a href="#/projects" ng-click="changeView('default')">Name</a></li>
+										<li><a href="#/projects" ng-click="changeView('category')">Category</a></li>
+										<li><a href="#/projects">Number</a></li>
+									</ul>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -60,21 +64,27 @@
 						</div>
 					</div><br />
 					
-					<div ng-repeat="project in uncategorized.projects | orderBy: '+name'">
-					<div ng-if="$index % 4 == 0" class="row"></div>
-						<div class="col col-sm-4 col-md-4 col-lg-4 project-col">
-							<div class="media draggable-project" cng-draggable-project projectName="{{project.name}}">
-								<div class="media-left">
-									<a href="#">
-										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-									</a>
-								</div>
-								<div class="media-body">
-									<h4 class="media-heading">
-										{{project.number}}
-										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
-									</h4>
-									<span>{{project.name}}</span>
+					<div class="draggable-project-wrapper">
+						<div ng-repeat="project in uncategorized.projects | orderBy: '+name'">
+							<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
+							<div class="col col-sm-4 col-md-4 col-lg-3">
+								<div class="media draggable-project" cng-draggable-project projectName="{{project.name}}">
+									<div class="media-left">
+										<a href="#">
+											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+										</a>
+									</div>
+									<div class="media-body">
+										<h4 class="media-heading">
+											{{project.number}}
+											<span class="glyphicon-wrapper">
+												<span class="glyphicon glyphicon-cog" 
+											        ng-click="changeProjectModalView('edit', uncategorized, project)">
+								        </span>
+							        </span>
+										</h4>
+										<span>{{project.name}}</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -83,13 +93,57 @@
 				</div> <!--ng-switch-default-->
 				
 				<div ng-switch-when="category">
-					<div ng-repeat="category in categories.list">
+					<div class="accordion project-accordion">
+						<div class="panel panel-default accordion-group" 
+						     cng-category-accordion color="{{uncategorized.color}}" 
+								 category-name="{{uncategorized.name}}" 
+								 change-category="updateSelectedCategory(uncategorized)">
+							<div class="panel-heading">
+								<div class="row">
+									<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
+										<div class="truncate">
+											<div class="accordion-heading">
+												<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
+													<span class="glyphicon glyphicon-chevron-right"></span> {{uncategorized.name}} 
+												</a>
+											</div>
+										</div>
+									</span>
+								</div> 
+							</div>
+							<div id="category{{$index}}" class="accordion-body collapse">
+								<div class="accordion-inner">
+									<div class="panel-body">
+										<div ng-repeat="project in uncategorized.projects | orderBy: '+name'"">
+											<br ng-if="$index % 3 == 0 && $index > 0" />
+											<div class="col col-sm-4 col-md-4 col-lg-4">
+												<div class="media category-accordion-media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
+													<div class="media-left">
+														<a href="#">
+															<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+														</a>
+													</div>
+													<div class="media-body">
+														<h4 class="media-heading">
+															{{project.number}}
+															<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', uncategorized, project)"></span></span>
+														</h4>
+														<span>{{project.name}}</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div ng-repeat="category in categories.list | orderBy: '+name'" ng-if="category.name != 'Uncategorized'">
 						<div class="accordion project-accordion">
 							<div class="panel panel-default accordion-group" 
 							     cng-category-accordion color="{{category.color}}" 
 									 category-name="{{category.name}}" 
 									 change-category="updateSelectedCategory(category)">
-
 								<div class="panel-heading">
 									<div class="row">
 										<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
@@ -103,11 +157,9 @@
 										</span>
 									</div> 
 								</div>
-					
 								<div id="category{{$index}}" class="accordion-body collapse">
 									<div class="accordion-inner">
 										<div class="panel-body">
-											
 											<div ng-repeat="project in category.projects | orderBy: '+name'"">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
 												<div class="col col-sm-4 col-md-4 col-lg-4">
@@ -120,18 +172,16 @@
 														<div class="media-body">
 															<h4 class="media-heading">
 																{{project.number}}
-																<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+																<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', category, project)"></span></span>
 															</h4>
 															<span>{{project.name}}</span>
 														</div>
 													</div>
 												</div>
 											</div>
-
 										</div>
 									</div>
 								</div>
-								
 							</div>
 						</div>
 					</div> <!--ng-repeat-->
@@ -160,7 +210,7 @@
 								<div class="media-body">
 									<h4 class="media-heading">
 										{{project.number}}
-										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', project)"></span></span>
+										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', selectedCategory, project)"></span></span>
 									</h4>
 									<span>{{project.name}}</span>
 								</div>
@@ -198,7 +248,7 @@
 							</div>
 						</a>
 			    </li>
-					<div ng-repeat="category in categories.list" ng-if="category.name != 'Uncategorized'">
+					<div ng-repeat="category in categories.list | orderBy: '+name'" ng-if="category.name != 'Uncategorized'">
 						<li class="droppable-category" 
 							  cng-droppable-category 
 							  category-name="{{category.name}}"
