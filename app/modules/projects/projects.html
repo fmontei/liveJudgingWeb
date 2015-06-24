@@ -349,12 +349,14 @@
 			<div ng-switch on="categoryModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
+						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteCategory()">Delete</button>
       			<button type="button" class="btn btn-success" ng-click="createNewCategory()">Save changes</button>
       			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
 					</div> <!-- ./modal-footer -->
 				</div> <!-- ng-switch-when-"ceate" -->
 				<div ng-switch-when="edit">
 					<div class="modal-footer">
+						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteCategory()">Delete</button>
       			<button type="button" class="btn btn-success" ng-click="editSelectedCategory()">Save changes</button>
       			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
 					</div> <!-- /.modal-footer-->
@@ -463,12 +465,14 @@
       <div ng-switch on="projectModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
+						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteTeam()">Delete</button>
       			<button type="button" class="btn btn-success" ng-click="createNewProject()">Save changes</button>
       			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
 					</div> <!-- ./modal-footer -->
 				</div> <!-- ng-switch-when-"ceate" -->
 				<div ng-switch-when="edit">
 					<div class="modal-footer">
+						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteTeam()">Delete</button>
       			<button type="button" class="btn btn-success" ng-click="editSelectedProject()">Save changes</button>
       			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
 					</div> <!-- /.modal-footer-->

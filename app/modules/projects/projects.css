@@ -46,6 +46,7 @@
   margin-right: auto; 
   height: 80px;
 	border: solid black 2px;
+	border-radius: 0;
 	margin-top: 10px;
 	width: 200px;
 	cursor: pointer;
@@ -100,7 +101,7 @@
 	position: relative;
 	z-index: 2;
 	background-color: white;
-	cursor: grab;
+	cursor: move;
 	margin-right: 10px;
 	margin-bottom: 20px;
 }
@@ -114,4 +115,8 @@
 
 .category-accordion-media {
 	margin-bottom: 10px;
+}
+
+.btn-delete {
+	float: left;
 }

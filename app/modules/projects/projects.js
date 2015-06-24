@@ -40,15 +40,24 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			categoryManagementService.editCategory();
 		}
 
+		$scope.deleteCategory = function() {
+			categoryManagementService.deleteCategory();
+		}
+
 		/*
 		 * Project Management Functionality
 		 */ 
+		 
 		$scope.createNewProject = function() {
 			teamManagementService.createNewTeam();
 		}
 
 		$scope.editSelectedProject = function() {
 			teamManagementService.editTeam();
+		}
+
+		$scope.deleteTeam = function() {
+			teamManagementService.deleteTeam();
 		}
 
 		$scope.transferTeamToCategory = function(categoryName, projectName) {
@@ -182,6 +191,24 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				for (var i = 0; i < category.projects.length; i++) 
 					if (category.projects[i].id === projectID)
 						return category.projects[i];
+			},
+			deleteByName: function(name) {
+				for (var i = 0; i < this.list.length; i++) {
+					if (this.list[i].name === name) {
+						this.list.splice(i, i + 1);
+						return;
+					}
+				}
+			},
+			deleteProjectByName: function(projectName) {
+				angular.forEach(this.list, function(category) {
+					for (var i = 0; i < category.projects.length; i++) {
+						if (category.projects[i].name === projectName) {
+							category.projects.splice(i, i + 1);
+							break;
+						}
+					}
+				});
 			}
 		};
 
@@ -308,6 +335,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 	function($log, CategoryRESTService, CurrentUserService) {
 		return function($scope, $cookies) {
 			var categoryManagement = {};
+			var authHeader = CurrentUserService.getAuthHeader();
 
 			categoryManagement.createNewCategory = function() {
 				var newCategory = {
@@ -325,7 +353,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 					due_at: newCategory.time,
 					color: convertColorToDecimal(newCategory.color)
 				}
-				var connection = CategoryRESTService(CurrentUserService.getAuthHeader(), $scope.selectedEvent.id);
+				var connection = CategoryRESTService(authHeader, $scope.selectedEvent.id);
 				connection.new_category.create(categoryReq).$promise.then(function(resp) {
 					$cookies.categories.list.push(newCategory);
 					$scope.closeCategoryModal();
@@ -354,9 +382,9 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 					due_at: updatedCategory.time,
 					color: convertColorToDecimal(updatedCategory.color)
 				}
-				var connection = CategoryRESTService(CurrentUserService.getAuthHeader(), updatedCategory.id);
+				var connection = CategoryRESTService(authHeader, updatedCategory.id);
 				connection.category.update(categoryReq).$promise.then(function(resp) {
-					editCurrentCategoryCookie($scope.selectedCategory.name, updatedCategory);
+					editCurrentCategoryCookie($cookies.selectedCategory.name, updatedCategory);
 					$scope.closeCategoryModal();
 					$log.log("Category successfully edited: " + JSON.stringify(updatedCategory));
 				}).catch(function() {
@@ -378,6 +406,17 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 						return;
 					}
 				}
+			}
+
+			categoryManagement.deleteCategory = function() {
+				var connection = CategoryRESTService(authHeader, $cookies.selectedCategory.id);
+				connection.category.delete().$promise.then(function(resp) {
+					$cookies.categories.deleteByName($cookies.selectedCategory.name);
+					$scope.closeCategoryModal();
+				}).catch(function() {
+					$scope.errorMessage = 'Error deleting catgory';
+					$log.log($scope.errorMessage);
+				});
 			}
 
 			return categoryManagement;
@@ -463,6 +502,18 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			});
 		}
 
+		teamManagement.deleteTeam = function() {
+			var connection = TeamRESTService(authHeader, $cookies.selectedProject.id);
+			connection.team.delete().$promise.then(function(resp) {
+				$cookies.categories.deleteProjectByName($cookies.selectedProject.name);
+				$scope.closeProjectModal();
+			}).catch(function() {
+				$scope.errorMessage = 'Error deleting project';
+				$log.log($scope.errorMessage);
+			});
+		}
+
+
 		teamManagement.transferTeamToCategory = function(categoryName, projectName) {
 			var category = $cookies.categories.getByName(categoryName);
 			var team = $cookies.categories.getProjectByName('Uncategorized', projectName);	
@@ -538,6 +589,10 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				update: {
 					method: 'PUT',
 					headers: authHeader
+				},
+				delete: {
+					method: 'DELETE',
+					headers: authHeader
 				}
 			}),
 			teams: $resource('http://api.stevedolan.me/events/:event_id/teams', {
@@ -589,7 +644,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			elem.draggable({
 				cursor: 'grab',
 				start: function(event, ui) { 
-					if (elem.data('originalPosition') === undefined) {
+					if (undefined === elem.data('originalPosition')) {
 						elem.data('originalPosition', elem.offset());
 					}
 				  $(this).draggable('option', 'cursorAt', {
