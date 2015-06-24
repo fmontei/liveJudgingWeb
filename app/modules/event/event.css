@@ -2,6 +2,9 @@
 .custom-jumbotron {
   display: inline-block;
   background: white;
+  width:600px;
+  position:absolute;
+  left: calc(50% - 300px);
 }
 #event-selection-h1 {
   text-decoration: underline;
