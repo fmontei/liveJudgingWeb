@@ -89,6 +89,10 @@
 	margin-left: 40px;
 }
 
+.modal-alert {
+	display: inline-block;
+}
+
 .project-col {
 	margin-bottom: 20px;
 }

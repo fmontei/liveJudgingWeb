@@ -292,7 +292,7 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>Category Name:</label>
+						<label>*Name:</label>
 					</div>
 					<div class="col col-lg-7 col-md-7 col-sm-7">
 						<input class="form-control" 
@@ -314,7 +314,7 @@
 				</div><br />
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>Due by:</label>
+						<label>*Due by:</label>
 					</div>
 					<div class="col col-lg-5 col-md-5 col-sm-5">
 						<div class="row">
@@ -329,7 +329,7 @@
 				</div><br />
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>Color:</label>
+						<label>*Color:</label>
 					</div>
 					<div class="col col-lg-5 col-md-5 col-sm-5">
 						<div class="input-group">
@@ -340,14 +340,27 @@
 							       ng-model="categoryColor" />
 						</div>
 					</div>
+				</div><br />
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+					</div>
+					<div class="col col-lg-9 col-md-9 col-sm-3 modal-col">
+						<div ng-switch on="categoryModalError">
+							<div ng-switch-when="undefined">
+							</div>
+							<div ng-switch-default>
+								<div class="alert alert-danger modal-alert">
+									{{categoryModalError}}
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-				<br />
 			</div> <!-- /.modal-body -->
 
 			<div ng-switch on="categoryModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
-						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteCategory()">Delete</button>
       			<button type="button" class="btn btn-success" ng-click="createNewCategory()">Save changes</button>
       			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
 					</div> <!-- ./modal-footer -->
@@ -387,13 +400,12 @@
       			<h4 class="modal-title">Edit Project: {{projectName}}</h4>
       		</div> <!-- ng-switch-when="edit" -->
     		</div> <!-- ng-switch on="projectModalView" -->
-
-      </div>
+      </div> <!-- ./modal-header panel-heading -->
 
       <div class="modal-body">
       	<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>Project Name:</label>
+						<label>*Project Name:</label>
 					</div>
 					<div class="col col-lg-7 col-md-7 col-sm-7">
 						<input class="form-control" 
@@ -458,12 +470,26 @@
 	          </textarea>
 					</div>
 				</div><br />
+				<div class="row">
+					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+					</div>
+					<div class="col col-lg-9 col-md-9 col-sm-3 modal-col">
+						<div ng-switch on="projectModalError">
+							<div ng-switch-when="undefined">
+							</div>
+							<div ng-switch-default>
+								<div class="alert alert-danger modal-alert">
+									{{projectModalError}}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
       </div> <!-- ./modal-body -->
 
       <div ng-switch on="projectModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
-						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteTeam()">Delete</button>
       			<button type="button" class="btn btn-success" ng-click="createNewProject()">Save changes</button>
       			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
 					</div> <!-- ./modal-footer -->

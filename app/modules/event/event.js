@@ -24,6 +24,8 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
         EventService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
             console.log(resp);
             $scope.eventList = resp.events;
+        }).catch(function(error) {
+            console.log(error);
         });
 
         $scope.showCreateEventForm = function() {
