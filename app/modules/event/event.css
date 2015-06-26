@@ -122,6 +122,25 @@ a.team-pic span.completed {
   opacity: 0.5;
 }
 
+.judge-accordion {
+	padding-top: 20px;
+}
+
+.judge-col {
+	margin-top: 10px;
+}
+
+.judge-heading-text {
+	width: 90%; 
+	overflow: hidden;
+}
+
+.projects-judged-text {
+	margin-top: 10px; 
+	font-size: 12px;
+	overflow: hidden;
+}
+
 /*
  * Team Completion Modal
  */

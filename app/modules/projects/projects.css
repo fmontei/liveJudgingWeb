@@ -119,8 +119,9 @@
 .draggable-team-name {
 	display: block;
 	width: 50px;
-	white-space: nowrap;
-}
+	word-wrap: break-word;
+	overflow:  hidden;
+}	
 
 .draggable-team .glyphicon-cog {
 	float: right;
