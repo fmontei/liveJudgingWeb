@@ -24,7 +24,6 @@
 			<div class="row">
 				<div class="col-sm-8 col-md-8 col-lg-8">
 					<em>Drag-'n-drop teams into categories.</em>
-					<button class="btn btn-primary" ng-click="removeColor()">REMOVE</button>
 				</div>
 				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
 					<div class="row">
@@ -41,9 +40,9 @@
 										<span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu" aria-labelledby="teams-dropdown">
-										<li><a href="#/teams" ng-click="changeView('default')">Name</a></li>
-										<li><a href="#/teams" ng-click="changeView('category')">Category</a></li>
-										<li><a href="#/teams">Number</a></li>
+										<li><a href="javascript:void(0)" ng-click="changeView('default')">Name</a></li>
+										<li><a href="javascript:void(0)" ng-click="changeView('category')">Category</a></li>
+										<li><a href="javascript:void(0)">Number</a></li>
 									</ul>
 								</div>
 							</div>
@@ -73,7 +72,7 @@
 											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 										</a>
 									</div>
-										<div class="media-body" style="max-width: 100%">
+										<div class="media-body">
 											<h4 class="media-heading">
 												{{team.id}}
 												<span class="glyphicon glyphicon-cog" 
@@ -124,10 +123,14 @@
 													</div>
 													<div class="media-body">
 														<h4 class="media-heading">
-															{{team.number}}
-															<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeTeamModalView('edit', uncategorized, team)"></span></span>
+															{{team.id}}
+															<span class="glyphicon glyphicon-cog" 
+														        ng-click="changeTeamModalView('edit', uncategorized, team)">
+											        </span>
 														</h4>
-														<span class="draggable-team-name">{{team.name}}</span>
+														<div class="draggable-team-name">
+															<span>{{team.name}}</span>
+														</div>
 													</div>
 												</div>
 											</div>
@@ -170,10 +173,14 @@
 														</div>
 														<div class="media-body">
 															<h4 class="media-heading">
-																{{team.number}}
-																<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeTeamModalView('edit', category, team)"></span></span>
+																{{team.id}}
+																<span class="glyphicon glyphicon-cog" 
+															        ng-click="changeTeamModalView('edit', uncategorized, team)">
+												        </span>
 															</h4>
-															<span class="draggable-team-name">{{team.name}}</span>
+															<div class="draggable-team-name">
+																<span>{{team.name}}</span>
+															</div>
 														</div>
 													</div>
 												</div>
@@ -208,10 +215,14 @@
 								</div>
 								<div class="media-body">
 									<h4 class="media-heading">
-										{{team.number}}
-										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeTeamModalView('edit', selectedCategory, team)"></span></span>
+										{{team.id}}
+										<span class="glyphicon glyphicon-cog" 
+									        ng-click="changeTeamModalView('edit', uncategorized, team)">
+						        </span>
 									</h4>
-									<span class="draggable-team-name">{{team.name}}</span>
+									<div class="draggable-team-name">
+										<span>{{team.name}}</span>
+									</div>
 								</div>
 							</div>
 						</div>
