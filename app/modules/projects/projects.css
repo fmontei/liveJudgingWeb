@@ -67,9 +67,9 @@
 	margin-top: 0;
 }
 
-.draggable-team .glyphicon-cog, .droppable-category .glyphicon-cog {
-	margin-right: 5px;
+.droppable-category .glyphicon-cog {
 	float: right;
+	margin-right: 5px;
 	color: #398439;
 	display: none;
 	cursor: pointer;
@@ -77,8 +77,8 @@
 }
 
 .category-specific-team .glyphicon-cog {
-	margin-right: 5px;
 	float: right;
+	margin-right: 5px;
 	display: none;
 	color: #398439;
 	cursor: pointer;
@@ -106,7 +106,6 @@
 	z-index: 2;
 	background-color: white;
 	cursor: move;
-	margin-right: 10px;
 	margin-bottom: 20px;
 }
 
@@ -115,6 +114,21 @@
 	border-color: rgba(126, 239, 104, 0.8);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
   outline: 0 none;
+}
+
+.draggable-team-name {
+	display: block;
+	width: 50px;
+	white-space: nowrap;
+}
+
+.draggable-team .glyphicon-cog {
+	float: right;
+	margin-right: 5px;
+	color: #398439;
+	display: none;
+	cursor: pointer;
+	font-size: 15px;
 }
 
 .category-accordion-media {

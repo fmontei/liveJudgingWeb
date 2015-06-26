@@ -219,6 +219,11 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			}
 		};
 
+		var defaultColorList = ["#ac725e", "#d06b64", "#f83a22", "#fa573c", "#ff7537", "#ffad46", "#42d692", "#16a765", 
+			"#7bd148", "#b3dc6c", "#fbe983", "#fad165", "#92e1c0", "#9fe1e7", "#9fc6e7", "#4986e7", "#9a9cff", "#b99aff",
+			"#cabdbf", "#cca6ac", "#f691b2", "#cd74e6", "#a47ae2"];
+		$cookies.putObject('colorList', defaultColorList);
+		
 		cookieInitService.initDefaultCookies = function() {
 			$cookies.currentView = 'default';
 			$cookies.categoryTime = Date();
@@ -235,6 +240,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		}
 
 		var initCategoryList = function(serverCategories) {
+			var filterColorList = [];
 			angular.forEach(serverCategories, function(serverCategory) {
 				var category = {
 					id: serverCategory.id,
@@ -246,9 +252,11 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 					judges: []
 				}
 				$cookies.categories.list.push(category);
+				filterColorList.push(category.color);
 			});
 			$cookies.uncategorized = $cookies.categories.list[0];
 			$cookies.selectedCategory = $cookies.categories.list[0];
+			filterExistingColors(filterColorList);
 		}
 
 		var convertColorToHex = function(decimalColor) {
@@ -258,7 +266,16 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 			if (lengthDiff > 0) {
 				prefix += Array(lengthDiff + 1).join('0');
 			}
-			return prefix + hexColor;
+			return (prefix + hexColor).toUpperCase();
+		}
+
+		var filterExistingColors = function(colorList) {
+			angular.forEach(colorList, function(color) {
+				var index = defaultColorList.indexOf(color.toLowerCase());
+				if (-1 !== index)
+					defaultColorList.splice(index, 1);
+			});
+			$cookies.putObject('colorList', defaultColorList);
 		}
 
 		cookieInitService.initTeams = function() {
@@ -285,7 +302,6 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 					var categoryID = team_category.category.id;
 					var category = $cookies.categories.getByID(categoryID);
 					category.teams.push(team_category.team);
-					console.log(team_category.team);
 				});
 			}).catch(function() {
 				var errorMessage = 'Error getting team categories from server.';
@@ -332,6 +348,12 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				$scope.categoryTime = newValue;
 			});
 
+			$scope.$watch(function() {
+				return $cookies.get('colorList');
+			}, function(newValue) {
+				$scope.colorList = newValue;
+			});
+
 			$scope.selectedEvent = $cookies.getObject('selected_event');
 		}
 
@@ -367,9 +389,10 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 					var returnedCategoryID = resp.event_category.id;
 					newCategory.id = returnedCategoryID;
 					$cookies.categories.list.push(newCategory);
+					updateColorList('create', undefined, newCategory.color);
 					$scope.closeCategoryModal();
-					$log.log("New category created: " + JSON.stringify(newCategory));
-					$log.log("Category list updated: " + $cookies.categories.list.length);
+					$log.log('New category created: ' + JSON.stringify(newCategory));
+					$log.log('Category list updated: ' + $cookies.categories.list.length);
 				}).catch(function() {
 					$scope.closeCategoryModal();
 					$scope.errorMessage = 'Error creating category on server.';
@@ -397,9 +420,10 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				}
 				var connection = CategoryRESTService(authHeader, updatedCategory.id);
 				connection.category.update(categoryReq).$promise.then(function(resp) {
+					updateColorList('edit', $cookies.selectedCategory.color, updatedCategory.color);
 					$cookies.categories.edit($cookies.selectedCategory, updatedCategory);
 					$scope.closeCategoryModal();
-					$log.log('Category successfully edited: ' + JSON.stringify(updatedCategory));
+					$log.log('Category successfully edited.');
 				}).catch(function() {
 					$scope.closeCategoryModal();
 					$scope.errorMessage = 'Error editing category on server.';
@@ -432,12 +456,33 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 				var connection = CategoryRESTService(authHeader, $cookies.selectedCategory.id);
 				connection.category.delete().$promise.then(function(resp) {
 					$cookies.categories.delete($cookies.selectedCategory);
+					updateColorList('delete', $cookies.selectedCategory.color, undefined);
 					$scope.closeCategoryModal();
 					$log.log('Successfully deleted category.');
 				}).catch(function() {
 					$scope.errorMessage = 'Error deleting catgory.';
 					$log.log($scope.errorMessage);
 				});
+			}
+
+			var updateColorList = function(action, oldColor, newColor) {
+				var colorList = $cookies.get('colorList');
+				colorList = JSON.parse(colorList);
+				if (action === 'create') {
+					var index = colorList.indexOf(newColor.toLowerCase());
+					if (-1 !== index) {
+						colorList.splice(index, 1);
+					}
+				} else if (action === 'edit') {
+					var index = colorList.indexOf(newColor.toLowerCase());
+					if (-1 !== index) {
+						colorList.splice(index, 1);
+						colorList.push(oldColor);
+					}
+				} else if (action === 'delete') {
+					colorList.push(oldColor);
+				}
+				$cookies.putObject('colorList', colorList);
 			}
 
 			return categoryManagement;
@@ -811,7 +856,7 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 	return {
 		restrict: 'A',
 		scope: {
-			cog: '@'
+			cog: '@cog'
 		},
 		link: function(scope, elem, attrs) {
 			var cog = elem.find(scope.cog);
@@ -828,9 +873,16 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 .directive('cngColorPicker', function() {
 
 	var link = function(scope, elem, attrs) {
-		elem.colorPicker({colors: ["FF0000", "FFFF00", "00FF00", "00FFFF", "FF00FF", "FF6347", "C0C0C0", "A0522D", 
-			"FA8072", "FFA500", "FFE4C4", "FFFFFF", "F0E68C", "B00000", "A0522D", "DDA0DD", "EEDD82", "8470FF"]});
 
+		// When colors array changes, update color palette 
+		scope.$watch(function() {
+			return scope.colorList;
+		}, function(newValue) {
+			$('.colorPicker-picker').remove(); // Delete the old palette
+			elem.colorPicker({colors: JSON.parse(newValue)}); // Create a new palette
+		});
+
+		// Autofocus on current category's color
 		scope.$watch('color', function(value) {
 			elem.val(value);
 			elem.change();
@@ -841,7 +893,8 @@ angular.module('liveJudgingAdmin.projects', ['ngRoute', 'ngCookies', 'liveJudgin
 		restrict: 'A',
 		require: '^ngModel',
 		scope: {
-			color: '@color'
+			color: '@color',
+			colorList: '@colorList'
 		},
 		link: link
 	};
