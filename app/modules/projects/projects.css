@@ -1,11 +1,11 @@
-#add-project-btn {
+#add-team-btn {
 	margin-top: 20px;
 	margin-bottom: 20px;
 	border: solid black 2px;
 	border-radius: 24px	;
 }
 
-#project-buttons {
+#team-buttons {
 	margin-top: -5px;
 	float: right;
 }
@@ -67,7 +67,7 @@
 	margin-top: 0;
 }
 
-.draggable-project .glyphicon-cog, .droppable-category .glyphicon-cog {
+.draggable-team .glyphicon-cog, .droppable-category .glyphicon-cog {
 	margin-right: 5px;
 	float: right;
 	color: #398439;
@@ -76,7 +76,7 @@
 	font-size: 15px;
 }
 
-.category-specific-project .glyphicon-cog {
+.category-specific-team .glyphicon-cog {
 	margin-right: 5px;
 	float: right;
 	display: none;
@@ -93,15 +93,15 @@
 	display: inline-block;
 }
 
-.project-col {
+.team-col {
 	margin-bottom: 20px;
 }
 
-.project-accordion {
+.team-accordion {
 	padding-top: 20px;
 }
 
-.draggable-project {
+.draggable-team {
 	position: relative;
 	z-index: 2;
 	background-color: white;
@@ -110,7 +110,7 @@
 	margin-bottom: 20px;
 }
 
-.draggable-project:hover, .category-specific-project:hover {
+.draggable-team:hover, .category-specific-team:hover {
 	background-color: white !important;
 	border-color: rgba(126, 239, 104, 0.8);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);

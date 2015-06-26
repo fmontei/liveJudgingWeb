@@ -6,7 +6,7 @@
 			<div ng-switch on="currentView">
 				<div ng-switch-default>
 					<div class="row">
-						<h1>Projects <span class="label label-default">{{projectList.length}}</span></h1>
+						<h1>Teams <span class="label label-default">{{teamList.length}}</span></h1>
 						<hr>
 					</div>
 				</div>
@@ -14,8 +14,8 @@
 					<div class="row">
 						<div class="page-header current-category-header">
 							<h1 id="breadcrumb-symbol">
-								<a ng-click="changeView('default')">Projects</a><span id="slash">&nbsp;/</span> {{selectedCategory.name}} 
-								<span class="label label-default">{{selectedCategory.projects.length}}</span>
+								<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.name}} 
+								<span class="label label-default">{{selectedCategory.teams.length}}</span>
 							</h1>
 						</div>
 					</div>
@@ -24,13 +24,13 @@
 			
 			<div class="row">
 				<div class="col-sm-8 col-md-8 col-lg-8">
-					<em>Drag-'n-drop projects into categories.</em>
+					<em>Drag-'n-drop teams into categories.</em>
 				</div>
 				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
 					<div class="row">
 						<div class="col-sm-12 col-md-12 col-lg-12">
-							<div class="btn-group" role="group" id="project-buttons">
-								<button class="btn btn-default" type="button" cng-organize-projects>
+							<div class="btn-group" role="group" id="team-buttons">
+								<button class="btn btn-default" type="button" cng-organize-teams>
 									Organize
 									<span class="glyphicon glyphicon-th-large"></span>
 								</button>
@@ -40,10 +40,10 @@
 										Sort by
 										<span class="caret"></span>
 									</button>
-									<ul class="dropdown-menu" aria-labelledby="projects-dropdown">
-										<li><a href="#/projects" ng-click="changeView('default')">Name</a></li>
-										<li><a href="#/projects" ng-click="changeView('category')">Category</a></li>
-										<li><a href="#/projects">Number</a></li>
+									<ul class="dropdown-menu" aria-labelledby="teams-dropdown">
+										<li><a href="#/teams" ng-click="changeView('default')">Name</a></li>
+										<li><a href="#/teams" ng-click="changeView('category')">Category</a></li>
+										<li><a href="#/teams">Number</a></li>
 									</ul>
 								</div>
 							</div>
@@ -56,18 +56,18 @@
 				<div ng-switch-default>
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
-							<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
+							<button class="btn btn-lg btn-success" id="add-team-btn" ng-click="changeTeamModalView('create')">
 								<span class="glyphicon glyphicon-plus"></span>
-								Add Project
+								Add Team
 							</button>
 						</div>
 					</div><br />
 					
-					<div class="draggable-project-wrapper">
-						<div ng-repeat="project in uncategorized.projects | orderBy: '+name'">
+					<div class="draggable-team-wrapper">
+						<div ng-repeat="team in uncategorized.teams | orderBy: '+name'">
 							<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
 							<div class="col col-sm-4 col-md-4 col-lg-3">
-								<div class="media draggable-project" cng-draggable-project projectName="{{project.name}}">
+								<div class="media draggable-team" cng-draggable-team teamName="{{team.name}}">
 									<div class="media-left">
 										<a href="#">
 											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -75,14 +75,14 @@
 									</div>
 									<div class="media-body">
 										<h4 class="media-heading">
-											{{project.number}}
+											{{team.id}}
 											<span class="glyphicon-wrapper">
 												<span class="glyphicon glyphicon-cog" 
-											        ng-click="changeProjectModalView('edit', uncategorized, project)">
+											        ng-click="changeTeamModalView('edit', uncategorized, team)">
 								        </span>
 							        </span>
 										</h4>
-										<span>{{project.name}}</span>
+										<span>{{team.name}}</span>
 									</div>
 								</div>
 							</div>
@@ -92,7 +92,7 @@
 				</div> <!--ng-switch-default-->
 				
 				<div ng-switch-when="category">
-					<div class="accordion project-accordion">
+					<div class="accordion team-accordion">
 						<div class="panel panel-default accordion-group" 
 						     cng-category-accordion color="{{uncategorized.color}}" 
 								 category-name="{{uncategorized.name}}" 
@@ -113,10 +113,10 @@
 							<div id="category{{$index}}" class="accordion-body collapse">
 								<div class="accordion-inner">
 									<div class="panel-body">
-										<div ng-repeat="project in uncategorized.projects | orderBy: '+name'"">
+										<div ng-repeat="team in uncategorized.teams | orderBy: '+name'"">
 											<br ng-if="$index % 3 == 0 && $index > 0" />
 											<div class="col col-sm-4 col-md-4 col-lg-4">
-												<div class="media category-accordion-media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
+												<div class="media category-accordion-media category-specific-team" cng-category-specific-team cog=".glyphicon-cog">
 													<div class="media-left">
 														<a href="#">
 															<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -124,10 +124,10 @@
 													</div>
 													<div class="media-body">
 														<h4 class="media-heading">
-															{{project.number}}
-															<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', uncategorized, project)"></span></span>
+															{{team.number}}
+															<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeTeamModalView('edit', uncategorized, team)"></span></span>
 														</h4>
-														<span>{{project.name}}</span>
+														<span>{{team.name}}</span>
 													</div>
 												</div>
 											</div>
@@ -138,7 +138,7 @@
 						</div>
 					</div>
 					<div ng-repeat="category in categories.list | orderBy: '+name'" ng-if="category.name != 'Uncategorized'">
-						<div class="accordion project-accordion">
+						<div class="accordion team-accordion">
 							<div class="panel panel-default accordion-group" 
 							     cng-category-accordion color="{{category.color}}" 
 									 category-name="{{category.name}}" 
@@ -159,10 +159,10 @@
 								<div id="category{{$index}}" class="accordion-body collapse">
 									<div class="accordion-inner">
 										<div class="panel-body">
-											<div ng-repeat="project in category.projects | orderBy: '+name'"">
+											<div ng-repeat="team in category.teams | orderBy: '+name'"">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
 												<div class="col col-sm-4 col-md-4 col-lg-4">
-													<div class="media category-accordion-media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
+													<div class="media category-accordion-media category-specific-team" cng-category-specific-team cog=".glyphicon-cog">
 														<div class="media-left">
 															<a href="#">
 																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -170,10 +170,10 @@
 														</div>
 														<div class="media-body">
 															<h4 class="media-heading">
-																{{project.number}}
-																<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', category, project)"></span></span>
+																{{team.number}}
+																<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeTeamModalView('edit', category, team)"></span></span>
 															</h4>
-															<span>{{project.name}}</span>
+															<span>{{team.name}}</span>
 														</div>
 													</div>
 												</div>
@@ -190,17 +190,17 @@
 
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
-							<button class="btn btn-lg btn-success" id="add-project-btn" ng-click="changeProjectModalView('create')">
+							<button class="btn btn-lg btn-success" id="add-team-btn" ng-click="changeTeamModalView('create')">
 								<span class="glyphicon glyphicon-plus"></span>
-								Add Project to {{selectedCategory.name}}
+								Add Team to {{selectedCategory.name}}
 							</button>
 						</div>
 					</div><br />
 
-					<div ng-repeat="project in selectedCategory.projects | orderBy: '+name'">
+					<div ng-repeat="team in selectedCategory.teams | orderBy: '+name'">
 						<div ng-if="$index % 4 == 0" class="row"></div>
-						<div class="col col-sm-3 col-md-3 col-lg-3 project-col">
-							<div class="media category-specific-project" cng-category-specific-project cog=".glyphicon-cog">
+						<div class="col col-sm-3 col-md-3 col-lg-3 team-col">
+							<div class="media category-specific-team" cng-category-specific-team cog=".glyphicon-cog">
 								<div class="media-left">
 									<a href="#">
 										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -208,10 +208,10 @@
 								</div>
 								<div class="media-body">
 									<h4 class="media-heading">
-										{{project.number}}
-										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeProjectModalView('edit', selectedCategory, project)"></span></span>
+										{{team.number}}
+										<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeTeamModalView('edit', selectedCategory, team)"></span></span>
 									</h4>
-									<span>{{project.name}}</span>
+									<span>{{team.name}}</span>
 								</div>
 							</div>
 						</div>
@@ -242,7 +242,7 @@
 		         	<h3></h3>
 							<div>
 								<div><u>{{uncategorized.name}}</u></div>
-								<span class="droppable-category-text">{{uncategorized.projects.length}} Projects</span>
+								<span class="droppable-category-text">{{uncategorized.teams.length}} Teams</span>
 							</div>
 						</a>
 			    </li>
@@ -250,16 +250,16 @@
 						<li class="droppable-category" 
 							  cng-droppable-category 
 							  category-name="{{category.name}}"
-							  check-category="$parent.categories.getProjectByName(categoryName, projectName)" 
-							  update-category="$parent.transferTeamToCategory(categoryName, projectName)">
+							  check-category="$parent.categories.getTeamByName(categoryName, teamName)" 
+							  update-category="$parent.transferTeamToCategory(categoryName, teamName)">
 			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
 			        	<h3>
 									<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
 								</h3>
 								<div>
 									<div><u>{{category.name}}</u></div>
-									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.projects.length}} Projects</span>
-									<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.projects.length}} Projects / {{category.judges.length}} Judges</span>
+									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.teams.length}} Teams</span>
+									<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.teams.length}} Teams / {{category.judges.length}} Judges</span>
 								</div>
 							</a>
 				    </li>
@@ -378,39 +378,39 @@
 	</div>
 </div>
 
-<!-- Project Modal -->
-<div class="modal fade" id="project-modal" tabindex="-1" role="dialog" aria-labelledby="project-modal" aria-hidden="true">
+<!-- Team Modal -->
+<div class="modal fade" id="team-modal" tabindex="-1" role="dialog" aria-labelledby="team-modal" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content panel-success">
       <div class="modal-header panel-heading">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
-   			<div ng-switch on="projectModalView">
+   			<div ng-switch on="teamModalView">
    				<div ng-switch-when="create">
 		        <div ng-switch on="currentView">
 		        	<div ng-switch-when="default">
-		        		<h4 class="modal-title">Add New Project</h4>
+		        		<h4 class="modal-title">Add New Team</h4>
 	        		</div>
 	        		<div ng-switch-when="selectedCategory">
-	        			<h4 class="modal-title">Add New Project to {{selectedCategory.name}}</h4>
+	        			<h4 class="modal-title">Add New Team to {{selectedCategory.name}}</h4>
 	        		</div>
 	      		</div>
       		</div> <!-- ng-switch-when="create" -->
       		<div ng-switch-when="edit">
-      			<h4 class="modal-title">Edit Project: {{projectName}}</h4>
+      			<h4 class="modal-title">Edit Team: {{teamName}}</h4>
       		</div> <!-- ng-switch-when="edit" -->
-    		</div> <!-- ng-switch on="projectModalView" -->
+    		</div> <!-- ng-switch on="teamModalView" -->
       </div> <!-- ./modal-header panel-heading -->
 
       <div class="modal-body">
       	<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>*Project Name:</label>
+						<label>*Team Name:</label>
 					</div>
 					<div class="col col-lg-7 col-md-7 col-sm-7">
 						<input class="form-control" 
 									 type="text" 
-									 ng-model="projectName"
+									 ng-model="teamName"
 									 required
 									 autofocus />
 					</div>
@@ -418,11 +418,11 @@
 
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>Project #:</label>
+						<label>Team #:</label>
 					</div>
 					<div class="col col-lg-7 col-md-7 col-sm-7">
-						<select ng-model="projectNumber" required>
-							<option ng-repeat="number in projectNumberOptions">{{number}}</option>
+						<select ng-model="teamNumber" required>
+							<option ng-repeat="number in teamNumberOptions">{{number}}</option>
 						</select>
 					</div>
 				</div><br />
@@ -446,7 +446,7 @@
 								         class="form-control input-sm" 
 								         placeholder="File" 
 								         style="width: 115%"
-								         ng-model="projectLogo">
+								         ng-model="teamLogo">
 								</div>
 							</div>
 						</div>
@@ -465,7 +465,7 @@
 					<div class="col col-lg-7 col-md-7 col-sm-7">
 						<textarea class="form-control" 
 						          rows="3" 
-						          ng-model="projectDesc"
+						          ng-model="teamDesc"
 						          required>
 	          </textarea>
 					</div>
@@ -474,12 +474,12 @@
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 					</div>
 					<div class="col col-lg-9 col-md-9 col-sm-3 modal-col">
-						<div ng-switch on="projectModalError">
+						<div ng-switch on="teamModalError">
 							<div ng-switch-when="undefined">
 							</div>
 							<div ng-switch-default>
 								<div class="alert alert-danger modal-alert">
-									{{projectModalError}}
+									{{teamModalError}}
 								</div>
 							</div>
 						</div>
@@ -487,18 +487,18 @@
 				</div>
       </div> <!-- ./modal-body -->
 
-      <div ng-switch on="projectModalView">
+      <div ng-switch on="teamModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
-      			<button type="button" class="btn btn-success" ng-click="createNewProject()">Save changes</button>
-      			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
+      			<button type="button" class="btn btn-success" ng-click="createNewTeam()">Save changes</button>
+      			<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
 					</div> <!-- ./modal-footer -->
 				</div> <!-- ng-switch-when-"ceate" -->
 				<div ng-switch-when="edit">
 					<div class="modal-footer">
 						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteTeam()">Delete</button>
-      			<button type="button" class="btn btn-success" ng-click="editSelectedProject()">Save changes</button>
-      			<button type="button" class="btn btn-default" ng-click="closeProjectModal()">Cancel</button>
+      			<button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Save changes</button>
+      			<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
 					</div> <!-- /.modal-footer-->
 				</div> <!-- ng-switch-when-"edit" -->
 			</div> <!-- ng-switch on="categoryModalView" -->
