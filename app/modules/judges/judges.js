@@ -10,18 +10,20 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 }])
 
 .controller('JudgesCtrl', ['$scope', '$log', 'filterFilter', function($scope, $log, filterFilter) {
-	$scope.$watch('thingy', function(newValue) {
-			console.log(newValue);
-		});
 	
 	$scope.tabs = [
-    { title:'Projects Judging', content:'Dynamic content 1' , active: true},
-    { title:'Criteria Rules', content:'Dynamic content 2'}
+    { title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
+    { title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
   ];
-	
-  $scope.teams = ['Alabama', 'Alaska', 'Arizona'];
+  $scope.teams = ['Alabama', 'Alaska', 'Arizona', 'Wyoming', 'Nebraska', 'Georgia', 'Florida', 'Apple', 'Anna', 'Another', 'Atlanta', 'Algeria', 'Albania'];
+	$scope.judgeModalView = 'teams';
 	$scope.filteredTeams = [];
 	$scope.selectedTeams = '';
+	$scope.selectedTeamCount = 0;
+	
+	$scope.changeModalTab = function(view) {
+		$scope.modalView = view;
+	}
 	
 	$scope.$watch('selectedTeam', function(newValue) {	
 		$scope.filterTeams(newValue);
@@ -38,9 +40,28 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	};
 	
 	$scope.addAllFilteredTeams = function() {
+		var firstChar = $scope.selectedTeams.trim().slice(-1);
+		if (firstChar !== ',' && firstChar !== '')
+			$scope.selectedTeams += ', ';
 		angular.forEach($scope.filteredTeams, function(team) {
 			if (-1 === $scope.selectedTeams.indexOf(team))
-			$scope.selectedTeams += (team + ', ');
+				$scope.selectedTeams += (team + ', ');
 		});
+		$scope.checkModalTextAreaForErrors();
+	};
+	
+	$scope.checkModalTextAreaForErrors = function() {
+		$scope.judgeModalTextAreaError = undefined;
+		var selectedTeams = $scope.selectedTeams.split(',');
+		var teamCount = 0;
+		for (var i = 0; i < selectedTeams.length; i++) {
+			var team = selectedTeams[i].trim();
+			if (-1 === $scope.teams.indexOf(team) && team !== '') {
+				$scope.judgeModalTextAreaError = team + ' is not a valid team.';
+			} else if (-1 !== $scope.teams.indexOf(team) && team !== '') {
+					teamCount++;
+			}
+		}
+		$scope.selectedTeamCount = teamCount;
 	}
 }]);

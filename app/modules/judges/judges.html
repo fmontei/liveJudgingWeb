@@ -106,7 +106,7 @@
 </div> <!-- ./container-fluid -->
 
 <div class="modal fade" id="judge-modal" tabindex="-1" role="dialog" aria-labelledby="judge-modal" aria-hidden="true">
-	<div class="modal-dialog">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content panel-success">
 			<div class="modal-header panel-heading">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -155,6 +155,7 @@
 					<div class="col col-sm-8 col-md-8 col-lg-8">
 						<div tabset>
 							<div tab ng-repeat="tab in tabs" 
+											 ng-click="changeModalTab(tab.view)"
 							         heading="{{tab.title}}" 
 											 active="tab.active" 
 											 disable="tab.disabled">
@@ -163,70 +164,91 @@
 						
 						<div class="row">
 							<div class="col col-sm-12 col-md-12 col-lg-12">
-								<div class="judge-modal-tab-content">
+								<div ng-switch on="judgeModalView">
+									<div ng-switch-default class="judge-modal-tab-content">
 									
-									<div class="row">
-										<div class="col col-sm-3 col-md-3 col-lg-3">
-											<div class="btn-group" role="group">
-												<button class="btn btn-default dropdown-toggle" type="button" 
-													data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-													Sort by
-													<span class="caret"></span>
-												</button>
-												<ul class="dropdown-menu">
-													<li><a href="javascript:void(0)">Name</a></li>
-													<li><a href="javascript:void(0)">Category</a></li>
-													<li><a href="javascript:void(0)">Number</a></li>
-												</ul>
+										<div class="row">
+											<div class="col col-sm-3 col-md-3 col-lg-3">
+												<div class="btn-group" role="group">
+													<button class="btn btn-default dropdown-toggle" type="button" 
+														data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+														Sort by
+														<span class="caret"></span>
+													</button>
+													<ul class="dropdown-menu">
+														<li><a href="javascript:void(0)">Name</a></li>
+														<li><a href="javascript:void(0)">Category</a></li>
+														<li><a href="javascript:void(0)">Number</a></li>
+													</ul>
+												</div>
+											</div>
+											<div class="col col-sm-7 col-md-7 col-lg-7">
+												<input type="text" 
+															 ng-model="$parent.selectedTeam" 
+															 typeahead-focus-first="false"
+															 typeahead="team for team in $parent.teams | filter:$viewValue | limitTo:8" 
+															 class="form-control">
+											</div>
+											<div class="col col-sm-2 col-md-2 col-lg-2">
+												<button class="btn btn-default" id="judge-modal-add-btn" ng-click="$parent.addAllFilteredTeams()">Add</button>
 											</div>
 										</div>
-										<div class="col col-sm-7 col-md-7 col-lg-7">
-											<input type="text" 
-														 ng-model="selectedTeam" 
-														 typeahead-focus-first="false"
-														 typeahead="team for team in teams | filter:$viewValue | limitTo:8" 
-														 class="form-control">
+										
+										<div class="row">
+											<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
+												<table class="table">
+													<thead>
+														<th>Team #</th>
+														<th>Team Name</th>
+													</thead>
+													<tbody>
+														<tr ng-repeat="filteredTeam in $parent.filteredTeams">
+															<td>0</td>
+															<td>{{filteredTeam}}</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
 										</div>
-										<div class="col col-sm-2 col-md-2 col-lg-2">
-											<button class="btn btn-default" id="judge-modal-add-btn" ng-click="addAllFilteredTeams()">Add</button>
+										<br />
+										
+										<div class="row">
+											<div class="col col-sm-4 col-md-4 col-lg-4" >
+												<label>Selected teams ({{$parent.selectedTeamCount}}):</label>
+											</div>
 										</div>
-									</div>
-									<br />
+										<div class="row">
+											<div class="col col-sm-12 col-md-12 col-lg-12">
+												<textarea class="form-control" 
+												          id="judge-modal-textarea" 
+																	ng-model="$parent.selectedTeams"
+																	ng-change="$parent.checkModalTextAreaForErrors()">
+																	{{$parent.selectedTeams}}
+												</textarea>
+											</div>
+										</div>
 									
-									<div class="row">
-										<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
-											<table class="table">
-												<thead>
-													<th>Team #</th>
-													<th>Team Name</th>
-												</thead>
-												<tbody>
-													<tr ng-repeat="filteredTeam in filteredTeams">
-														<td>0</td>
-														<td>{{filteredTeam}}</td>
-													</tr>
-												</tbody>
-											</table>
+										<div ng-switch on="judgeModalTextAreaError">
+											<div ng-switch-when="undefined">
+											</div>
+											<div ng-switch-default>
+												<div class="alert alert-danger" id="judge-modal-alert">
+													<span class="glyphicon glyphicon-alert"> {{$parent.judgeModalTextAreaError}}</span>
+												</div>
+											</div>
 										</div>
-									</div>
-									
-									<div class="row">
-										<div class="col col-sm-12 col-md-12 col-lg-12">
-											<textarea class="form-control" id="judge-modal-textarea" ng-model="selectedTeams"></textarea>
-										</div>
-									</div>
-
-								</div>
-							</div>
-						</div>
+										
+									</div> <!-- ng-switch-when="teams" -->
+								</div> <!-- ng-switch on -->
+							</div> <!-- ./col -->
+						</div> <!-- ./row -->
 					</div>
 					
 					<div class="col col-sm-2 col-md-2 col-lg-2">
-					</div>
+					</div>		
 				</div> <!-- ./row -->
-				<br />
-				
 			</div> <!-- ./modal-body -->
+			
 			<div class="modal-footer">
 				<div class="row">
 					<span class="col col-sm-5"><button type="button" class="btn btn-success pull-right"">Create</button></span>
