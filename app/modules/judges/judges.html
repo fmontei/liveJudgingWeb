@@ -1,4 +1,5 @@
 
+
 <div class="container-fluid">
 	<div class="row">
 		<div class="col col-sm-8 col-md-8 col-lg-8">
@@ -7,16 +8,6 @@
 					<div class="row">
 						<h1>Judges <span class="label label-default"></span></h1>
 						<hr>
-					</div>
-				</div>
-				<div ng-switch-when="selectedCategory">
-					<div class="row">
-						<div class="page-header current-category-header">
-							<h1 id="breadcrumb-symbol">
-								<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.name}} 
-								<span class="label label-default">{{selectedCategory.teams.length}}</span>
-							</h1>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -29,7 +20,7 @@
 					<div class="row">
 						<div class="col-sm-12 col-md-12 col-lg-12">
 							<div class="btn-group" role="group" id="team-buttons">
-								<button class="btn btn-default" type="button" cng-organize-teams>
+								<button class="btn btn-default" type="button">
 									Organize
 									<span class="glyphicon glyphicon-th-large"></span>
 								</button>
@@ -39,7 +30,7 @@
 										Sort by
 										<span class="caret"></span>
 									</button>
-									<ul class="dropdown-menu" aria-labelledby="teams-dropdown">
+									<ul class="dropdown-menu">
 										<li><a href="javascript:void(0)" ng-click="changeView('default')">Name</a></li>
 										<li><a href="javascript:void(0)" ng-click="changeView('category')">Affiliation</a></li>
 									</ul>
@@ -49,6 +40,17 @@
 					</div>
 				</div>
 			</div>
+			
+			<div class="row">
+				<div class="col col-sm-12 col-md-12 col-lg-12">
+					<button class="btn btn-lg btn-success add-entity-btn"
+									data-toggle="modal"
+									data-target="#judge-modal">
+						<span class="glyphicon glyphicon-plus"></span> Add Judge
+					</button>
+				</div>
+			</div>
+			
 		</div> <!-- ./col col-sm-8 col-md-8 col-lg-8 -->
 		
 		<div class="col-sm-4 col-md-4 col-lg-4">
@@ -71,7 +73,7 @@
 		        <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails('uncategorized')">
 		         	<h3></h3>
 							<div>
-								<div><u>{{uncategorized.name}}</u></div>
+								<div><u>Uncategorized</u></div>
 								<span class="droppable-category-text">{{uncategorized.teams.length}} Teams</span>
 							</div>
 						</a>
@@ -102,3 +104,136 @@
 
 	</div> <!-- ./col-sm-4 col-md-4 col-lg-4 -->
 </div> <!-- ./container-fluid -->
+
+<div class="modal fade" id="judge-modal" tabindex="-1" role="dialog" aria-labelledby="judge-modal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content panel-success">
+			<div class="modal-header panel-heading">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="notification-modal-label">Judge Creation</h4>
+			</div>
+			<div class="modal-body">
+			
+				<div class="row">
+					<div class="col col-sm-2 col-md-2 col-lg-2">
+					</div>
+					<div class="col col-sm-3 col-md-3 col-lg-3">
+						<label>*Name:</label>
+					</div>
+					<div class="col col-sm-5 col-md-5 col-lg-5">
+						<input class="form-control" type="text" />
+					</div>
+				</div> <!-- ./row -->
+				<br />
+				
+				<div class="row">
+					<div class="col col-sm-2 col-md-2 col-lg-2">
+					</div>
+					<div class="col col-sm-3 col-md-3 col-lg-3">
+						<label>*E-mail:</label>
+					</div>
+					<div class="col col-sm-5 col-md-5 col-lg-5">
+						<input class="form-control" type="text" />
+					</div>
+				</div> <!-- ./row -->
+				<br />
+				
+				<div class="row">
+					<div class="col col-sm-2 col-md-2 col-lg-2">
+					</div>
+					<div class="col col-sm-3 col-md-3 col-lg-3">
+						<label>Affiliation:</label>
+					</div>
+					<div class="col col-sm-5 col-md-5 col-lg-5">
+						<input class="form-control" type="text" />
+					</div>
+				</div> <!-- ./row -->
+				
+				<div class="row">
+					<div class="col col-sm-2 col-md-2 col-lg-2">
+					</div>
+					<div class="col col-sm-8 col-md-8 col-lg-8">
+						<div tabset>
+							<div tab ng-repeat="tab in tabs" 
+							         heading="{{tab.title}}" 
+											 active="tab.active" 
+											 disable="tab.disabled">
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col col-sm-12 col-md-12 col-lg-12">
+								<div class="judge-modal-tab-content">
+									
+									<div class="row">
+										<div class="col col-sm-3 col-md-3 col-lg-3">
+											<div class="btn-group" role="group">
+												<button class="btn btn-default dropdown-toggle" type="button" 
+													data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+													Sort by
+													<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu">
+													<li><a href="javascript:void(0)">Name</a></li>
+													<li><a href="javascript:void(0)">Category</a></li>
+													<li><a href="javascript:void(0)">Number</a></li>
+												</ul>
+											</div>
+										</div>
+										<div class="col col-sm-7 col-md-7 col-lg-7">
+											<input type="text" 
+														 ng-model="selectedTeam" 
+														 typeahead-focus-first="false"
+														 typeahead="team for team in teams | filter:$viewValue | limitTo:8" 
+														 class="form-control">
+										</div>
+										<div class="col col-sm-2 col-md-2 col-lg-2">
+											<button class="btn btn-default" id="judge-modal-add-btn" ng-click="addAllFilteredTeams()">Add</button>
+										</div>
+									</div>
+									<br />
+									
+									<div class="row">
+										<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
+											<table class="table">
+												<thead>
+													<th>Team #</th>
+													<th>Team Name</th>
+												</thead>
+												<tbody>
+													<tr ng-repeat="filteredTeam in filteredTeams">
+														<td>0</td>
+														<td>{{filteredTeam}}</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+									
+									<div class="row">
+										<div class="col col-sm-12 col-md-12 col-lg-12">
+											<textarea class="form-control" id="judge-modal-textarea" ng-model="selectedTeams"></textarea>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="col col-sm-2 col-md-2 col-lg-2">
+					</div>
+				</div> <!-- ./row -->
+				<br />
+				
+			</div> <!-- ./modal-body -->
+			<div class="modal-footer">
+				<div class="row">
+					<span class="col col-sm-5"><button type="button" class="btn btn-success pull-right"">Create</button></span>
+					<span class="col col-sm-2"></span>
+					<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+				</div>
+			</div> <!-- ./modal-footer -->
+		</div>
+	</div>
+</div>
