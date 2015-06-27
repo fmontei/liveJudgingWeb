@@ -22,7 +22,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	$scope.selectedTeamCount = 0;
 	
 	$scope.changeModalTab = function(view) {
-		$scope.modalView = view;
+		$scope.judgeModalView = view;
 	}
 	
 	$scope.$watch('selectedTeam', function(newValue) {	
@@ -40,8 +40,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	};
 	
 	$scope.addAllFilteredTeams = function() {
-		var firstChar = $scope.selectedTeams.trim().slice(-1);
-		if (firstChar !== ',' && firstChar !== '')
+		var lastChar = $scope.selectedTeams.trim().slice(-1);
+		if (lastChar !== ',' && lastChar !== '')
 			$scope.selectedTeams += ', ';
 		angular.forEach($scope.filteredTeams, function(team) {
 			if (-1 === $scope.selectedTeams.indexOf(team))

@@ -1,3 +1,14 @@
+#judge-modal-tabs  .nav-tabs {
+	margin-bottom: 0;
+	border: none;
+}
+
+#judge-modal-teams-view {
+	border: solid #dddddd 1px; 
+	border-radius: 0px 0px 5px 5px;
+  padding: 10px;
+}
+
 .judge-modal-tab-content {
 	margin-left: 2px;
 	margin-right: 2px;
@@ -24,4 +35,6 @@
 	margin-top: 2px;
 	margin-bottom: 0px;
 	overflow: hidden;
+	background-color: #E51C23;
+	color: white;
 }

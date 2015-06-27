@@ -153,8 +153,9 @@
 					<div class="col col-sm-2 col-md-2 col-lg-2">
 					</div>
 					<div class="col col-sm-8 col-md-8 col-lg-8">
-						<div tabset>
-							<div tab ng-repeat="tab in tabs" 
+						<div tabset id="judge-modal-tabs">
+							<div tab 
+							         ng-repeat="tab in tabs" 
 											 ng-click="changeModalTab(tab.view)"
 							         heading="{{tab.title}}" 
 											 active="tab.active" 
@@ -162,10 +163,10 @@
 							</div>
 						</div>
 						
-						<div class="row">
+						<div class="row" id="judge-modal-teams-view">
 							<div class="col col-sm-12 col-md-12 col-lg-12">
 								<div ng-switch on="judgeModalView">
-									<div ng-switch-default class="judge-modal-tab-content">
+									<div ng-switch-when="teams" class="judge-modal-tab-content">
 									
 										<div class="row">
 											<div class="col col-sm-3 col-md-3 col-lg-3">
@@ -196,7 +197,7 @@
 										
 										<div class="row">
 											<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
-												<table class="table">
+												<table class="table table-striped">
 													<thead>
 														<th>Team #</th>
 														<th>Team Name</th>
