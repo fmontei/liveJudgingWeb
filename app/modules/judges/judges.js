@@ -15,14 +15,39 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
     { title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
     { title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
   ];
-  $scope.teams = ['Alabama', 'Alaska', 'Arizona', 'Wyoming', 'Nebraska', 'Georgia', 'Florida', 'Apple', 'Anna', 'Another', 'Atlanta', 'Algeria', 'Albania'];
+  $scope.teams = [
+		{name: 'Alabama', category: 'A', color: '#ac725e', id: '5'}, 
+		{name: 'Georgia', category: 'A', color: '#ac725e', id: '3'}, 
+		{name: 'Washington', category: 'B', color: '#92e1c0', id: '1'}];
+	$scope.getTeam = function(attr, value) {
+		for (var i = 0; i < $scope.teams.length; i++)
+			if ($scope.teams[i][attr] === value)
+				return $scope.teams[i];
+	}
+	$scope.color = 'green';
 	$scope.judgeModalView = 'teams';
-	$scope.filteredTeams = [];
-	$scope.selectedTeams = '';
-	$scope.selectedTeamCount = 0;
+	$scope.filteredTeams = $scope.teams;
+	$scope.selectedTeams = [];
+	$scope.modalSortType = '+name';
+	
+	$scope.selectedTeams.toString = function() {
+		var string = '';
+		for (var i = 0; i < $scope.selectedTeams.length; i++) {
+			if (i < $scope.selectedTeams.length - 1)
+				string += $scope.selectedTeams[i] + '; ';
+			else
+				string += $scope.selectedTeams[i];
+		}
+		return string;
+	}
 	
 	$scope.changeModalTab = function(view) {
 		$scope.judgeModalView = view;
+	}
+	
+	$scope.changeModalSortType = function(type) {
+		if (type === 'name' || type === 'category' || type === 'id')
+			$scope.modalSortType = '+' + type;
 	}
 	
 	$scope.$watch('selectedTeam', function(newValue) {	
@@ -39,29 +64,48 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		});
 	};
 	
-	$scope.addAllFilteredTeams = function() {
-		var lastChar = $scope.selectedTeams.trim().slice(-1);
-		if (lastChar !== ',' && lastChar !== '')
-			$scope.selectedTeams += ', ';
-		angular.forEach($scope.filteredTeams, function(team) {
-			if (-1 === $scope.selectedTeams.indexOf(team))
-				$scope.selectedTeams += (team + ', ');
-		});
-		$scope.checkModalTextAreaForErrors();
+	$scope.selectSingleFilteredTeam = function(teamName) {
+		if (false === $scope.isTeamSelected(teamName)) {
+			$scope.selectFilteredTeam(teamName); 
+		} else {
+			$scope.deselectFilteredTeam(teamName);
+		}
+	}
+	
+	$scope.selectAllFilteredTeams = function() {
+		if (false === $scope.areAllTeamsSelected()) {
+			angular.forEach($scope.filteredTeams, function(team) {
+				$scope.selectFilteredTeam(team.name);
+			});
+		} else {
+			angular.forEach($scope.filteredTeams, function(team) {
+				$scope.deselectFilteredTeam(team.name);
+			});
+		}
 	};
 	
-	$scope.checkModalTextAreaForErrors = function() {
-		$scope.judgeModalTextAreaError = undefined;
-		var selectedTeams = $scope.selectedTeams.split(',');
-		var teamCount = 0;
-		for (var i = 0; i < selectedTeams.length; i++) {
-			var team = selectedTeams[i].trim();
-			if (-1 === $scope.teams.indexOf(team) && team !== '') {
-				$scope.judgeModalTextAreaError = team + ' is not a valid team.';
-			} else if (-1 !== $scope.teams.indexOf(team) && team !== '') {
-					teamCount++;
+	$scope.selectFilteredTeam = function(teamName) {
+		if ($scope.selectedTeams.indexOf(teamName) === -1) {
+			$scope.selectedTeams.push(teamName);
+		}
+	}
+	
+	$scope.deselectFilteredTeam = function(teamName) {
+		var length = $scope.selectedTeams.length;
+		$scope.selectedTeams.splice($scope.selectedTeams.indexOf(teamName), 1); 
+	}
+	
+	$scope.isTeamSelected = function(teamName) {
+		return $scope.selectedTeams.indexOf(teamName) !== -1;
+	}
+	
+	$scope.areAllTeamsSelected = function() {
+		for (var i = 0; i < $scope.filteredTeams.length; i++) {
+			var teamName = $scope.filteredTeams[i].name;
+			if ($scope.selectedTeams.indexOf(teamName) === -1) {
+				return false;
 			}
 		}
-		$scope.selectedTeamCount = teamCount;
+		return true;
 	}
 }]);

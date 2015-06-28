@@ -169,7 +169,7 @@
 									<div ng-switch-when="teams" class="judge-modal-tab-content">
 									
 										<div class="row">
-											<div class="col col-sm-3 col-md-3 col-lg-3">
+											<div class="col col-sm-2 col-md-2 col-lg-2">
 												<div class="btn-group" role="group">
 													<button class="btn btn-default dropdown-toggle" type="button" 
 														data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -177,23 +177,42 @@
 														<span class="caret"></span>
 													</button>
 													<ul class="dropdown-menu">
-														<li><a href="javascript:void(0)">Name</a></li>
-														<li><a href="javascript:void(0)">Category</a></li>
-														<li><a href="javascript:void(0)">Number</a></li>
+														<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('name')">Name</a></li>
+														<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('category')">Category</a></li>
+														<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('id')">Number</a></li>
 													</ul>
 												</div>
 											</div>
 											<div class="col col-sm-7 col-md-7 col-lg-7">
 												<input type="text" 
+															 placeholder="Type to filter results..."
 															 ng-model="$parent.selectedTeam" 
 															 typeahead-focus-first="false"
-															 typeahead="team for team in $parent.teams | filter:$viewValue | limitTo:8" 
+															 typeahead="team.name for team in $parent.teams | filter:$viewValue | limitTo:8" 
 															 class="form-control">
 											</div>
-											<div class="col col-sm-2 col-md-2 col-lg-2">
-												<button class="btn btn-default" id="judge-modal-add-btn" ng-click="$parent.addAllFilteredTeams()">Add</button>
+											<div class="col col-sm-3 col-md-3 col-lg-3 pull-right">
+												<div class="btn-group" role="group">
+													<div ng-switch on="$parent.areAllTeamsSelected()">
+														<div ng-switch-when="true">
+															<button class="btn btn-warning" 
+																			id="judge-modal-add-btn" 
+																			ng-click="$parent.selectAllFilteredTeams()">
+																			De-select Shown
+															</button>
+														</div>
+														<div ng-switch-when="false">
+															<button class="btn btn-info" 
+																			id="judge-modal-add-btn" 
+																			ng-click="$parent.selectAllFilteredTeams()">
+																			Select Shown
+															</button>
+														</div>
+													</div>
+												</div>
 											</div>
 										</div>
+										<br />
 										
 										<div class="row">
 											<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
@@ -201,11 +220,30 @@
 													<thead>
 														<th>Team #</th>
 														<th>Team Name</th>
+														<th>Category</th>
+														<th>Add</th>
 													</thead>
 													<tbody>
-														<tr ng-repeat="filteredTeam in $parent.filteredTeams">
-															<td>0</td>
-															<td>{{filteredTeam}}</td>
+														<!-- For modalSortType === 'name' or 'id', default to grey background color -->
+														<tr ng-repeat="filteredTeam in $parent.filteredTeams | orderBy: $parent.modalSortType"
+														    ng-if="$parent.modalSortType.indexOf('name') !== -1 || $parent.modalSortType.indexOf('id') !== -1">
+															<td>{{filteredTeam.id}}</td>
+															<td>{{filteredTeam.name}}</td>
+															<td>{{filteredTeam.category}}</td>
+															<td><input type="checkbox" 
+															           ng-click="$parent.selectSingleFilteredTeam(filteredTeam.name)" 
+																				 ng-checked="$parent.isTeamSelected(filteredTeam.name)" />
+														</tr>
+														<!-- For modalSortType === 'color', change background color to category color -->
+														<tr ng-repeat="filteredTeam in $parent.filteredTeams | orderBy: $parent.modalSortType"
+														    ng-if="$parent.modalSortType.indexOf('category') !== -1" 
+																style="background-color: {{filteredTeam.color}}">
+																<td>{{filteredTeam.id}}</td>
+																<td>{{filteredTeam.name}}</td>
+																<td>{{filteredTeam.category}}</td>
+																<td><input type="checkbox" 
+																					 ng-click="$parent.selectSingleFilteredTeam(filteredTeam.name)" 
+																					 ng-checked="$parent.isTeamSelected(filteredTeam.name)" />
 														</tr>
 													</tbody>
 												</table>
@@ -215,30 +253,17 @@
 										
 										<div class="row">
 											<div class="col col-sm-4 col-md-4 col-lg-4" >
-												<label>Selected teams ({{$parent.selectedTeamCount}}):</label>
+												<label>Selected teams ({{$parent.selectedTeams.length}}):</label>
 											</div>
 										</div>
 										<div class="row">
 											<div class="col col-sm-12 col-md-12 col-lg-12">
 												<textarea class="form-control" 
-												          id="judge-modal-textarea" 
-																	ng-model="$parent.selectedTeams"
-																	ng-change="$parent.checkModalTextAreaForErrors()">
-																	{{$parent.selectedTeams}}
-												</textarea>
+												          id="judge-modal-textarea"
+																	readonly>{{$parent.selectedTeams.toString().replace(',', ', ')}}</textarea>
 											</div>
 										</div>
-									
-										<div ng-switch on="judgeModalTextAreaError">
-											<div ng-switch-when="undefined">
-											</div>
-											<div ng-switch-default>
-												<div class="alert alert-danger" id="judge-modal-alert">
-													<span class="glyphicon glyphicon-alert"> {{$parent.judgeModalTextAreaError}}</span>
-												</div>
-											</div>
-										</div>
-										
+							
 									</div> <!-- ng-switch-when="teams" -->
 								</div> <!-- ng-switch on -->
 							</div> <!-- ./col -->

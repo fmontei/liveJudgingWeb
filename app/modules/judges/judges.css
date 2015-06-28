@@ -29,12 +29,3 @@
 	margin-top: 5px;
 	overflow-y: auto;
 }
-
-#judge-modal-alert {
-	padding: 1px;
-	margin-top: 2px;
-	margin-bottom: 0px;
-	overflow: hidden;
-	background-color: #E51C23;
-	color: white;
-}
