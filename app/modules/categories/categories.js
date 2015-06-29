@@ -9,8 +9,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
   });
 }])
 
-.controller('CategoriesCtrl', ['$cookies', '$location', '$rootScope', '$scope', 'CategoryManagementService', 'CatWatchService', 'TeamManagementService',
-    function($cookies, $location, $rootScope, $scope, CategoryManagementService, CatWatchService, TeamManagementService) {
+.controller('CategoriesCtrl', ['$cookies', '$location', '$scope', 'CategoryManagementService', 'CatWatchService', 'TeamManagementService',
+    function($cookies, $location, $scope, CategoryManagementService, CatWatchService, TeamManagementService) {
 
         var catWatchService = CatWatchService($cookies, $scope);
         catWatchService.init();
@@ -96,13 +96,13 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 ])
 
-.factory('CatWatchService', function($rootScope) {
+.factory('CatWatchService', function() {
     return function($cookies, $scope) {
         var service = {};
 
         service.init = function() {
             $scope.$watch(function() { 
-                return $rootScope.categories;
+                return $cookies.getObject('categories');
             }, function(newValue) {
                 $scope.categories = newValue;
             }, true);
@@ -118,8 +118,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 })
 
-.factory('CategoryManagementService', ['$cookies', '$log', '$rootScope', 'CategoryRESTService', 'CurrentUserService',
-    function($cookies, $log, $rootScope, CategoryRESTService, CurrentUserService) {
+.factory('CategoryManagementService', ['$cookies', '$log', 'CategoryRESTService', 'CurrentUserService',
+    function($cookies, $log, CategoryRESTService, CurrentUserService) {
     return function($scope, $cookies) {
         var authHeader = CurrentUserService.getAuthHeader();
         var eventId = $cookies.getObject('selected_event').id;
@@ -135,7 +135,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     }
                     category.color = categoryManagement.convertColorToHex(category.color);
                 });
-                $rootScope.categories = resp.event_categories;
+                $cookies.putObject('categories', resp.event_categories);
 
             }).catch(function() {
                 console.log('Error getting categories.');
@@ -166,17 +166,17 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 newCategory.id = returnedCategoryID;
                 resp.event_category.color = categoryManagement.convertColorToHex(resp.event_category.color);
                 // Save category objects in cookie.
-                var currentCats = $rootScope.categories;
+                var currentCats = $cookies.getObject('categories');
                 if (currentCats) {
                     currentCats.push(resp.event_category);
-                    $rootScope.categories = currentCats;
+                    $cookies.putObject('categories', currentCats);
                 } else {
-                    $rootScope.categories = resp.event_category;
+                    $cookies.putObject('categories', resp.event_category);
                 }
 
                 $scope.closeCategoryModal();
                 $log.log("New category created: " + JSON.stringify(newCategory));
-                $log.log("Category list updated: " + $rootScope.categories.length);
+                $log.log("Category list updated: " + $cookies.getObject('categories').length);
             }).catch(function() {
                 $scope.closeCategoryModal();
                 $scope.errorMessage = 'Error creating category on server.';
@@ -219,14 +219,14 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var catId = $cookies.getObject('selectedCategory').id;
             var connection = CategoryRESTService(authHeader);
             connection.category.delete({id: catId}).$promise.then(function(resp) {
-                var cats = $rootScope.categories;
+                var cats = $cookies.getObject('categories');
                 for (var i = 0; i < cats.length; i++) {
                     if (cats[i].id == catId) {
                         cats.splice(i, 1);
                         break;
                     }
                 }
-                $rootScope.categories = cats;
+                $cookies.putObject('categories', cats);
                 $scope.closeCategoryModal();
                 $log.log('Successfully deleted category.');
             }).catch(function() {
@@ -273,7 +273,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         var isNameTaken = function(name) {
             var retVal = false;
-            var cats = $rootScope.categories;;
+            var cats = $cookies.getObject('categories');
             angular.forEach(cats, function(cat) {
                 if (cat.label == name) {
                     retVal = true;
