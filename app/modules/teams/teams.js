@@ -72,7 +72,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			$scope.openTeamModal();
 			if (view === 'edit') {
 				$scope.populateTeamModal(team);
-				$cookies.put('selectedTeamId', team.id);
+				$cookies.putObject('selectedTeam', team);
 			}
 		}
 
@@ -94,7 +94,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			$scope.teamLogo = '';
 			$scope.teamDesc = '';
 			$('#team-modal').modal('hide');
-			$cookies.remove('selectedTeamId');
+			$cookies.remove('selectedTeam');
 		}
 
 }])
@@ -158,10 +158,15 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		initService.init = function() {
 			$scope.$watch(function() {
-				//return $cookies.getObject('selectedCategory');
 				return $rootScope.selectedCategory;
 			}, function(newValue) {
 				$scope.selectedCategory = newValue;
+			}, true);
+
+			$scope.$watch(function() {
+				return $cookies.getObject('selectedTeam');
+			}, function(newValue) {
+				$scope.selectedTeam = newValue;
 			}, true);
 
 			$scope.$watch(function() {
@@ -254,8 +259,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			connection.team.update({id: updatedTeam.id}, req).$promise.then(function(resp) {
 				// Todo: call API to update category->team mappings (once that's in the API).
 				$scope.closeTeamModal();
-				// Todo: change selectedTeamId cookies to selectedTeam
-				$log.log("Team edited: " + JSON.stringify($cookies.selectedTeam));
+				$log.log("Team edited: " + resp.event_team.name);
 			}).catch(function() {
 				$scope.errorMessage = 'Error editing team.';
 				$log.log($scope.errorMessage);
@@ -264,10 +268,10 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		teamManagement.deleteTeam = function() {
 			var connection = TeamRESTService(authHeader);
-			connection.team.delete({id: $cookies.get('selectedTeamId')}).$promise.then(function(resp) {
+			connection.team.delete({id: $cookies.getObject('selectedTeam').id}).$promise.then(function(resp) {
 				var teams = $rootScope.teams;
 				for (var i = 0; i < teams.length; i++) {
-					if (teams[i].id == $cookies.get('selectedTeamId')) {
+					if (teams[i].id == $cookies.getObject('selectedTeam').id) {
 						teams.splice(i, 1);
 						break;
 					}

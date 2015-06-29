@@ -1,0 +1,15 @@
+Cookies & RootScope variables list:
+
+$cookies.getObject('current_user')
+$cookies.getObject('selected_event')
+
+$rootScope.teams -- set when /teams loads
+$rootScope.categories -- set when /teams, /judges, or /rubrics loads
+
+$cookies.getObject('selectedTeam') -- set when a team modal is opened
+$cookies.getObject('selectedCategory') -- set when a category is clicked
+$cookies.getObject('uncategorized') -- the uncategorized category object
+
+$cookies.get('teamView')
+    Originally 'currentView' -- I changed this since we have rubrics and judges tabs,
+    but now that I'm thinking about it, maybe it's good to leave it as one view?
