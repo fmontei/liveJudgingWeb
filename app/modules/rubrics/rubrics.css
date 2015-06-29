@@ -1,0 +1,26 @@
+#rubric-accordion-add-btn {
+	width: 100%;
+}
+
+.rubric-accordion-row {
+	font-size: 12px;
+	margin-top: -10px;
+	
+	input {
+		font-size: 12px;
+	}
+}
+
+.rubric-accordion-heading   {
+	margin-bottom: -20px;
+}
+
+.rubric-accordion-heading-content {
+	color: #407B57;	
+}
+
+.criterion-remove-icon {
+	color: #C9302C;
+	cursor: pointer;
+}
+

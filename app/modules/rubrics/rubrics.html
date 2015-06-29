@@ -1,1 +1,232 @@
-Rubrics
+
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col col-sm-8 col-md-8 col-lg-8">
+			<div ng-switch on="currentView">
+				<div ng-switch-default>
+					<div class="row">
+						<h1>Rubrics <span class="label label-default">{{rubrics.length}}</span></h1>
+						<hr>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-8 col-md-8 col-lg-8">
+					<em>Drag-'n-drop rubrics into categories.</em>
+				</div>
+				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
+					<div class="row">
+						<div class="col-sm-12 col-md-12 col-lg-12">
+							<div class="btn-group" role="group" id="team-buttons">
+								<button class="btn btn-default" type="button">
+									Organize
+									<span class="glyphicon glyphicon-th-large"></span>
+								</button>
+								<div class="btn-group" role="group">
+									<button class="btn btn-default dropdown-toggle" type="button" 
+										data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										Sort by
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li><a href="javascript:void(0)" ng-click="changeView('default')">Name</a></li>
+										<li><a href="javascript:void(0)" ng-click="changeView('category')">Category</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col col-sm-12 col-md-12 col-lg-12">
+					<button class="btn btn-lg btn-success add-entity-btn"
+									data-toggle="modal"
+									data-target="#rubric-modal">
+						<span class="glyphicon glyphicon-plus"></span> Add Rubric
+					</button>
+				</div>
+			</div>
+			
+		</div> <!-- ./col col-sm-8 col-md-8 col-lg-8 -->
+		
+		<div class="col-sm-4 col-md-4 col-lg-4">
+			<div class="text-center" id="category-container">
+		
+				<div class="row">
+					<h1>Categories <span class="label label-default">3</span></h1>
+					<hr>
+				</div>
+			
+				<ul>
+					<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalView('create')">
+						<span class="glyphicon glyphicon-plus"></span> Add Category
+					</button>
+				</ul>
+				
+				<ul id="category-list">
+					<br /><br />
+					<li class="droppable-category">
+		        <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails('uncategorized')">
+		         	<h3></h3>
+							<div>
+								<div><u>Uncategorized</u></div>
+								<span class="droppable-category-text">{{uncategorized.teams.length}} Teams</span>
+							</div>
+						</a>
+			    </li>
+					<div ng-repeat="category in categories.list | orderBy: '+name'" ng-if="category.name != 'Uncategorized'">
+						<li class="droppable-category" 
+							  cng-droppable-category 
+							  category-name="{{category.name}}"
+							  check-category="$parent.categories.getTeamByName(categoryName, teamName)" 
+							  update-category="$parent.transferTeamToCategory(categoryName, teamName)">
+			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
+			        	<h3>
+									<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
+								</h3>
+								<div>
+									<div><u>{{category.name}}</u></div>
+									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.teams.length}} Teams</span>
+									<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.teams.length}} Teams / {{category.judges.length}} Judges</span>
+								</div>
+							</a>
+				    </li>
+			    </div>
+			    <br /><br /> 
+				</ul>
+				
+			</div> <!-- ./text-center -->
+		</div> <!-- ./col -->
+
+	</div> <!-- ./col-sm-4 col-md-4 col-lg-4 -->
+</div> <!-- ./container-fluid -->
+
+<div class="modal fade" id="rubric-modal" tabindex="-1" role="dialog" aria-labelledby="rubric-modal" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content panel-success">
+			<div class="modal-header panel-heading">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="notification-modal-label">Add New Rubric</h4>
+			</div>
+			<div class="modal-body">
+			
+				<div class="row">
+					<div class="col col-sm-1 col-md-1 col-lg-1">
+					</div>
+					<div class="col col-sm-3 col-md-3 col-lg-3">
+						<label>*Name:</label>
+					</div>
+					<div class="col col-sm-7 col-md-7 col-lg-7">
+						<input class="form-control" type="text" />
+					</div>
+				</div> <!-- ./row -->
+				<br />
+				
+				<div class="row">
+					<div class="col col-sm-1 col-md-1 col-lg-1">
+					</div>
+					<div class="col col-sm-3 col-md-3 col-lg-3">
+						<label>*Overall Rating Scale:</label>
+					</div>
+					<div class="col col-sm-7 col-md-7 col-lg-7">
+						<div ng-init="rubricRating = 3"><rating ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
+					</div>			
+				</div> <!-- ./row -->
+				<br />
+				
+				<div class="row">
+					<div class="col col-sm-1 col-md-1 col-lg-1">
+					</div>
+					<div class="col col-sm-3 col-md-3 col-lg-3">
+						<label>*Criteria:</label>
+					</div>
+					<div class="col col-sm-7 col-md-7 col-lg-7">
+				
+						<div accordion close-others="true">
+							<button class="btn btn-success" 
+							        id="rubric-accordion-add-btn" 
+											ng-click="createNewAccordionCriterion()">
+								<span class="glyphicon glyphicon-plus"></span>
+								Add New Criterion
+							</button>
+							<div ng-repeat="criteria in modalCriteria">
+								<div accordion-group is-open="status.open" class="panel-success">
+									<div accordion-heading class="panel-heading rubric-accordion-heading">
+										<div class="rubric-accordion-heading-content">
+											{{criteria.name}}
+											<i class="pull-right glyphicon" 
+												 ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}">
+											</i>
+										</div>
+									</div accordion-heading>
+									<div class="row">
+										<div class="col-sm-12 col-md-12 col-lg-12">
+											<i class="pull-right glyphicon glyphicon-remove criterion-remove-icon" 
+												 ng-click="removeAccordionCriterion($index)">
+											</i>
+										</div>
+									</div>
+									<br />
+									<div class="row rubric-accordion-row">
+										<div class="col col-sm-5 col-md-5 col-lg-5">
+											<label>*Name:</label>
+										</div>
+										<div class="col col-sm-7 col-md-7 col-lg-7">
+											<input ng-model="modalCriteria[$index].name" type="text" class="form-control" />
+										</div>
+									</div>
+									<br />
+									<div class="row rubric-accordion-row">
+										<div class="col col-sm-5 col-md-5 col-lg-5">
+											<label>*Description:</label>
+										</div>
+										<div class="col col-sm-7 col-md-7 col-lg-7">
+											<textarea ng-model="modalCriteria[$index].description" class="form-control" rows="2" />
+										</div>
+									</div>
+									<br />
+									<div class="row rubric-accordion-row">
+										<div class="col col-sm-5 col-md-5 col-lg-5">
+											<label>*Rating Scale:</label>
+										</div>
+									</div>
+									<br />
+									<div class="row rubric-accordion-row">
+										<div class="col col-sm-6 col-md-6 col-lg-6">
+											<div class="panel panel-default">
+												<label>Inherited</label>
+												<div><rating ng-model="rubricRating" readonly="true" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
+											</div>
+										</div>
+										<div class="col col-sm-6 col-md-6 col-lg-6">
+											<div class="panel panel-default">
+												<label>Custom</label>
+												<div ng-init="customRating = 3">
+													<rating ng-model="modalCriteria[$index].rating" max="10"></rating> <b>({{modalCriteria[$index].rating}} / 10)</b>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div accordion-group>
+							</div>
+						</div accordion>
+						
+					</div>
+				</div>
+				
+			</div> <!-- ./modal-body -->
+			
+			<div class="modal-footer">
+				<div class="row">
+					<span class="col col-sm-5"><button type="button" class="btn btn-success pull-right">Create</button></span>
+					<span class="col col-sm-2"></span>
+					<span class="col col-sm-5"><button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button></span>
+				</div>
+			</div> <!-- ./modal-footer -->
+		</div>
+	</div>
+</div>
