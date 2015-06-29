@@ -191,21 +191,25 @@
 									<br />
 									<div class="row rubric-accordion-row">
 										<div class="col col-sm-5 col-md-5 col-lg-5">
-											<label>*Rating Scale:</label>
+											<label>*Rating Scale: <span ng-init="modalCriteria[$index].ratingType=''"><em>{{modalCriteria[$index].ratingType}}</em></span></label>
 										</div>
 									</div>
 									<br />
 									<div class="row rubric-accordion-row">
 										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default">
+											<div class="panel panel-default" 
+											     ng-style="inheritedActive" 
+											     ng-click="updateRatingType($index, 'Inherited'); inheritedActive={'background-color':'#d6e9c6'}; customActive={'background-color':'white'}">
 												<label>Inherited</label>
 												<div><rating ng-model="rubricRating" readonly="true" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
 											</div>
 										</div>
 										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default">
+											<div class="panel panel-default" 
+											     ng-style="customActive" 
+											     ng-click="updateRatingType($index, 'Custom'); customActive={'background-color':'#d6e9c6'}; inheritedActive={'background-color':'white'}">
 												<label>Custom</label>
-												<div ng-init="customRating = 3">
+												<div ng-init="modalCriteria[$index].rating = 0">
 													<rating ng-model="modalCriteria[$index].rating" max="10"></rating> <b>({{modalCriteria[$index].rating}} / 10)</b>
 												</div>
 											</div>
