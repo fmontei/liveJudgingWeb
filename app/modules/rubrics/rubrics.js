@@ -26,4 +26,8 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	$scope.removeAccordionCriterion = function(index) {
 		$scope.modalCriteria.splice(index, 1);
 	}
+
+	$scope.updateRatingType = function(index, type) {
+		$scope.modalCriteria[index].ratingType = type;
+	}
 }]);
