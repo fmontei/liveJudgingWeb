@@ -1,7 +1,7 @@
 <div class="container-fluid">
 	<div class="row">
-		<div class="col col-sm-8 col-md-8 col-lg-8">
-			<div ng-switch on="currentView">
+		<div class="col col-sm-8 col-md-8 col-lg-8">		
+			<div ng-switch on="teamView">
 				<div ng-switch-default>
 					<div class="row">
 						<h1>Teams <span class="label label-default">{{teamList.length}}</span></h1>
@@ -10,12 +10,11 @@
 				</div>
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
-						<div class="page-header current-category-header">
-							<h1 id="breadcrumb-symbol">
-								<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.name}} 
-								<span class="label label-default">{{selectedCategory.teams.length}}</span>
-							</h1>
-						</div>
+						<h1 id="breadcrumb-symbol">
+							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
+							<span class="label label-default">{{selectedCategory.teams.length}}</span>
+						</h1>
+						<hr>
 					</div>
 				</div>
 			</div>
@@ -50,7 +49,7 @@
 				</div>
 			</div>
 			
-			<div ng-switch on="currentView">
+			<div class="row" ng-switch on="teamView">
 				<div ng-switch-default>
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
@@ -62,10 +61,10 @@
 					</div><br />
 					
 					<div class="draggable-team-wrapper">
-						<div ng-repeat="team in uncategorized.teams | orderBy: '+name'">
+						<div ng-repeat="team in teams | orderBy: '+name'">
 							<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
 							<div class="col col-sm-4 col-md-4 col-lg-3">
-								<div class="media draggable-team" cng-draggable-team teamName="{{team.name}}">
+								<div class="media draggable-team" cng-draggable-team teamId="{{team.id}}">
 									<div class="media-left">
 										<a href="#">
 											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -75,7 +74,7 @@
 											<h4 class="media-heading">
 												{{team.id}}
 												<span class="glyphicon glyphicon-cog" 
-											        ng-click="changeTeamModalView('edit', uncategorized, team)">
+											        ng-click="changeTeamModalView('edit', team)">
 								        </span>
 											</h4>
 											<div class="draggable-team-name">
@@ -86,7 +85,6 @@
 							</div>
 						</div>
 					</div>
-		
 				</div> <!--ng-switch-default-->
 				
 				<div ng-switch-when="category">
@@ -101,7 +99,7 @@
 										<div class="truncate">
 											<div class="accordion-heading">
 												<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
-													<span class="glyphicon glyphicon-chevron-right"></span> {{uncategorized.name}} 
+													<span class="glyphicon glyphicon-chevron-right"></span> {{uncategorized.label}} 
 												</a>
 											</div>
 										</div>
@@ -124,8 +122,8 @@
 														<h4 class="media-heading">
 															{{team.id}}
 															<span class="glyphicon glyphicon-cog" 
-														        ng-click="changeTeamModalView('edit', uncategorized, team)">
-											        </span>
+														        ng-click="changeTeamModalView('edit', team)">
+											        		</span>
 														</h4>
 														<div class="draggable-team-name">
 															<span>{{team.name}}</span>
@@ -139,11 +137,11 @@
 							</div>
 						</div>
 					</div>
-					<div ng-repeat="category in categories.list | orderBy: '+name'" ng-if="category.name != 'Uncategorized'">
+					<div ng-repeat="category in categories | orderBy: '+name'" ng-if="category.label != 'Uncategorized'">
 						<div class="accordion team-accordion">
 							<div class="panel panel-default accordion-group" 
 							     cng-category-accordion color="{{category.color}}" 
-									 category-name="{{category.name}}" 
+									 category-name="{{category.label}}" 
 									 change-category="updateSelectedCategory(category)">
 								<div class="panel-heading">
 									<div class="row">
@@ -151,7 +149,7 @@
 											<div class="truncate">
 												<div class="accordion-heading">
 													<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
-														<span class="glyphicon glyphicon-chevron-right"></span> {{category.name}} 
+														<span class="glyphicon glyphicon-chevron-right"></span> {{category.label}} 
 													</a>
 												</div>
 											</div>
@@ -174,8 +172,8 @@
 															<h4 class="media-heading">
 																{{team.id}}
 																<span class="glyphicon glyphicon-cog" 
-															        ng-click="changeTeamModalView('edit', uncategorized, team)">
-												        </span>
+															        ng-click="changeTeamModalView('edit', category, team)">
+												        		</span>
 															</h4>
 															<div class="draggable-team-name">
 																<span>{{team.name}}</span>
@@ -193,12 +191,11 @@
 				</div> <!--ng-switch-when-->
 
 				<div ng-switch-when="selectedCategory">
-
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
 							<button class="btn btn-lg btn-success add-entity-btn" ng-click="changeTeamModalView('create')">
 								<span class="glyphicon glyphicon-plus"></span>
-								Add Team to {{selectedCategory.name}}
+								Add Team to {{selectedCategory.label}}
 							</button>
 						</div>
 					</div><br />
@@ -216,7 +213,7 @@
 									<h4 class="media-heading">
 										{{team.id}}
 										<span class="glyphicon glyphicon-cog" 
-									        ng-click="changeTeamModalView('edit', uncategorized, team)">
+									        ng-click="changeTeamModalView('edit', team)">
 						        </span>
 									</h4>
 									<div class="draggable-team-name">
@@ -229,165 +226,14 @@
 				</div> <!--ng-switch-when-->
 				
 			</div> <!--ng-switch on-->
-		</div> 
+		</div>
 		
 		<div class="col-sm-4 col-md-4 col-lg-4">
-			<div class="text-center" id="category-container">
-			
-				<div class="row">
-					<h1>Categories <span class="label label-default">3</span></h1>
-					<hr>
-				</div>
-			
-				<ul>
-					<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalView('create')">
-						<span class="glyphicon glyphicon-plus"></span> Add Category
-					</button>
-				</ul>
-				
-				<ul id="category-list">
-					<br /><br />
-					<li class="droppable-category">
-		        <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails('uncategorized')">
-		         	<h3></h3>
-							<div>
-								<div><u>{{uncategorized.name}}</u></div>
-								<span class="droppable-category-text">{{uncategorized.teams.length}} Teams</span>
-							</div>
-						</a>
-			    </li>
-					<div ng-repeat="category in categories.list | orderBy: '+name'" ng-if="category.name != 'Uncategorized'">
-						<li class="droppable-category" 
-							  cng-droppable-category 
-							  category-name="{{category.name}}"
-							  check-category="$parent.categories.getTeamByName(categoryName, teamName)" 
-							  update-category="$parent.transferTeamToCategory(categoryName, teamName)">
-			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
-			        	<h3>
-									<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
-								</h3>
-								<div>
-									<div><u>{{category.name}}</u></div>
-									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.teams.length}} Teams</span>
-									<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.teams.length}} Teams / {{category.judges.length}} Judges</span>
-								</div>
-							</a>
-				    </li>
-			    </div>
-			    <br /><br /> 
-				</ul>
-				
-			</div> <!--Text-Center-->
+			<div class="text-center" id="category-container" ng-include="'modules/categories/categories.html'"></div> <!--Text-Center-->
 		</div> <!--Col-->
 
 	</div> <!--Row-->
 </div> <!--Container-Fluid-->
-
-<!-- Category Modal -->
-<div class="modal fade" id="category-modal" tabindex="-1" role="dialog" aria-labelledby="category-modal" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content panel-success">
-			<div class="modal-header panel-heading">
-				<button type="button" class="close" aria-label="Close" ng-click="closeCategoryModal()"><span aria-hidden="true">&times;</span></button>
-				<div ng-switch on="categoryModalView">
-					<div ng-switch-when="create">
-						<h4 class="modal-title" id="category-modal-label">Add New Category</h4>
-					</div>
-					<div ng-switch-when="edit">
-						<h4 class="modal-title" id="category-modal-label">Edit Category: {{categoryName}}</h4>
-					</div>
-				</div>
-			</div>
-
-			<div class="modal-body">
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>*Name:</label>
-					</div>
-					<div class="col col-lg-7 col-md-7 col-sm-7">
-						<input class="form-control" 
-						       type="text" 
-						       ng-model="categoryName"
-						       required
-						       autofocus />
-					</div>
-				</div><br />
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>Description:</label>
-					</div>
-					<div class="col col-lg-7 col-md-7 col-sm-7">
-						<textarea class="form-control" 
-						          rows="3" 
-						          ng-model="categoryDesc"></textarea>
-					</div>
-				</div><br />
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>*Due by:</label>
-					</div>
-					<div class="col col-lg-5 col-md-5 col-sm-5">
-						<div class="row">
-							<div class="col-sm-8 col-md-8 col-lg-8">
-								<timepicker minute-step="1"
-													  ng-model="categoryTime"
-													  required>
-								</timepicker>
-							</div>
-						</div>
-					</div>
-				</div><br />
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-						<label>*Color:</label>
-					</div>
-					<div class="col col-lg-5 col-md-5 col-sm-5">
-						<div class="input-group">
-							<input type="text" 
-							       class="form-control" 
-							       cng-color-picker 
-							       color="{{categoryColor}}"
-							       color-list="{{colorList}}"
-							       ng-model="categoryColor" />
-						</div>
-					</div>
-				</div><br />
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-					</div>
-					<div class="col col-lg-9 col-md-9 col-sm-3 modal-col">
-						<div ng-switch on="categoryModalError">
-							<div ng-switch-when="undefined">
-							</div>
-							<div ng-switch-default>
-								<div class="alert alert-danger modal-alert">
-									{{categoryModalError}}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div> <!-- /.modal-body -->
-
-			<div ng-switch on="categoryModalView">
-				<div ng-switch-when="create">
-					<div class="modal-footer">
-      			<button type="button" class="btn btn-success" ng-click="createNewCategory()">Save changes</button>
-      			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
-					</div> <!-- ./modal-footer -->
-				</div> <!-- ng-switch-when-"ceate" -->
-				<div ng-switch-when="edit">
-					<div class="modal-footer">
-						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteCategory()">Delete</button>
-      			<button type="button" class="btn btn-success" ng-click="editSelectedCategory()">Save changes</button>
-      			<button type="button" class="btn btn-default" ng-click="closeCategoryModal()">Cancel</button>
-					</div> <!-- /.modal-footer-->
-				</div> <!-- ng-switch-when-"edit" -->
-			</div> <!-- ng-switch on="categoryModalView" -->
-
-		</div>
-	</div>
-</div>
 
 <!-- Team Modal -->
 <div class="modal fade" id="team-modal" tabindex="-1" role="dialog" aria-labelledby="team-modal" aria-hidden="true">
@@ -398,7 +244,7 @@
 
    			<div ng-switch on="teamModalView">
    				<div ng-switch-when="create">
-		        <div ng-switch on="currentView">
+		        <div ng-switch on="teamView">
 		        	<div ng-switch-when="default">
 		        		<h4 class="modal-title">Add New Team</h4>
 	        		</div>

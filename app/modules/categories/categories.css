@@ -1,0 +1,49 @@
+#category-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#add-category-btn {
+    height: 80px;
+    width: 200px;
+    border: solid black 2px;
+    border-radius: 0;
+}
+
+#category-list {
+    list-style-type: none;
+    margin-top: -30px;
+}
+
+.droppable-category a {
+    color: black;
+    margin-left: auto;
+    margin-right: auto; 
+    height: 80px;
+    border: solid black 2px;
+    border-radius: 0;
+    margin-top: 10px;
+    width: 200px;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
+    /*margin-right: 5px;
+    float: right;
+    color: #398439;
+    display: none;
+    cursor: pointer;
+    font-size: 15px;*/
+}
+
+.droppable-category a:hover {
+    background-color: white !important;
+    border-color: rgba(126, 239, 104, 0.8);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+    outline: 0 none;
+}
+
+.droppable-category h3 {
+    margin-top: 0;
+}

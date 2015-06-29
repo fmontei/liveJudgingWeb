@@ -54,52 +54,7 @@
 		</div> <!-- ./col col-sm-8 col-md-8 col-lg-8 -->
 		
 		<div class="col-sm-4 col-md-4 col-lg-4">
-			<div class="text-center" id="category-container">
-		
-				<div class="row">
-					<h1>Categories <span class="label label-default">3</span></h1>
-					<hr>
-				</div>
-			
-				<ul>
-					<button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalView('create')">
-						<span class="glyphicon glyphicon-plus"></span> Add Category
-					</button>
-				</ul>
-				
-				<ul id="category-list">
-					<br /><br />
-					<li class="droppable-category">
-		        <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails('uncategorized')">
-		         	<h3></h3>
-							<div>
-								<div><u>Uncategorized</u></div>
-								<span class="droppable-category-text">{{uncategorized.teams.length}} Teams</span>
-							</div>
-						</a>
-			    </li>
-					<div ng-repeat="category in categories.list | orderBy: '+name'" ng-if="category.name != 'Uncategorized'">
-						<li class="droppable-category" 
-							  cng-droppable-category 
-							  category-name="{{category.name}}"
-							  check-category="$parent.categories.getTeamByName(categoryName, teamName)" 
-							  update-category="$parent.transferTeamToCategory(categoryName, teamName)">
-			        <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails($event)">
-			        	<h3>
-									<span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
-								</h3>
-								<div>
-									<div><u>{{category.name}}</u></div>
-									<span ng-if="category.judges.length == 0" class="droppable-category-text">{{category.teams.length}} Teams</span>
-									<span ng-if="category.judges.length > 0" class="droppable-category-text">{{category.teams.length}} Teams / {{category.judges.length}} Judges</span>
-								</div>
-							</a>
-				    </li>
-			    </div>
-			    <br /><br /> 
-				</ul>
-				
-			</div> <!-- ./text-center -->
+			<div class="text-center" id="category-container" ng-include="'modules/categories/categories.html'"></div> <!--Text-Center-->
 		</div> <!-- ./col -->
 
 	</div> <!-- ./col-sm-4 col-md-4 col-lg-4 -->

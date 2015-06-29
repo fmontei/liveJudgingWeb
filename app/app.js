@@ -8,7 +8,7 @@ angular.module('liveJudgingAdmin', [
   'ui.bootstrap',
   'liveJudgingAdmin.login',
   'liveJudgingAdmin.event',
-  'liveJudgingAdmin.projects',
+  'liveJudgingAdmin.teams',
   'liveJudgingAdmin.judges',
   'liveJudgingAdmin.rubrics',
   'liveJudgingAdmin.categories',
