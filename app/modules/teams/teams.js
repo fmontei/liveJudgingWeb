@@ -189,11 +189,13 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 })
 
 
-.factory('TeamManagementService', ['$log', '$rootScope', 'CurrentUserService', 'TeamRESTService', 
-	function($log, $rootScope, CurrentUserService, TeamRESTService) {
+.factory('TeamManagementService', ['$log', '$rootScope', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService',
+	function($log, $rootScope, CategoryManagementService, CurrentUserService, TeamRESTService) {
 	return function($scope, $cookies) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
+
+		var categoryManagementService = CategoryManagementService($scope, $cookies);
 
 		teamManagement.createNewTeam = function() {	
 			if (!validateForm(false)) 
@@ -292,8 +294,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			var connection = TeamRESTService(authHeader);
 			var req = {category_id: categoryId};
 			connection.team_categories.add_team({team_id: teamId}, req).$promise.then(function(resp) {
-				/* TODO: Call function in categories.js that will update 
-				   the category view with this team addition by calling the API. */
+				// Update the category view
+				categoryManagementService.getCategories();
 				if (!isDragNDrop) {
 					$scope.closeTeamModal();
 				}
