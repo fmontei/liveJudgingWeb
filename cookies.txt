@@ -3,8 +3,8 @@ Cookies & RootScope variables list:
 $cookies.getObject('current_user')
 $cookies.getObject('selected_event')
 
-$rootScope.teams -- set when /teams loads
-$rootScope.categories -- set when /teams, /judges, or /rubrics loads
+$cookies.getObject('teams') -- set when /teams loads
+$cookies.getObject('categories') -- set when /teams, /judges, or /rubrics loads
 
 $cookies.getObject('selectedTeam') -- set when a team modal is opened
 $cookies.getObject('selectedCategory') -- set when a category is clicked

@@ -9,7 +9,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
   });
 }])
 
-.controller('JudgesCtrl', ['$rootScope', '$scope', '$log', 'filterFilter', function($rootScope, $scope, $log, filterFilter) {
+.controller('JudgesCtrl', ['$scope', '$log', 'filterFilter',
+	function($scope, $log, filterFilter) {
 	
 	$scope.tabs = [
     { title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
@@ -117,3 +118,23 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		return categoryLabels.slice(0, -2);
 	}
 });
+
+.factory('JudgeRESTService'), ['$resource', function($resource) {
+	return function(authHeader) {
+		return {
+			eventJudges: $resource('http://api.stevedolan.me/events/:event_id/judges', {
+				event_id: '@id'
+			}, {
+				get: {
+					method: 'GET',
+					headers: authHeader
+				},
+				create: {
+					method: 'POST',
+					headers: authHeader
+				}
+			})
+		}
+	}
+}];
+
