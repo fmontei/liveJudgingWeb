@@ -399,7 +399,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 if ($(this).hasClass('destroy-special-category'))
                     scope.deleteTeam({itemId: scope.itemId});
                 else if ($(this).hasClass('remove-special-category'))
-                    
+                    scope.removeTeamFromCategory({itemId: scope.itemId});
             }
         });
     }

@@ -117,7 +117,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		}
 		return categoryLabels.slice(0, -2);
 	}
-});
+})
 
 .factory('JudgeRESTService'), ['$resource', function($resource) {
 	return function(authHeader) {
