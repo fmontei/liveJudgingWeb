@@ -86,6 +86,10 @@
     margin-bottom: 5px;
 }
 
+.special-category-hr.void {
+    margin-top: 15px;
+}
+
 .special-category-hr a {
     background-color: white; 
     position: relative;
