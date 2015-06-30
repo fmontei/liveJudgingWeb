@@ -396,10 +396,20 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             drop: function(event, ui) {
                 var droppedTeam = ui.draggable;
                 scope.itemId = droppedTeam.attr('teamId').trim();
-                if ($(this).hasClass('destroy-special-category'))
-                    scope.deleteTeam({itemId: scope.itemId});
-                else if ($(this).hasClass('remove-special-category'))
-                    scope.removeTeamFromCategory({itemId: scope.itemId});
+                if ($(this).hasClass('destroy-special-category')) {
+                    var confirm = window.confirm('Are you sure you want to destroy this team?');
+                    if (confirm)
+                        scope.deleteTeam({itemId: scope.itemId});
+                    else
+                        droppedTeam.goBack();
+                }
+                else if ($(this).hasClass('remove-special-category')) {
+                    var confirm = window.confirm('Are you sure you want to remove this team?');
+                    if (confirm)
+                        scope.removeTeamFromCategory({itemId: scope.itemId});
+                    else
+                        droppedTeam.goBack();
+                }
             }
         });
     }
