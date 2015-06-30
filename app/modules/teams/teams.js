@@ -306,6 +306,21 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			});
 		}
 
+		teamManagement.removeTeamFromCategory = function(teamId, categoryId) {
+			var connection = TeamRESTService(authHeader);
+			connection.team_categories_remove.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
+				// TODO: update category in cookies
+				var category = $cookies.getObject('selectedCategory');
+				for (var i = 0; i < category.teams.length; i++) {
+					if (category.teams[i].id === parseInt(teamId)) {
+						category.teams.splice(i, 1);
+						break;
+					}
+				}
+				teamManagement.updateSelectedCategory(category);
+			});
+		}
+
 		teamManagement.updateSelectedCategory = function(category) {
 			$cookies.putObject('selectedCategory', category);
 			$cookies.put('teamView', 'selectedCategory');
@@ -406,6 +421,14 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 				add_team: {
 					method: 'POST',
 					headers: authHeader
+				},
+			}),
+			team_categories_remove: $resource('http://api.stevedolan.me/teams/:team_id/categories/:category_id', {
+				team_id: '@team_id', category_id: '@category_id'
+			}, {
+				remove_team: {
+					method: 'DELETE',
+					headers: authHeader
 				}
 			})
 		}
@@ -430,9 +453,12 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 	return {
 		restrict: 'A',
 		scope: {
-			teamId: '=teamId'
+			cog: '@',
+			teamId: '=teamId',
+			isTransferable: '@isTransferable'
 		},
 		link: function(scope, elem, attrs) {
+			elem.data('isTransferable', scope.isTransferable === 'true');
 			elem.draggable({
 				cursor: 'grab',
 				start: function(event, ui) {
@@ -447,8 +473,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 				}
 			});
 
-			var cog = elem.find('.glyphicon-cog');
-
+			var cog = elem.find(scope.cog);
 			elem.bind('mouseenter', function() {
 				cog.show();
 			});
@@ -502,24 +527,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			elem.find('.panel-heading').css('border-color', scope.color).css('background-color', scope.color);
 			elem.bind('mouseenter', function() {
 				scope.changeCategory({category: scope.categoryName});
-			});
-		}
-	}
-})
-
-.directive('cngCategorySpecificTeam', function() {
-	return {
-		restrict: 'A',
-		scope: {
-			cog: '@'
-		},
-		link: function(scope, elem, attrs) {
-			var cog = elem.find(scope.cog);
-			elem.bind('mouseenter', function() {
-				cog.show();
-			});
-			elem.bind('mouseleave', function() {
-				cog.hide();
 			});
 		}
 	}

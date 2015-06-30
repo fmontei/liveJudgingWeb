@@ -12,9 +12,34 @@
 
     <ul id="category-list">
         <br />
-        <hr class="special-category-hr" /> 
+        <div class="special-category-hr">
+            <div ng-init="isSpecialCategorySectionShown='true'" ng-switch on="isSpecialCategorySectionShown">
+                <div ng-switch-when="true">
+                    <a ng-click="$parent.isSpecialCategorySectionShown = !$parent.isSpecialCategorySectionShown; $parent.specialCategoryShow={'display':'none'}">Hide</a>
+                </div>
+                <div ng-switch-when="false">
+                    <a ng-click="$parent.isSpecialCategorySectionShown = !$parent.isSpecialCategorySectionShown; $parent.specialCategoryShow={'display':''}">Show</a>
+                </div>
+            </div>
+        </div>
         <div ng-switch on="teamView">
-            <div ng-switch-default>
+            <div ng-switch-default 
+                ng-style="specialCategoryShow">
+                <li class="droppable-category destroy-special-category" 
+                    cng-special-droppable-category
+                    delete-team="$parent.deleteTeam(itemId)">
+                    <a class="btn" href="javascript:void(0)">
+                        <div>
+                            <div><u>Destroy</u></div>
+                            <span>Destroy Team.</span>
+                        </div>
+                    </a>
+                </li>
+                <div class="special-category-hr"></div>
+            </div>
+            <div ng-switch-when="selectedCategory" 
+                 ng-if="selectedCategory.label === uncategorized.label" 
+                 ng-style="specialCategoryShow">
                 <li class="droppable-category destroy-special-category"
                     cng-special-droppable-category
                     delete-team="$parent.deleteTeam(itemId)">
@@ -25,20 +50,11 @@
                         </div>
                     </a>
                 </li>
+                <div class="special-category-hr"></div>
             </div>
-            <div ng-switch-when="selectedCategory" ng-if="selectedCategory === uncategorized">
-                <li class="droppable-category destroy-special-category"
-                    cng-special-droppable-category
-                    delete-team="$parent.deleteTeam(itemId)">
-                    <a class="btn" href="javascript:void(0)">
-                        <div>
-                            <div><u>Destroy</u></div>
-                            <span>Destroy Team.</span>
-                        </div>
-                    </a>
-                </li>
-            </div>
-            <div ng-switch-when="selectedCategory" ng-if="selectedCategory !== uncategorized">
+            <div ng-switch-when="selectedCategory" 
+                 ng-if="selectedCategory.label !== uncategorized.label" 
+                 ng-style="specialCategoryShow">
                 <li class="droppable-category destroy-special-category"
                     cng-special-droppable-category
                     delete-team="$parent.deleteTeam(itemId)">
@@ -59,9 +75,9 @@
                         </div>
                     </a>
                 </li>
+                <div class="special-category-hr"></div>
             </div>
-        </div>
-        <hr class="special-category-hr" />        
+        </div>  
         <li class="droppable-category">
             <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails(uncategorized)">
                 <div>

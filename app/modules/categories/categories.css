@@ -76,8 +76,20 @@
 }
 
 .special-category-hr {
-    width: 200px;
-    margin-left: auto;
-    margin-right: auto; 
+    height: 2px;
+    width: 200px; 
+    background-color: #CCCCCC; 
+    text-align: center;  
+    margin-left: auto; 
+    margin-right: auto;
+    margin-top: 10px;
     margin-bottom: 5px;
+}
+
+.special-category-hr a {
+    background-color: white; 
+    position: relative;
+    top: -1em;
+    font-size: 10px;
+    cursor: pointer;
 }

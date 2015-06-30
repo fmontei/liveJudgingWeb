@@ -39,7 +39,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.removeTeamFromCategory = function(itemId) {
-
+            var categoryId = $scope.selectedCategory.id;
+            teamManagementService.removeTeamFromCategory(itemId, categoryId);
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -347,6 +348,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         elem.droppable({
             drop: function(event, ui) {
                 var droppedTeam = ui.draggable;
+                var isTransferable = droppedTeam.data('isTransferable');
+                if (false === isTransferable) {
+                    droppedTeam.goBack();
+                    return;
+                }
                 scope.itemId = droppedTeam.attr('teamId').trim();
                 // TODO: make the draggables generic (perhaps in another module).
                 scope.categoryId = event.target.getAttribute('category-id');

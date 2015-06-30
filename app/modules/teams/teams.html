@@ -11,7 +11,7 @@
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
 						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
+							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}} 
 							<span class="label label-default">{{selectedCategory.teams.length}}</span>
 						</h1>
 						<hr>
@@ -64,7 +64,11 @@
 						<div ng-repeat="team in teams | orderBy: '+name'">
 							<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
 							<div class="col col-sm-4 col-md-4 col-lg-3">
-								<div class="media draggable-team" cng-draggable-team teamId="{{team.id}}">
+								<div class="media draggable-team" 
+								     cng-draggable-team 
+								     teamId="{{team.id}}" 
+								     cog=".glyphicon-cog"
+								     is-transferable="true">
 									<div class="media-left">
 										<a href="#">
 											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -112,7 +116,11 @@
 										<div ng-repeat="team in uncategorized.teams | orderBy: '+name'"">
 											<br ng-if="$index % 3 == 0 && $index > 0" />
 											<div class="col col-sm-4 col-md-4 col-lg-4">
-												<div class="media category-accordion-media category-specific-team" cng-category-specific-team cog=".glyphicon-cog">
+												<div class="media category-accordion-media category-specific-team" 
+												     cng-draggable-team 
+												     teamId="{{team.id}}" 
+												     cog=".glyphicon-cog"
+												     is-transferable="false">
 													<div class="media-left">
 														<a href="#">
 															<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -162,7 +170,9 @@
 											<div ng-repeat="team in category.teams | orderBy: '+name'"">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
 												<div class="col col-sm-4 col-md-4 col-lg-4">
-													<div class="media category-accordion-media category-specific-team" cng-category-specific-team cog=".glyphicon-cog">
+													<div class="media category-accordion-media category-specific-team" 
+													     cng-category-specific-team 
+													     cog=".glyphicon-cog">
 														<div class="media-left">
 															<a href="#">
 																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -195,30 +205,36 @@
 						<div class="col col-sm-12 col-md-12 col-lg-12">
 							<button class="btn btn-lg btn-success add-entity-btn" ng-click="changeTeamModalView('create')">
 								<span class="glyphicon glyphicon-plus"></span>
-								Add Team to {{selectedCategory.label}}
+								Add Team to {{selectedCategory.label}} 
 							</button>
 						</div>
 					</div><br />
 
-					<div ng-repeat="team in selectedCategory.teams | orderBy: '+name'">
-						<div ng-if="$index % 4 == 0" class="row"></div>
-						<div class="col col-sm-3 col-md-3 col-lg-3 team-col">
-							<div class="media category-specific-team" cng-category-specific-team cog=".glyphicon-cog">
-								<div class="media-left">
-									<a href="#">
-										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-									</a>
-								</div>
-								<div class="media-body">
-									<h4 class="media-heading">
-										{{team.id}}
-										<span class="glyphicon glyphicon-cog" 
-									        ng-click="changeTeamModalView('edit', team)">
-						        </span>
-									</h4>
-									<div class="draggable-team-name">
-										<span>{{team.name}}</span>
+					<div class="draggable-team-wrapper">
+						<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
+							<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
+							<div class="col col-sm-4 col-md-4 col-lg-3">
+								<div class="media draggable-team" 
+								     cng-draggable-team 
+								     teamId="{{team.id}}" 
+								     cog=".glyphicon-cog"
+								     is-transferable="false">
+									<div class="media-left">
+										<a href="#">
+											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+										</a>
 									</div>
+										<div class="media-body">
+											<h4 class="media-heading">
+												{{team.id}}
+												<span class="glyphicon glyphicon-cog" 
+											        ng-click="changeTeamModalView('edit', team)">
+								        </span>
+											</h4>
+											<div class="draggable-team-name">
+												<span>{{team.name}}</span>
+											</div>
+										</div>
 								</div>
 							</div>
 						</div>
