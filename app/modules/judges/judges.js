@@ -9,16 +9,13 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
   });
 }])
 
-.controller('JudgesCtrl', ['$scope', '$log', 'filterFilter', function($scope, $log, filterFilter) {
+.controller('JudgesCtrl', ['$rootScope', '$scope', '$log', 'filterFilter', function($rootScope, $scope, $log, filterFilter) {
 	
 	$scope.tabs = [
     { title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
     { title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
   ];
-  $scope.teams = [
-		{name: 'Alabama', category: 'A', color: '#ac725e', id: '5'}, 
-		{name: 'Georgia', category: 'A', color: '#ac725e', id: '3'}, 
-		{name: 'Washington', category: 'B', color: '#92e1c0', id: '1'}];
+  $scope.teams = $rootScope.teams; 
 	$scope.getTeam = function(attr, value) {
 		for (var i = 0; i < $scope.teams.length; i++)
 			if ($scope.teams[i][attr] === value)
@@ -46,7 +43,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 	
 	$scope.changeModalSortType = function(type) {
-		if (type === 'name' || type === 'category' || type === 'id')
+		if (type === 'name' || type === 'id')
 			$scope.modalSortType = '+' + type;
 	}
 	
@@ -108,4 +105,15 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		}
 		return true;
 	}
-}]);
+}])
+
+.filter('getAllCategories', function() {
+	return function(team) {
+		var categoryLabels = '';
+		for (var i = 0; i < team.categories.length; i++) {
+			if (team.categories[i].label !== 'Uncategorized')
+				categoryLabels += team.categories[i].label + ', ';
+		}
+		return categoryLabels.slice(0, -2);
+	}
+});

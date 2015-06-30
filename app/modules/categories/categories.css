@@ -29,12 +29,6 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     text-align: center;
-    /*margin-right: 5px;
-    float: right;
-    color: #398439;
-    display: none;
-    cursor: pointer;
-    font-size: 15px;*/
 }
 
 .droppable-category a:hover {
@@ -46,4 +40,44 @@
 
 .droppable-category h3 {
     margin-top: 0;
+}
+
+.destroy-special-category a {
+    background: repeating-linear-gradient(
+        45deg,
+        #D9534F,
+        #D9534F 10px,
+        #DE6C69 10px,
+        #DE6C69 20px
+    );
+    cursor: default;
+}
+
+.remove-special-category a {
+    background: repeating-linear-gradient(
+        45deg,
+        #F0AD4E,
+        #F0AD4E 10px,
+        #F2B968 10px,
+        #F2B968 20px
+    );
+    cursor: default;
+}
+
+.destroy-special-category div, .remove-special-category div {
+    color: white;
+    text-overflow: ellipsis;
+}
+
+.destroy-special-category span, .remove-special-category span {
+    color: white;
+    font-size: 12px;
+    text-overflow: ellipsis;
+}
+
+.special-category-hr {
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto; 
+    margin-bottom: 5px;
 }

@@ -194,7 +194,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 	return function($scope, $cookies) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
-
 		var categoryManagementService = CategoryManagementService($scope, $cookies);
 
 		teamManagement.createNewTeam = function() {	
@@ -464,9 +463,9 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 					var topDifference = $(this).offset().top - originalPosition.top;
 					var topDecrement = '-=' + topDifference;
 					$(this).animate({
-		    		'left': leftDecrement,
-		    		'top': topDecrement
-		    	}, 500);
+			    		'left': leftDecrement,
+			    		'top': topDecrement
+		    		}, 500);
 				}
 			}
 		}

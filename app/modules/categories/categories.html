@@ -11,28 +11,78 @@
     </ul>
 
     <ul id="category-list">
-        <br /><br />
+        <br />
+        <hr class="special-category-hr" /> 
+        <div ng-switch on="teamView">
+            <div ng-switch-default>
+                <li class="droppable-category destroy-special-category"
+                    cng-special-droppable-category
+                    delete-team="$parent.deleteTeam(itemId)">
+                    <a class="btn" href="javascript:void(0)">
+                        <div>
+                            <div><u>Destroy</u></div>
+                            <span>Destroy Team.</span>
+                        </div>
+                    </a>
+                </li>
+            </div>
+            <div ng-switch-when="selectedCategory" ng-if="selectedCategory === uncategorized">
+                <li class="droppable-category destroy-special-category"
+                    cng-special-droppable-category
+                    delete-team="$parent.deleteTeam(itemId)">
+                    <a class="btn" href="javascript:void(0)">
+                        <div>
+                            <div><u>Destroy</u></div>
+                            <span>Destroy Team.</span>
+                        </div>
+                    </a>
+                </li>
+            </div>
+            <div ng-switch-when="selectedCategory" ng-if="selectedCategory !== uncategorized">
+                <li class="droppable-category destroy-special-category"
+                    cng-special-droppable-category
+                    delete-team="$parent.deleteTeam(itemId)">
+                    <a class="btn" href="javascript:void(0)">
+                        <div>
+                            <div><u>Destroy</u></div>
+                            <span>Destroy Team.</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="droppable-category remove-special-category"
+                    cng-special-droppable-category
+                    remove-team-from-category="$parent.removeTeamFromCategory(itemId)">
+                    <a class="btn" href="javascript:void(0)">
+                        <div>
+                            <div><u>Remove</u></div>
+                            <span>Remove team from:<br />{{selectedCategory.label}}</span>
+                        </div>
+                    </a>
+                </li>
+            </div>
+        </div>
+        <hr class="special-category-hr" />        
         <li class="droppable-category">
             <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails(uncategorized)">
                 <div>
                     <div><u>{{uncategorized.label}}</u></div>
-                    <span class="droppable-category-text">{{uncategorized.teams.length}} Teams</span>
+                    <span>{{uncategorized.teams.length}} Teams</span>
                 </div>
             </a>
         </li>
         <div ng-repeat="category in categories | orderBy: '+label'" ng-if="category.label != 'Uncategorized'">
             <li class="droppable-category" 
-                  cng-droppable-category 
-                  category-id="{{category.id}}"
-                  check-category="$parent.categories.getProjectByName(categoryName, projectName)" 
-                  update-category="$parent.transferTeamToCategory(categoryId, projectId, true)">
+                cng-droppable-category 
+                category-id="{{category.id}}"
+                check-category="$parent.categories.getProjectByName(categoryName, projectName)" 
+                update-category="$parent.transferTeamToCategory(categoryId, projectId, true)">
                 <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails(category)">
                     <h3>
                         <span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
                     </h3>
                     <div>
                         <div><u>{{category.label}}</u></div>
-                        <span class="droppable-category-text">{{category.teams.length}} Teams</span>
+                        <span>{{category.teams.length}} Teams</span>
                     </div>
                 </a>
             </li>

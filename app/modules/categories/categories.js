@@ -32,6 +32,16 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             categoryManagementService.deleteCategory();
         }
 
+        $scope.deleteTeam = function(itemId) {
+            var team = teamManagementService.getTeamByID(parseInt(itemId));
+            $cookies.putObject('selectedTeam', team);
+            teamManagementService.deleteTeam();
+        }
+
+        $scope.removeTeamFromCategory = function(itemId) {
+
+        }
+
         $scope.changeCategoryModalView = function(view, event, category) {
             $scope.categoryModalView = view;
             $scope.openCategoryModal();
@@ -111,6 +121,12 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 return $cookies.getObject('uncategorized');
             }, function(newValue) {
                 $scope.uncategorized = newValue;
+            }, true);
+
+            $scope.$watch(function() {
+                return $cookies.get('teamView');
+            }, function(newValue) {
+                $scope.teamView = newValue;
             }, true);
         };
 
@@ -348,10 +364,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         var performFlashAnimation = function(categoryContainer) {
         var originalColor = categoryContainer.css('backgroundColor');
             categoryContainer.animate({
-        backgroundColor: "#fff"
+                backgroundColor: "#fff"
             }, 400);
             categoryContainer.animate({
-        backgroundColor: originalColor
+                backgroundColor: originalColor
             }, 400);
         }
 
@@ -369,6 +385,32 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     return {
         restrict: 'A',
         link: link
-    };
+    }
 
-}]);
+}])
+
+.directive('cngSpecialDroppableCategory', function() {
+
+    var link = function(scope, elem, attrs) {
+        elem.droppable({
+            drop: function(event, ui) {
+                var droppedTeam = ui.draggable;
+                scope.itemId = droppedTeam.attr('teamId').trim();
+                if ($(this).hasClass('destroy-special-category'))
+                    scope.deleteTeam({itemId: scope.itemId});
+                else if ($(this).hasClass('remove-special-category'))
+                    
+            }
+        });
+    }
+
+    return {
+        restrict: 'A',
+        scope: {
+            deleteTeam: '&deleteTeam',
+            removeTeamFromCategory: '&removeTeamFromCategory'
+        },
+        link: link
+    }
+
+});

@@ -133,7 +133,6 @@
 													</button>
 													<ul class="dropdown-menu">
 														<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('name')">Name</a></li>
-														<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('category')">Category</a></li>
 														<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('id')">Number</a></li>
 													</ul>
 												</div>
@@ -171,7 +170,7 @@
 										
 										<div class="row">
 											<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
-												<table class="table table-striped">
+												<table class="table table-striped" id="judge-modal-table">
 													<thead>
 														<th>Team #</th>
 														<th>Team Name</th>
@@ -180,25 +179,13 @@
 													</thead>
 													<tbody>
 														<!-- For modalSortType === 'name' or 'id', default to grey background color -->
-														<tr ng-repeat="filteredTeam in $parent.filteredTeams | orderBy: $parent.modalSortType"
-														    ng-if="$parent.modalSortType.indexOf('name') !== -1 || $parent.modalSortType.indexOf('id') !== -1">
+														<tr ng-repeat="filteredTeam in $parent.filteredTeams | orderBy: $parent.modalSortType">
 															<td>{{filteredTeam.id}}</td>
 															<td>{{filteredTeam.name}}</td>
-															<td>{{filteredTeam.category}}</td>
+															<td>{{filteredTeam | getAllCategories}}</td>
 															<td><input type="checkbox" 
 															           ng-click="$parent.selectSingleFilteredTeam(filteredTeam.name)" 
 																				 ng-checked="$parent.isTeamSelected(filteredTeam.name)" />
-														</tr>
-														<!-- For modalSortType === 'color', change background color to category color -->
-														<tr ng-repeat="filteredTeam in $parent.filteredTeams | orderBy: $parent.modalSortType"
-														    ng-if="$parent.modalSortType.indexOf('category') !== -1" 
-																style="background-color: {{filteredTeam.color}}">
-																<td>{{filteredTeam.id}}</td>
-																<td>{{filteredTeam.name}}</td>
-																<td>{{filteredTeam.category}}</td>
-																<td><input type="checkbox" 
-																					 ng-click="$parent.selectSingleFilteredTeam(filteredTeam.name)" 
-																					 ng-checked="$parent.isTeamSelected(filteredTeam.name)" />
 														</tr>
 													</tbody>
 												</table>
