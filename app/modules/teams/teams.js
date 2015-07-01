@@ -59,7 +59,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 				$scope.categories = $cookies.getObject('categories');
 				$scope.uncategorized = $cookies.getObject('uncategorized');
 			}
-
 			$cookies.put('teamView', view);
 		}
 
@@ -99,8 +98,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 }])
 
-.factory('TeamInitService', ['$q', '$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService', 'CategoryManagementService', 'CurrentUserService', 
-	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService, CategoryManagementService, CurrentUserService) {
+.factory('TeamInitService', ['$q', '$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService', 'CategoryManagementService', 'CurrentUserService', 'sessionStorage',
+	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService, CategoryManagementService, CurrentUserService, sessionStorage) {
 	return function($scope, $cookies) {
 		var teamInitService = {};
 		var selectedEvent = $cookies.getObject('selected_event');
@@ -116,8 +115,9 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
 			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
 				initTeamList(resp.event_teams).then(function(filledTeams) {
-					$cookies.putObject('teams', filledTeams);
+					sessionStorage.putObject('teams', filledTeams);
 				});
+				initTeamList(resp.event_teams);
 			}).catch(function() {
 				var errorMessage = 'Error getting teams from server.';
 				$log.log(errorMessage);
@@ -165,7 +165,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 	}
 }])
 
-.factory('ScopeInitService', function() {
+.factory('ScopeInitService', function(sessionStorage) {
 	return function($scope, $cookies) {
 		var initService = {};
 
@@ -189,7 +189,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			});
 
 			$scope.$watch(function() {
-				return $cookies.getObject('teams');
+				return sessionStorage.getObject('teams');
 			}, function(newValue) {
 				$scope.teams = newValue;
 			}, true);
@@ -208,6 +208,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
 		var categoryManagementService = CategoryManagementService($scope, $cookies);
+
+
 
 		teamManagement.createNewTeam = function() {	
 			if (!validateForm(false)) 
@@ -230,7 +232,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			var connection = TeamRESTService(authHeader);
 			connection.teams.create({event_id: eventId}, teamReq).$promise.then(function(resp) {
 
-				// Add new team to uncategorized.
+				// Add new team to uncategorized (or to the selected category if there is one).
 				var returnedTeamID = resp.event_team.id;
 				var catId;
 				if ($cookies.getObject('selectedCategory')) {

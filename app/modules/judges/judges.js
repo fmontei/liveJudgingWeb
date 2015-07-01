@@ -129,7 +129,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 .factory('JudgeRESTService'), ['$resource', function($resource) {
 	return function(authHeader) {
 		return {
-			eventJudges: $resource('http://api.stevedolan.me/events/:event_id/judges', {
+			judges: $resource('http://api.stevedolan.me/events/:event_id/judges', {
 				event_id: '@id'
 			}, {
 				get: {
@@ -139,6 +139,31 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 				create: {
 					method: 'POST',
 					headers: authHeader
+				}
+			}),
+			judge: $resource('http://api.stevedolan.me/judges/:id', {
+				id: '@id'
+			}, {
+				delete: {
+					method: 'DELETE',
+					header: authHeader
+				}
+			}),
+			judgeTeams: $resource('http://api.stevedolan.me/judges/:judge_id/teams', {
+				judge_id: '@id'
+			}, {
+				get: {
+					method: 'GET',
+					headers: authHeader
+				},
+				assign: {
+					method: 'POST',
+					header: authHeader
+				},
+				remove: {
+					method: 'DELETE',
+					url: 'http://api.stevedolan.me/judges/:judge_id/teams/:id',
+					header: authHeader
 				}
 			})
 		}

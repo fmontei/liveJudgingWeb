@@ -69,4 +69,34 @@ angular.module('liveJudgingAdmin', [
     });
 
     $scope.logout = CurrentUserService.logout;
-}]);
+}])
+
+.factory('sessionStorage', ['$window',
+  function($window) {
+    var sessionStorage = {};
+
+    sessionStorage.putObject = function(key, value) {
+      var stringValue = JSON.stringify(value);
+      $window.sessionStorage.setItem(key, stringValue);
+    }
+
+    sessionStorage.put = function(key, value) {
+      $window.sessionStorage.setItem(key, stringValue);
+    }
+
+    sessionStorage.getObject = function(key) {
+      var stringValue = $window.sessionStorage.getItem(key);
+      return JSON.parse(stringValue);
+    }
+
+    sessionStorage.get = function(key) {
+      return $window.sessionStorage.getItem(key);
+    }
+
+    sessionStorage.clear = function() {
+      return $window.sessionStorage.clear();
+    }
+
+    return sessionStorage;
+  }
+]);
