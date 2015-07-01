@@ -209,8 +209,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		var authHeader = CurrentUserService.getAuthHeader();
 		var categoryManagementService = CategoryManagementService($scope, $cookies);
 
-
-
 		teamManagement.createNewTeam = function() {	
 			if (!validateForm(false)) 
 				return;

@@ -73,10 +73,26 @@
 					<div class="col col-sm-2 col-md-2 col-lg-2">
 					</div>
 					<div class="col col-sm-3 col-md-3 col-lg-3">
-						<label>*Name:</label>
+						<label>*First Name:</label>
 					</div>
 					<div class="col col-sm-5 col-md-5 col-lg-5">
-						<input class="form-control" type="text" />
+						<input class="form-control"
+						       type="text"
+						       ng-model="judgeFirstName" />
+					</div>
+				</div> <!-- ./row -->
+				<br />
+
+				<div class="row">
+					<div class="col col-sm-2 col-md-2 col-lg-2">
+					</div>
+					<div class="col col-sm-3 col-md-3 col-lg-3">
+						<label>*Last Name:</label>
+					</div>
+					<div class="col col-sm-5 col-md-5 col-lg-5">
+						<input class="form-control"
+						       type="text"
+						       ng-model="judgeLastName" />
 					</div>
 				</div> <!-- ./row -->
 				<br />
@@ -88,7 +104,9 @@
 						<label>*E-mail:</label>
 					</div>
 					<div class="col col-sm-5 col-md-5 col-lg-5">
-						<input class="form-control" type="text" />
+						<input class="form-control"
+						       type="text"
+						       ng-model="judgeEmail" />
 					</div>
 				</div> <!-- ./row -->
 				<br />
@@ -100,7 +118,9 @@
 						<label>Affiliation:</label>
 					</div>
 					<div class="col col-sm-5 col-md-5 col-lg-5">
-						<input class="form-control" type="text" />
+						<input class="form-control"
+						       type="text"
+						       ng-model="judgeAffiliation" />
 					</div>
 				</div> <!-- ./row -->
 				
@@ -110,10 +130,10 @@
 					<div class="col col-sm-8 col-md-8 col-lg-8">
 						<div tabset id="judge-modal-tabs">
 							<div tab 
-							         ng-repeat="tab in tabs" 
-											 ng-click="changeModalTab(tab.view)"
-							         heading="{{tab.title}}" 
-											 active="tab.active" 
+							         ng-repeat="tab in tabs"
+									 ng-click="changeModalTab(tab.view)"
+							         heading="{{tab.title}}"
+											 active="tab.active"
 											 disable="tab.disabled">
 							</div>
 						</div>
@@ -219,7 +239,13 @@
 			
 			<div class="modal-footer">
 				<div class="row">
-					<span class="col col-sm-5"><button type="button" class="btn btn-success pull-right"">Create</button></span>
+					<span class="col col-sm-5">
+						<button type="button"
+						        class="btn btn-success pull-right"
+						        ng-click="addJudge()">
+					        Create
+				        </button>
+			        </span>
 					<span class="col col-sm-2"></span>
 					<span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
 				</div>

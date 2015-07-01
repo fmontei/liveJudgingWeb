@@ -17,7 +17,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
                           'CurrentUserService',
                           'LoginService',
                           'LogoutService',
-                          'User', 
+                          'UserRESTService', 
     function($base64,
              $cookies,
              $location,
@@ -26,7 +26,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
              CurrentUserService,
              LoginService,
              LogoutService,
-             User) {
+             UserRESTService) {
 
         /* TODO: Use hash not base64 */
 
@@ -35,7 +35,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
         $scope.error = '';
 
         $scope.register = function(user) {
-            User.register(user).$promise.then(function(user) {
+            UserRESTService.register(user).$promise.then(function(user) {
                 console.log('User registered.');
                 alert("Successfully registered.");
             });
@@ -54,7 +54,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
     }
 ])
 
-.factory('User', ['$resource', function($resource) {
+.factory('UserRESTService', ['$resource', function($resource) {
     return $resource('http://api.stevedolan.me/users', {}, {
         register: {
             method: 'POST'

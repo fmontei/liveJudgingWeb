@@ -9,23 +9,20 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
   });
 }])
 
-.controller('JudgesCtrl', ['$scope', '$cookies', '$log', 'filterFilter', 'sessionStorage',
-	function($scope, $cookies, $log, filterFilter, sessionStorage) {
+.controller('JudgesCtrl', ['$scope', '$cookies', '$log', 'filterFilter', 'JudgeManagementService', 'JudgeWatchService', 'sessionStorage',
+	function($scope, $cookies, $log, filterFilter, JudgeManagementService, JudgeWatchService, sessionStorage) {
 	
+	var judgeWatchService = JudgeWatchService($cookies, $scope);
+	judgeWatchService.init();
+
 	$scope.tabs = [
-    { title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
-    { title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
-  ];
+    	{ title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
+    	{ title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
+  	];
+
 	$scope.judgeModalView = 'teams';
 	$scope.selectedTeams = [];
 	$scope.modalSortType = '+name';
-
-  $scope.$watch(function() {
-    return sessionStorage.getObject('teams');
-  }, function(newValue) {
-  	$scope.teams = newValue;
-  	$scope.filteredTeams = newValue;
-  }, true);
 
 	$scope.getTeam = function(attr, value) {
 		for (var i = 0; i < $scope.teams.length; i++)
@@ -41,10 +38,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		if (type === 'name' || type === 'id')
 			$scope.modalSortType = '+' + type;
 	}
-	
-	$scope.$watch('selectedTeam', function(newValue) {	
-		$scope.filterTeams(newValue);
-	});
 	
 	$scope.filterTeams = function(filterText) {
 		if (undefined === filterText) 
@@ -100,6 +93,16 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		}
 		return true;
 	}
+
+	$scope.addJudge = function() {
+		var judgeFormData = {
+			email: $scope.judgeEmail,
+			first_name: $scope.judgeFirstName,
+			last_name: $scope.judgeLastName
+		};
+
+		JudgeManagementService.addJudge(judgeFormData);
+	}
 }])
 
 .filter('printAllCategories', function() {
@@ -126,7 +129,66 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	}
 })
 
-.factory('JudgeRESTService'), ['$resource', function($resource) {
+.factory('JudgeManagementService', ['JudgeRESTService', 'UserRESTService',
+	function(JudgeRESTService, UserRESTService) {
+
+		var judgeManagement = {};
+
+		judgeManagement.addJudge = function(judgeFormData) {
+
+			// Todo: Check if a user with the email already exists.
+
+			var judgeReq = judgeFormData;
+			var randomPass = judgeManagement.generatePassword();
+			judgeReq.password = randomPass;
+			judgeReq.password_confirmation = randomPass;
+
+			// Create judge user
+			UserRESTService.register(judgeReq).$promise.then(function(resp) {
+				// Close modal
+			})
+		}
+
+		judgeManagement.generatePassword = function() {
+			// Most certainly do a better way
+			var pass = "";
+    		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    		for(var i = 0; i < 6; i++) {
+        		pass += possible.charAt(Math.floor(Math.random() * possible.length));
+    		}
+
+    		return pass;
+		}
+
+		return judgeManagement;
+	}
+])
+
+.factory('JudgeWatchService', function(sessionStorage) {
+	return function($cookies, $scope) {
+		var service = {};
+
+		service.init = function() {
+			$scope.$watch(function() {
+    			return sessionStorage.getObject('teams');
+  			}, function(newValue) {
+  				$scope.teams = newValue;
+  				$scope.filteredTeams = newValue;
+  			}, true);
+
+			$scope.$watch(function() {
+				return $cookies.getObject('selectedTeam');
+			}, function(newValue) {	
+				$scope.filterTeams(newValue);
+			}, true);
+		}
+
+		return service;
+	}
+})
+
+.factory('JudgeRESTService', function($resource) {
 	return function(authHeader) {
 		return {
 			judges: $resource('http://api.stevedolan.me/events/:event_id/judges', {
@@ -136,7 +198,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 					method: 'GET',
 					headers: authHeader
 				},
-				create: {
+				addToEvent: {
 					method: 'POST',
 					headers: authHeader
 				}
@@ -168,5 +230,5 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 			})
 		}
 	}
-}];
+});
 
