@@ -9,8 +9,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
   });
 }])
 
-.controller('JudgesCtrl', ['$scope', '$cookies', '$log', 'filterFilter',
-	function($scope, $cookies, $log, filterFilter) {
+.controller('JudgesCtrl', ['$scope', '$cookies', '$log', 'filterFilter', 'sessionStorage',
+	function($scope, $cookies, $log, filterFilter, sessionStorage) {
 	
 	$scope.tabs = [
     { title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
@@ -21,7 +21,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	$scope.modalSortType = '+name';
 
   $scope.$watch(function() {
-  	return $cookies.getObject('teams');
+    return sessionStorage.getObject('teams');
   }, function(newValue) {
   	$scope.teams = newValue;
   	$scope.filteredTeams = newValue;
