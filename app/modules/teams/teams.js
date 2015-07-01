@@ -98,12 +98,13 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 }])
 
-.factory('TeamInitService', ['$q', '$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService', 'CategoryManagementService', 'CurrentUserService', 'sessionStorage',
-	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService, CategoryManagementService, CurrentUserService, sessionStorage) {
+.factory('TeamInitService', ['$q', '$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService', 
+		'CategoryManagementService', 'CurrentUserService', 'sessionStorage',
+	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService, 
+		CategoryManagementService, CurrentUserService, sessionStorage) {
 	return function($scope, $cookies) {
 		var teamInitService = {};
 		var selectedEvent = $cookies.getObject('selected_event');
-
 		var categoryManagementService = CategoryManagementService($scope, $cookies);	
 
 		teamInitService.initDefaultCookies = function() {
@@ -114,49 +115,43 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		teamInitService.initTeams = function() {
 			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
 			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
-				initTeamList(resp.event_teams).then(function(filledTeams) {
-					sessionStorage.putObject('teams', filledTeams);
-				});
-				initTeamList(resp.event_teams);
+				return getCategoriesForEachTeam(resp.event_teams);
+			}).then(function(filledTeams) {
+				sessionStorage.putObject('teams', filledTeams);
 			}).catch(function() {
 				var errorMessage = 'Error getting teams from server.';
 				$log.log(errorMessage);
 			});
 		}
-
-		// Fills in team objects with their categories.
-		var initTeamList = function(eventTeams) {
+		
+		var getCategoriesForEachTeam = function(eventTeams) {
 			var deferred = $q.defer();
-			var filledTeams = [];
-			var promises = [];
-			angular.forEach(eventTeams, function(eventTeam) {
-				var promise = getEveryCategoryByTeamID(eventTeam).then(function(filledTeam) {
+			var filledTeams = [], promises = [];
+			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
+			
+			function promiseCategories(team) {
+				var innerDeferred = $q.defer();
+				team.categories = [];
+				connection.team_categories.get({team_id: team.id}).$promise.then(function(resp) {
+					angular.forEach(resp.team_categories, function(team_category) {
+						team.categories.push(team_category.category);
+					});
+					$q.all(team.categories).then(function() {
+						innerDeferred.resolve(team);
+					});
+				});
+				return innerDeferred.promise;
+			}
+			
+			angular.forEach(eventTeams, function(team) {
+				var promise = promiseCategories(team).then(function(filledTeam) {
 					filledTeams.push(filledTeam);
 				});
 				promises.push(promise);
 			});
+			
 			$q.all(promises).then(function() {
 				deferred.resolve(filledTeams);
-			});
-			return deferred.promise;
-		}
-
-		var getEveryCategoryByTeamID = function(team) {
-			var deferred = $q.defer();
-			var teamCategories = [];
-			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
-			connection.team_categories.get({team_id: team.id}).$promise.then(function(resp) {
-				angular.forEach(resp.team_categories, function(team_category) {
-					var cat = team_category.category;
-					teamCategories.push(cat);
-				});
-				$q.all(teamCategories).then(function() {
-					team.categories = teamCategories;
-					deferred.resolve(team);
-				});
-			}).catch(function() {
-				var errorMessage = 'Error getting team categories from server.';
-				$log.log(errorMessage);
 			});
 			return deferred.promise;
 		}

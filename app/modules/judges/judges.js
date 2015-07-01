@@ -173,6 +173,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 			$scope.$watch(function() {
     			return sessionStorage.getObject('teams');
   			}, function(newValue) {
+					console.log(JSON.stringify(newValue));
   				$scope.teams = newValue;
   				$scope.filteredTeams = newValue;
   			}, true);
