@@ -15,6 +15,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	var judgeWatchService = JudgeWatchService($scope, $cookies);
 	judgeWatchService.init();
 
+    JudgeManagementService.getJudges();
+
 	$scope.tabs = [
     	{ title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
     	{ title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
@@ -110,7 +112,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		};
 
 		JudgeManagementService.addJudge(judgeFormData).then(function() {
-			$scope.closeJudgeModal();
+            // Refresh judge objects
+            JudgeManagementService.getJudges();
+            $scope.closeJudgeModal();
 		});
 	}
 }])
@@ -139,10 +143,18 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	}
 })
 
-.factory('JudgeManagementService', ['$cookies', '$q', 'CurrentUserService', 'JudgeRESTService', 'UserRESTService',
-	function($cookies, $q, CurrentUserService, JudgeRESTService, UserRESTService) {
+.factory('JudgeManagementService', ['$cookies', '$q', 'CurrentUserService', 'JudgeRESTService', 'sessionStorage', 'UserRESTService',
+	function($cookies, $q, CurrentUserService, JudgeRESTService, sessionStorage, UserRESTService) {
 
 		var judgeManagement = {};
+
+        judgeManagement.getJudges = function() {
+            var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
+            var eventId = $cookies.getObject('selected_event').id;
+            judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
+                sessionStorage.putObject('judges', resp.event_judges);
+            });
+        }
 
 		judgeManagement.addJudge = function(judgeFormData) {
 			var defer = $q.defer();
@@ -159,8 +171,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 				var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
 				var eventId = $cookies.getObject('selected_event').id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: resp.user.id}).$promise.then(function(resp) {
-					// Todo: Because the resp just has judge id and event id, there will have to be another call
-					// to get the judge user by id. Then, add the new judge to session storage.
+                    console.log('Judge successfully registered & added to event');
 				}).catch(function() {
 					console.log('Error adding judge to event');
 				});
@@ -206,6 +217,13 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 			}, function(newValue) {	
 				$scope.filterTeams(newValue);
 			}, true);
+
+            $scope.$watch(function() {
+                return sessionStorage.getObject('judges');
+            }, function(newValue) {
+                $scope.judges = newValue;
+                console.log($scope.judges);
+            }, true);
 		}
 
 		return service;

@@ -1,5 +1,3 @@
-
-
 <div class="container-fluid">
 	<div class="row">
 		<div class="col col-sm-8 col-md-8 col-lg-8">
@@ -48,6 +46,32 @@
 									data-target="#judge-modal">
 						<span class="glyphicon glyphicon-plus"></span> Add Judge
 					</button>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="draggable-team-wrapper">
+					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
+						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
+						<div class="col col-sm-4 col-md-4 col-lg-3">
+							<div class="media draggable-judge" 
+							     cng-draggable-judge 
+							     judgeId="{{judgeObj.judge.id}}" 
+							     cog=".glyphicon-cog"
+							     is-transferable="true">
+								<div class="media-body">
+									<h4 class="media-heading">
+										<span class="glyphicon glyphicon-cog" 
+									        ng-click="changeJudgeModalView('edit', judge)">
+						        		</span>
+									</h4>
+									<div class="draggable-judge-name">
+										<span>{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			
