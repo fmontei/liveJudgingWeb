@@ -12,7 +12,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 .controller('JudgesCtrl', ['$scope', '$cookies', '$log', 'filterFilter', 'JudgeManagementService', 'JudgeWatchService', 'sessionStorage',
 	function($scope, $cookies, $log, filterFilter, JudgeManagementService, JudgeWatchService, sessionStorage) {
 	
-	var judgeWatchService = JudgeWatchService($cookies, $scope);
+	var judgeWatchService = JudgeWatchService($scope, $cookies);
 	judgeWatchService.init();
 
 	$scope.tabs = [
@@ -37,6 +37,14 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	$scope.changeModalSortType = function(type) {
 		if (type === 'name' || type === 'id')
 			$scope.modalSortType = '+' + type;
+	}
+
+	$scope.closeJudgeModal = function() {
+		$scope.judgeFirstName = '';
+		$scope.judgeLastName = '';
+		$scope.judgeEmail = '';
+		$scope.judgeAffliation = '';
+		$('#judge-modal').modal('hide');
 	}
 	
 	$scope.filterTeams = function(filterText) {
@@ -101,7 +109,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 			last_name: $scope.judgeLastName
 		};
 
-		JudgeManagementService.addJudge(judgeFormData);
+		JudgeManagementService.addJudge(judgeFormData).then(function() {
+			$scope.closeJudgeModal();
+		});
 	}
 }])
 
@@ -129,28 +139,42 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	}
 })
 
-.factory('JudgeManagementService', ['JudgeRESTService', 'UserRESTService',
-	function(JudgeRESTService, UserRESTService) {
+.factory('JudgeManagementService', ['$cookies', '$q', 'CurrentUserService', 'JudgeRESTService', 'UserRESTService',
+	function($cookies, $q, CurrentUserService, JudgeRESTService, UserRESTService) {
 
 		var judgeManagement = {};
 
 		judgeManagement.addJudge = function(judgeFormData) {
+			var defer = $q.defer();
 
-			// Todo: Check if a user with the email already exists.
+			// Todo: Check if a user with the email already exists (once that's in the API).
 
 			var judgeReq = judgeFormData;
 			var randomPass = judgeManagement.generatePassword();
 			judgeReq.password = randomPass;
 			judgeReq.password_confirmation = randomPass;
 
-			// Create judge user
+			// Register judge as a user & adds them to the event.
 			UserRESTService.register(judgeReq).$promise.then(function(resp) {
-				// Close modal
-			})
+				var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
+				var eventId = $cookies.getObject('selected_event').id;
+				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: resp.user.id}).$promise.then(function(resp) {
+					// Todo: Because the resp just has judge id and event id, there will have to be another call
+					// to get the judge user by id. Then, add the new judge to session storage.
+				}).catch(function() {
+					console.log('Error adding judge to event');
+				});
+			}).catch(function() {
+				console.log('Error registering judge user');
+			}).finally(function() {
+				defer.resolve('Finished addJudge()');
+			});
+
+			return defer.promise;
 		}
 
 		judgeManagement.generatePassword = function() {
-			// Most certainly do a better way
+			// Most certainly should be done on the server (would require a call to make a judge user)
 			var pass = "";
     		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -166,7 +190,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 ])
 
 .factory('JudgeWatchService', function(sessionStorage) {
-	return function($cookies, $scope) {
+	return function($scope, $cookies) {
 		var service = {};
 
 		service.init = function() {
