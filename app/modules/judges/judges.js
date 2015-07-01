@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.judges', ['ngRoute'])
+angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/judges', {
@@ -9,34 +9,28 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
   });
 }])
 
-.controller('JudgesCtrl', ['$scope', '$log', 'filterFilter',
-	function($scope, $log, filterFilter) {
+.controller('JudgesCtrl', ['$scope', '$cookies', '$log', 'filterFilter',
+	function($scope, $cookies, $log, filterFilter) {
 	
 	$scope.tabs = [
     { title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
     { title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
   ];
-  $scope.teams = $rootScope.teams; 
+	$scope.judgeModalView = 'teams';
+	$scope.selectedTeams = [];
+	$scope.modalSortType = '+name';
+
+  $scope.$watch(function() {
+  	return $cookies.getObject('teams');
+  }, function(newValue) {
+  	$scope.teams = newValue;
+  	$scope.filteredTeams = newValue;
+  }, true);
+
 	$scope.getTeam = function(attr, value) {
 		for (var i = 0; i < $scope.teams.length; i++)
 			if ($scope.teams[i][attr] === value)
 				return $scope.teams[i];
-	}
-	$scope.color = 'green';
-	$scope.judgeModalView = 'teams';
-	$scope.filteredTeams = $scope.teams;
-	$scope.selectedTeams = [];
-	$scope.modalSortType = '+name';
-	
-	$scope.selectedTeams.toString = function() {
-		var string = '';
-		for (var i = 0; i < $scope.selectedTeams.length; i++) {
-			if (i < $scope.selectedTeams.length - 1)
-				string += $scope.selectedTeams[i] + '; ';
-			else
-				string += $scope.selectedTeams[i];
-		}
-		return string;
 	}
 	
 	$scope.changeModalTab = function(view) {
@@ -108,7 +102,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 }])
 
-.filter('getAllCategories', function() {
+.filter('printAllCategories', function() {
 	return function(team) {
 		var categoryLabels = '';
 		for (var i = 0; i < team.categories.length; i++) {
@@ -116,6 +110,19 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				categoryLabels += team.categories[i].label + ', ';
 		}
 		return categoryLabels.slice(0, -2);
+	}
+})
+
+.filter('printAllTeams', function() {
+	return function(selectedTeams) {
+		var string = '';
+		for (var i = 0; i < selectedTeams.length; i++) {
+			if (i < selectedTeams.length - 1)
+				string += selectedTeams[i] + '; ';
+			else
+				string += selectedTeams[i];
+		}
+		return string.replace(',', ', ');
 	}
 })
 

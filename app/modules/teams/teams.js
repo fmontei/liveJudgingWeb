@@ -99,8 +99,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 }])
 
-.factory('TeamInitService', ['$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService', 'CategoryManagementService', 'CurrentUserService', 
-	function($log, $rootScope, CategoryRESTService, TeamRESTService, CategoryManagementService, CurrentUserService) {
+.factory('TeamInitService', ['$q', '$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService', 'CategoryManagementService', 'CurrentUserService', 
+	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService, CategoryManagementService, CurrentUserService) {
 	return function($scope, $cookies) {
 		var teamInitService = {};
 		var selectedEvent = $cookies.getObject('selected_event');
@@ -115,7 +115,9 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		teamInitService.initTeams = function() {
 			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
 			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
-				initTeamList(resp.event_teams);
+				initTeamList(resp.event_teams).then(function(filledTeams) {
+					$cookies.putObject('teams', filledTeams);
+				});
 			}).catch(function() {
 				var errorMessage = 'Error getting teams from server.';
 				$log.log(errorMessage);
@@ -124,15 +126,23 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		// Fills in team objects with their categories.
 		var initTeamList = function(eventTeams) {
+			var deferred = $q.defer();
 			var filledTeams = [];
+			var promises = [];
 			angular.forEach(eventTeams, function(eventTeam) {
-				var filledTeam = getEveryCategoryByTeamID(eventTeam);
-				filledTeams.push(filledTeam);
+				var promise = getEveryCategoryByTeamID(eventTeam).then(function(filledTeam) {
+					filledTeams.push(filledTeam);
+				});
+				promises.push(promise);
 			});
-			$cookies.putObject('teams', filledTeams);
-		};
+			$q.all(promises).then(function() {
+				deferred.resolve(filledTeams);
+			});
+			return deferred.promise;
+		}
 
 		var getEveryCategoryByTeamID = function(team) {
+			var deferred = $q.defer();
 			var teamCategories = [];
 			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
 			connection.team_categories.get({team_id: team.id}).$promise.then(function(resp) {
@@ -140,12 +150,15 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 					var cat = team_category.category;
 					teamCategories.push(cat);
 				});
+				$q.all(teamCategories).then(function() {
+					team.categories = teamCategories;
+					deferred.resolve(team);
+				});
 			}).catch(function() {
 				var errorMessage = 'Error getting team categories from server.';
 				$log.log(errorMessage);
 			});
-			team.categories = teamCategories;
-			return team;
+			return deferred.promise;
 		}
 
 		return teamInitService;

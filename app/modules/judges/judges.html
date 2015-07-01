@@ -182,7 +182,7 @@
 														<tr ng-repeat="filteredTeam in $parent.filteredTeams | orderBy: $parent.modalSortType">
 															<td>{{filteredTeam.id}}</td>
 															<td>{{filteredTeam.name}}</td>
-															<td>{{filteredTeam | getAllCategories}}</td>
+															<td>{{filteredTeam | printAllCategories}}</td>
 															<td><input type="checkbox" 
 															           ng-click="$parent.selectSingleFilteredTeam(filteredTeam.name)" 
 																				 ng-checked="$parent.isTeamSelected(filteredTeam.name)" />
@@ -202,7 +202,7 @@
 											<div class="col col-sm-12 col-md-12 col-lg-12">
 												<textarea class="form-control" 
 												          id="judge-modal-textarea"
-																	readonly>{{$parent.selectedTeams.toString().replace(',', ', ')}}</textarea>
+																	readonly>{{$parent.selectedTeams | printAllTeams}}</textarea>
 											</div>
 										</div>
 							
