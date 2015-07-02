@@ -14,8 +14,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	
 	var judgeWatchService = JudgeWatchService($scope, $cookies);
 	judgeWatchService.init();
-
-    JudgeManagementService.getJudges();
+	JudgeManagementService.getJudges();
 
 	$scope.tabs = [
     	{ title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
@@ -46,6 +45,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		$scope.judgeLastName = '';
 		$scope.judgeEmail = '';
 		$scope.judgeAffliation = '';
+		$scope.judgeErrorMessage = undefined;
 		$('#judge-modal').modal('hide');
 	}
 	
@@ -57,7 +57,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		angular.forEach(teams, function(team) {
 			$scope.filteredTeams.push(team);
 		});
-	};
+	}
 	
 	$scope.selectSingleFilteredTeam = function(teamName) {
 		if (false === $scope.isTeamSelected(teamName)) {
@@ -106,15 +106,16 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 
 	$scope.addJudge = function() {
 		var judgeFormData = {
-			email: $scope.judgeEmail,
-			first_name: $scope.judgeFirstName,
-			last_name: $scope.judgeLastName
+			email: $scope.judgeEmail.trim(),
+			first_name: $scope.judgeFirstName.trim(),
+			last_name: $scope.judgeLastName.trim()
 		};
-
 		JudgeManagementService.addJudge(judgeFormData).then(function() {
-            // Refresh judge objects
-            JudgeManagementService.getJudges();
-            $scope.closeJudgeModal();
+			// Refresh judge objects
+			JudgeManagementService.getJudges();
+			$scope.closeJudgeModal();
+		}).catch(function(error) {
+			$scope.judgeErrorMessage = error;
 		});
 	}
 }])
@@ -148,17 +149,17 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 
 		var judgeManagement = {};
 
-        judgeManagement.getJudges = function() {
-            var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
-            var eventId = $cookies.getObject('selected_event').id;
-            judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
-                sessionStorage.putObject('judges', resp.event_judges);
-            });
-        }
+		judgeManagement.getJudges = function() {
+			var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
+			var eventId = $cookies.getObject('selected_event').id;
+			judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
+					sessionStorage.putObject('judges', resp.event_judges);
+			});
+		}
 
 		judgeManagement.addJudge = function(judgeFormData) {
 			var defer = $q.defer();
-
+			
 			// Todo: Check if a user with the email already exists (once that's in the API).
 
 			var judgeReq = judgeFormData;
@@ -171,12 +172,16 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 				var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
 				var eventId = $cookies.getObject('selected_event').id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: resp.user.id}).$promise.then(function(resp) {
-                    console.log('Judge successfully registered & added to event');
+					console.log('Judge successfully registered & added to event');
 				}).catch(function() {
 					console.log('Error adding judge to event');
 				});
-			}).catch(function() {
+			}).catch(function(error) {
 				console.log('Error registering judge user');
+				if (error.data.email !== undefined) {
+					var error = 'Email already exists. Please use another.';
+					defer.reject(error);
+				}
 			}).finally(function() {
 				defer.resolve('Finished addJudge()');
 			});
@@ -200,31 +205,30 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	}
 ])
 
-.factory('JudgeWatchService', function(sessionStorage) {
+.factory('JudgeWatchService', function (sessionStorage) {
 	return function($scope, $cookies) {
 		var service = {};
 
 		service.init = function() {
 			$scope.$watch(function() {
-    			return sessionStorage.getObject('teams');
-  			}, function(newValue) {
-					console.log(JSON.stringify(newValue));
-  				$scope.teams = newValue;
-  				$scope.filteredTeams = newValue;
-  			}, true);
+				return sessionStorage.getObject('teams');
+			}, function(newValue) {
+				$scope.teams = newValue;
+				$scope.filteredTeams = newValue;
+			}, true);
 
 			$scope.$watch(function() {
-				return $cookies.getObject('selectedTeam');
+				return $scope.typeAheadFilter;
 			}, function(newValue) {	
 				$scope.filterTeams(newValue);
 			}, true);
 
-            $scope.$watch(function() {
-                return sessionStorage.getObject('judges');
-            }, function(newValue) {
-                $scope.judges = newValue;
-                console.log($scope.judges);
-            }, true);
+			$scope.$watch(function() {
+					return sessionStorage.getObject('judges');
+			}, function(newValue) {
+					$scope.judges = newValue;
+					console.log($scope.judges);
+			}, true);
 		}
 
 		return service;

@@ -29,6 +29,27 @@
 	cursor: pointer;
 }
 
+.draggable-team {
+	position: relative;
+	z-index: 2;
+	background-color: white;
+	cursor: move;
+	margin-bottom: 20px;
+	margin-right: -10px;
+	font-size: 12px;
+	white-space: nowrap;
+  overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.draggable-team:hover, .category-specific-team:hover {
+	background-color: white !important;
+	border-color: rgba(126, 239, 104, 0.8);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+	outline: 0 none;
+	cursor: move;
+}
+
 .draggable-team .glyphicon-cog, .glyphicon-cog {
 	margin-right: 5px;
 	float: right;
@@ -36,6 +57,15 @@
 	display: none;
 	cursor: pointer;
 	font-size: 15px;
+}
+
+.draggable-team .media-text {
+	width: 100px; 
+}
+
+.draggable-team .media-text p {
+	padding: 0;
+	margin: 0;
 }
 
 .category-specific-team .glyphicon-cog {
@@ -63,21 +93,8 @@
 	padding-top: 20px;
 }
 
-.draggable-team {
-	position: relative;
-	z-index: 2;
-	background-color: white;
-	cursor: move;
-	margin-right: 10px;
-	margin-bottom: 20px;
-}
-
-.draggable-team:hover, .category-specific-team:hover {
-	background-color: white !important;
-	border-color: rgba(126, 239, 104, 0.8);
-  	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
-  	outline: 0 none;
-  	cursor: move;
+.team-accordion .panel-body {
+	margin-bottom: -20px;
 }
 
 .category-accordion-media {

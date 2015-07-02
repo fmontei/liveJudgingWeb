@@ -197,8 +197,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 })
 
 
-.factory('TeamManagementService', ['$log', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService',
-	function($log, CategoryManagementService, CurrentUserService, TeamRESTService) {
+.factory('TeamManagementService', ['$log', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService', 'sessionStorage',
+	function($log, CategoryManagementService, CurrentUserService, TeamRESTService, sessionStorage) {
 	return function($scope, $cookies) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
@@ -269,12 +269,27 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			var connection = TeamRESTService(authHeader);
 			connection.team.update({id: updatedTeam.id}, req).$promise.then(function(resp) {
 				// Todo: call API to update category->team mappings (once that's in the API).
+				updateTeam(updatedTeam);
 				$scope.closeTeamModal();
 				$log.log("Team edited: " + resp.event_team.name);
 			}).catch(function() {
 				$scope.errorMessage = 'Error editing team.';
 				$log.log($scope.errorMessage);
 			});
+		}
+		
+		var updateTeam = function(newTeam) {
+			var teams = sessionStorage.getObject('teams');
+			var teamToUpdate = null;
+			for (var i = 0; i < teams.length; i++) {
+				if (newTeam.id === teams[i].id) {
+					teamToUpdate = teams[i];
+					break;
+				}
+			}
+			newTeam.categories = teamToUpdate.categories;
+			teams[teams.indexOf(teamToUpdate)] = newTeam;
+			sessionStorage.putObject('teams', teams);
 		}
 
 		teamManagement.deleteTeam = function() {
@@ -342,7 +357,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		teamManagement.getTeamByName = function(teamName) {
 			var retVal = null;
-			var teams = $cookies.getObject('teams');
+			var teams = sessionStorage.getObject('teams');
 			angular.forEach(teams, function(team) {
 				if (team.name === teamName) {
 					retVal = team;
@@ -353,7 +368,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		teamManagement.getTeamByID = function(teamId) {
 			var retVal = null;
-			var teams = $cookies.getObject('teams');
+			var teams = sessionStorage.getObject('teams');
 			angular.forEach(teams, function(team) {
 				if (team.id === teamId) {
 					retVal = team;
@@ -439,6 +454,29 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 					headers: authHeader
 				}
 			})
+		}
+	}
+})
+
+.directive('cngWrapWord', function() {
+	return {
+		restrict: 'A', 
+		scope: {
+			word: '@word'
+		},
+		link: function(scope, elem, attrs) {
+			var wrappedWord = '', maximumCharCount = 38, rowLength = 20;
+			for (var i = 0; i < scope.word.length; i++) {
+				if (i < maximumCharCount) {
+					wrappedWord += scope.word.charAt(i);
+					if (i !== 0 && i % rowLength === 0)
+						wrappedWord += '-<br />';
+				} else {
+					wrappedWord += '...'; 
+					break;
+				}
+			}
+			elem.html(wrappedWord);
 		}
 	}
 })
