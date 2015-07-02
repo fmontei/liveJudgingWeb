@@ -29,6 +29,10 @@
 	cursor: pointer;
 }
 
+.draggable-team-col {
+	width: 220px;
+}
+
 .draggable-team {
 	position: relative;
 	z-index: 2;

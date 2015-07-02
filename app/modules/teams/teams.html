@@ -62,7 +62,7 @@
 					
 					<div ng-repeat="team in teams | orderBy: '+name'">
 						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-						<div class="col col-sm-4 col-md-4 col-lg-3" style="width: 250px">
+						<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
 							<div class="media draggable-team" 
 									 cng-draggable-team 
 									 teamId="{{team.id}}" 
@@ -112,7 +112,7 @@
 									<div class="panel-body">
 										<div ng-repeat="team in uncategorized.teams | orderBy: '+name'"">
 											<br ng-if="$index % 3 == 0 && $index > 0" />
-											<div class="col col-sm-4 col-md-4 col-lg-3" style="width: 250px">
+											<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
 												<div class="media draggable-team" 
 														 cng-draggable-team 
 														 teamId="{{team.id}}" 
@@ -165,7 +165,7 @@
 										<div class="panel-body">
 											<div ng-repeat="team in category.teams | orderBy: '+name'"">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
-												<div class="col col-sm-4 col-md-4 col-lg-3" style="width: 250px">
+												<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
 													<div class="media draggable-team" 
 															 cng-draggable-team 
 															 teamId="{{team.id}}" 
@@ -209,7 +209,7 @@
 
 					<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
 						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-						<div class="col col-sm-4 col-md-4 col-lg-3" style="width: 250px">
+						<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
 							<div class="media draggable-team" 
 									 cng-draggable-team 
 									 teamId="{{team.id}}" 
