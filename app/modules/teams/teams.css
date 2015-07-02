@@ -35,7 +35,6 @@
 
 .draggable-item {
 	position: relative;
-	z-index: 2;
 	background-color: white;
 	cursor: move;
 	margin-bottom: 20px;

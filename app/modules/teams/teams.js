@@ -471,20 +471,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 	return timeParseTool;
 }])
 
-.directive('cngOrganizeTeams', function() {
-	return {
-		restrict: 'A',
-		link: function(scope, elem, attrs) {
-			elem.bind('click', function() {
-				$('[cng-draggable-team]').each(function() {
-					if (undefined !== $(this).data('originalPosition'))
-						$(this).goBack();
-				});
-			});
-		}
-	}
-})
-
 .directive('cngCategoryAccordion', function() {
 	return {
 		restrict: 'A',

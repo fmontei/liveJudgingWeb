@@ -140,6 +140,7 @@ angular.module('liveJudgingAdmin', [
 			elem.draggable({
 				cursor: 'grab',
 				start: function(event, ui) {
+					$(this).css('zIndex', '100');
 					scope.itemId = ui.helper.context.attributes.itemId.nodeValue;
 					if (undefined === elem.data('originalPosition')) {
 						elem.data('originalPosition', elem.offset());
@@ -148,6 +149,12 @@ angular.module('liveJudgingAdmin', [
 				    left: Math.floor(ui.helper.width() / 2),
 				    top: Math.floor(ui.helper.height() / 2)
 				  }); 
+				},
+				stop: function(event, ui) {
+					$('[cng-draggable-item]').each(function() {
+						$(this).css('zIndex', '1');
+					});
+					$(this).css('zIndex', '2');
 				}
 			});
 
@@ -176,4 +183,18 @@ angular.module('liveJudgingAdmin', [
 		}
 	}
 
-}]);
+}])
+
+.directive('cngOrganizeItems', function() {
+	return {
+		restrict: 'A',
+		link: function(scope, elem, attrs) {
+			elem.bind('click', function() {
+				$('[cng-draggable-item]').each(function() {
+					if (undefined !== $(this).data('originalPosition'))
+						$(this).goBack();
+				});
+			});
+		}
+	}
+});
