@@ -458,29 +458,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 	}
 })
 
-.directive('cngWrapWord', function() {
-	return {
-		restrict: 'A', 
-		scope: {
-			word: '@word'
-		},
-		link: function(scope, elem, attrs) {
-			var wrappedWord = '', maximumCharCount = 38, rowLength = 20;
-			for (var i = 0; i < scope.word.length; i++) {
-				if (i < maximumCharCount) {
-					wrappedWord += scope.word.charAt(i);
-					if (i !== 0 && i % rowLength === 0)
-						wrappedWord += '-<br />';
-				} else {
-					wrappedWord += '...'; 
-					break;
-				}
-			}
-			elem.html(wrappedWord);
-		}
-	}
-})
-
 .factory('TimeParseTool', ['$filter', function($filter) {
 	var timeParseTool = {};
 
@@ -492,58 +469,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 	}
 
 	return timeParseTool;
-}])
-
-.directive('cngDraggableTeam', [function() { 
-
-	return {
-		restrict: 'A',
-		scope: {
-			cog: '@',
-			teamId: '=teamId',
-			isTransferable: '@isTransferable'
-		},
-		link: function(scope, elem, attrs) {
-			elem.data('isTransferable', scope.isTransferable === 'true');
-			elem.draggable({
-				cursor: 'grab',
-				start: function(event, ui) {
-					scope.teamId = ui.helper.context.attributes.teamid.nodeValue;
-					if (undefined === elem.data('originalPosition')) {
-						elem.data('originalPosition', elem.offset());
-					}
-				  $(this).draggable('option', 'cursorAt', {
-				    left: Math.floor(ui.helper.width() / 2),
-				    top: Math.floor(ui.helper.height() / 2)
-				  }); 
-				}
-			});
-
-			var cog = elem.find(scope.cog);
-			elem.bind('mouseenter', function() {
-				cog.show();
-			});
-
-			elem.bind('mouseleave', function() {
-				cog.hide();
-			});
-
-			$.fn.goBack = function() {
-				if ($(this).is('[cng-draggable-team]')) {
-					var originalPosition = $(this).data('originalPosition');
-					var leftDifference = $(this).offset().left - originalPosition.left;
-					var leftDecrement = '-=' + leftDifference;
-					var topDifference = $(this).offset().top - originalPosition.top;
-					var topDecrement = '-=' + topDifference;
-					$(this).animate({
-			    		'left': leftDecrement,
-			    		'top': topDecrement
-		    		}, 500);
-				}
-			}
-		}
-	}
-
 }])
 
 .directive('cngOrganizeTeams', function() {

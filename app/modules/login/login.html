@@ -3,7 +3,13 @@
 
     <tabset>
         <tab heading="Login" class="login-tab">
-            <p ng-bind="error"></p>
+						<div ng-switch on="error">
+							<div ng-switch-default>
+								<p class="alert alert-danger" ng-bind="error"></p>
+							</div>
+							<div ng-switch-when="null">
+							</div>
+						</div>
             <form class="login-form" ng-submit="login(returningUser)">
                 <label>Email</label>
                 <input type="email"

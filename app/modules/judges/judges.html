@@ -50,24 +50,25 @@
 			</div>
 
 			<div class="row">
-				<div class="draggable-team-wrapper">
-					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
-						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-						<div class="col col-sm-4 col-md-4 col-lg-3">
-							<div class="media draggable-judge" 
-							     cng-draggable-judge 
-							     judgeId="{{judgeObj.judge.id}}" 
-							     cog=".glyphicon-cog"
-							     is-transferable="true">
-								<div class="media-body">
-									<h4 class="media-heading">
-										<span class="glyphicon glyphicon-cog" 
-									        ng-click="changeJudgeModalView('edit', judge)">
-						        		</span>
-									</h4>
-									<div class="draggable-judge-name">
-										<span>{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}</span>
-									</div>
+				<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
+					<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
+					<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
+						<div class="media draggable-item"
+								 cng-draggable-item
+								 itemId="{{judgeObj.judge.id}}" 
+								 cog=".glyphicon-cog"
+								 is-transferable="true">
+							<div class="media-left"></div>
+							<div class="media-body">
+								<h4 class="media-heading">
+									<span class="glyphicon glyphicon-cog" 
+												ng-click="changeJudgeModalView('edit', judge)">
+									</span>
+								</h4>
+								<div class="media-text judge-media-text" 
+								     cng-wrap-word word="{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}"
+										 line-width="25"
+										 total-width="50">
 								</div>
 							</div>
 						</div>
@@ -161,11 +162,11 @@
 						<div class="col col-sm-8 col-md-8 col-lg-8">
 							<div tabset id="judge-modal-tabs">
 								<div tab 
-												 ng-repeat="tab in tabs"
+										 ng-repeat="tab in tabs"
 										 ng-click="changeModalTab(tab.view)"
-												 heading="{{tab.title}}"
-												 active="tab.active"
-												 disable="tab.disabled">
+										 heading="{{tab.title}}"
+										 active="tab.active"
+										 disable="tab.disabled">
 								</div>
 							</div>
 							

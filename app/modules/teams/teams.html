@@ -18,7 +18,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div class="row">
 				<div class="col-sm-8 col-md-8 col-lg-8">
 					<em>Drag-'n-drop teams into categories.</em>
@@ -62,14 +62,14 @@
 					
 					<div ng-repeat="team in teams | orderBy: '+name'">
 						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-						<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
-							<div class="media draggable-team" 
-									 cng-draggable-team 
-									 teamId="{{team.id}}" 
+						<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
+							<div class="media draggable-item" 
+									 cng-draggable-item
+									 itemId="{{team.id}}" 
 									 cog=".glyphicon-cog"
 									 is-transferable="true">
 								<div class="media-left">
-									<a href="#">
+									<a href="javascript:void(0)">
 										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 									</a>
 								</div>
@@ -80,7 +80,10 @@
 													 ng-click="changeTeamModalView('edit', team)">
 											</div>
 										</h4>
-										<div class="media-text" cng-wrap-word word="{{team.name}}">
+										<div class="media-text" 
+										     cng-wrap-word word="{{team.name}}"
+												 line-width="18"
+												 total-width="36">
 										</div>
 									</div>
 							</div>
@@ -112,14 +115,14 @@
 									<div class="panel-body">
 										<div ng-repeat="team in uncategorized.teams | orderBy: '+name'"">
 											<br ng-if="$index % 3 == 0 && $index > 0" />
-											<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
-												<div class="media draggable-team" 
-														 cng-draggable-team 
-														 teamId="{{team.id}}" 
+											<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
+												<div class="media draggable-item" 
+														 cng-draggable-item 
+														 itemId="{{team.id}}" 
 														 cog=".glyphicon-cog"
 														 is-transferable="true">
 													<div class="media-left">
-														<a href="#">
+														<a href="javascript:void(0)">
 															<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 														</a>
 													</div>
@@ -130,8 +133,10 @@
 																		 ng-click="changeTeamModalView('edit', team)">
 																</div>
 															</h4>
-															<div class="media-text" cng-wrap-word word="{{team.name}}">
-															</div>
+															<div class="media-text" 
+																	 cng-wrap-word word="{{team.name}}"
+																	 line-width="18"
+																	 total-width="36">
 														</div>
 												</div>
 											</div>
@@ -165,14 +170,14 @@
 										<div class="panel-body">
 											<div ng-repeat="team in category.teams | orderBy: '+name'"">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
-												<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
-													<div class="media draggable-team" 
-															 cng-draggable-team 
-															 teamId="{{team.id}}" 
+												<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
+													<div class="media draggable-item" 
+															 cng-draggable-item
+															 itemId="{{team.id}}" 
 															 cog=".glyphicon-cog"
 															 is-transferable="true">
 														<div class="media-left">
-															<a href="#">
+															<a href="javascript:void(0)">
 																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 															</a>
 														</div>
@@ -183,8 +188,10 @@
 																			 ng-click="changeTeamModalView('edit', team)">
 																	</div>
 																</h4>
-																<div class="media-text" cng-wrap-word word="{{team.name}}">
-																</div>
+																<div class="media-text" 
+																		 cng-wrap-word word="{{team.name}}"
+																		 line-width="18"
+																		 total-width="36">
 															</div>
 													</div>
 												</div>
@@ -209,14 +216,14 @@
 
 					<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
 						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-						<div class="col col-sm-4 col-md-4 col-lg-3 draggable-team-col">
-							<div class="media draggable-team" 
-									 cng-draggable-team 
-									 teamId="{{team.id}}" 
+						<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
+							<div class="media draggable-item" 
+									 cng-draggable-item 
+									 itemId="{{team.id}}" 
 									 cog=".glyphicon-cog"
 									 is-transferable="true">
 								<div class="media-left">
-									<a href="#">
+									<a href="javascript:void(0)">
 										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 									</a>
 								</div>
@@ -227,8 +234,10 @@
 													 ng-click="changeTeamModalView('edit', team)">
 											</div>
 										</h4>
-										<div class="media-text" cng-wrap-word word="{{team.name}}">
-										</div>
+										<div class="media-text" 
+										     cng-wrap-word word="{{team.name}}"
+												 line-width="18"
+												 total-width="36">
 									</div>
 							</div>
 						</div>

@@ -353,7 +353,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     droppedTeam.goBack();
                     return;
                 }
-                scope.itemId = droppedTeam.attr('teamId').trim();
+                scope.itemId = droppedTeam.attr('itemId').trim();
                 // TODO: make the draggables generic (perhaps in another module).
                 scope.categoryId = event.target.getAttribute('category-id');
                 //var alreadyExists = scope.checkCategory({categoryName: categoryName, teamId: teamId});

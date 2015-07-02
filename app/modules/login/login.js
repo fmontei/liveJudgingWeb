@@ -32,7 +32,11 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
 
         $scope.newUser = {};
         $scope.returningUser = {};
-        $scope.error = '';
+				$scope.$watch(function() {
+						return CurrentUserService.hasLoginError;
+				 }, function(newValue) {
+						$scope.error = (newValue) ? 'Error logging in.' : null;
+				 });
 
         $scope.register = function(user) {
             UserRESTService.register(user).$promise.then(function(user) {
@@ -43,9 +47,6 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
 
         $scope.login = function(user) {
             CurrentUserService.login(user)
-            if (CurrentUserService.hasLoginError) {
-                $scope.error = 'Unable to login.';
-            }
         };
 
         $scope.logout = function() {
@@ -104,7 +105,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
     },
 
     service.login = function(user) {
-        service.hasLoginError = false;
+				service.hasLoginError = false;
         LoginService(service.getLoginAuthHeader(user.email, user.password)).login().$promise.then(function(resp) {
             console.log(service);
             service.currentUser = resp.user;
