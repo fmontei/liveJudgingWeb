@@ -41,7 +41,7 @@
 	margin-right: -10px;
 	font-size: 12px;
 	white-space: nowrap;
-  overflow: hidden;
+	overflow: hidden;
 	text-overflow: ellipsis;
 	height: 100px;
 }

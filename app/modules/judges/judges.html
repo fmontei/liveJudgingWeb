@@ -356,3 +356,43 @@
 		</div>
 	</div>
 </form>
+
+<div class="modal fade" id="judge-cat-assignment-modal" tabindex="-1" role="dialog" aria-labelledby="judge-cat-assignment-modal" aria-hidden="true">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content panel-success">
+			<div class="modal-header panel-heading">
+				<span class="modal-title">Assign Teams in Category to Judge</span>
+			</div>
+
+			<div class="modal-body">
+				<div ng-repeat="team in teamsInDropCat" class="teams-in-cat-list">
+					<label>
+    					<input type="checkbox" ng-model="team.checked" />
+    						{{team.name}}
+  					</label>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<div class="row">
+					<span class="col col-sm-7">
+						<button type="button"
+								class="btn btn-success pull-right"
+								ng-click="assignTeamsToJudge()">
+							Assign Selected Teams to Judge
+						</button>
+					</span>
+					<span class="col col-sm-2"></span>
+					<span class="col col-sm-5">
+						<button type="button"
+								class="btn btn-default pull-left"
+								data-dismiss="modal"
+								ng-click="closeAssignByCatModal()">
+							Cancel
+						</button>
+					</span>
+				</div>
+			</div>
+		</div>	
+	</div>
+</div>

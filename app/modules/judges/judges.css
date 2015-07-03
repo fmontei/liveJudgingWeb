@@ -14,7 +14,7 @@
 #judge-modal-teams-view {
 	border: solid #dddddd 1px; 
 	border-radius: 0px 0px 5px 5px;
-  padding: 10px;
+	padding: 10px;
 }
 
 .judge-modal-tab-content {
@@ -66,4 +66,9 @@
 
 #judge-modal-table th:nth-of-type(4) {
 	width: 10%;
+}
+
+.teams-in-cat-list {
+	width: 90%;
+    margin: 0 auto;
 }
