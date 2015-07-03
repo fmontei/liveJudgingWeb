@@ -203,10 +203,11 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 						console.log('Error adding judge to event');
 					});
 				}).then(function() {
+					/* Assign judge to every team selected in modal */
 					angular.forEach(judgeFormData.teams, function(team) {
 						var req = {team_id: team.id};
 						judgeRESTService.judgeTeams.assign({judge_id: judgeId}, req).$promise.then(function(resp) {
-							console.log('success');
+							console.log('Judge assigned to judge team.');
 						}).catch(function(error) {
 							console.log(JSON.stringify(error));
 						});

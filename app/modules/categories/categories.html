@@ -97,7 +97,10 @@
                 update-category="$parent.transferTeamToCategory(categoryId, projectId, true)">
                 <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails(category)">
                     <h3>
-                        <span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
+                        <span class="glyphicon-wrapper">
+													<span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)">
+													</span>
+												</span>
                     </h3>
                     <div>
                         <div><u>{{category.label}}</u></div>
