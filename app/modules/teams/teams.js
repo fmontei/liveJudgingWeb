@@ -235,12 +235,12 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 				}
 				teamManagement.transferTeamToCategory(catId, returnedTeamID, false);
 
-				var teams = $cookies.getObject('teams');
+				var teams = sessionStorage.getObject('teams');
 				if (teams) {
 					teams.push(resp.event_team);
-					$cookies.putObject('teams', teams);
+					sessionStorage.putObject('teams', teams);
 				} else { 
-					$cookies.putObject('teams', resp.event_team);
+					sessionStorage.putObject('teams', resp.event_team);
 				}
 				// Todo: Update uncategorized to reflect changes.
 			}).catch(function() {
@@ -295,14 +295,14 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		teamManagement.deleteTeam = function() {
 			var connection = TeamRESTService(authHeader);
 			connection.team.delete({id: $cookies.getObject('selectedTeam').id}).$promise.then(function(resp) {
-				var teams = $cookies.getObject('teams');
+				var teams = sessionStorage.getObject('teams');
 				for (var i = 0; i < teams.length; i++) {
 					if (teams[i].id == $cookies.getObject('selectedTeam').id) {
 						teams.splice(i, 1);
 						break;
 					}
 				}
-				$cookies.putObject('teams', teams);
+				sessionStorage.putObject('teams', teams);
 				$scope.closeTeamModal();
 				console.log('Successfully deleted team.');
 				// Todo: update categories' team lists to reflect changes.
