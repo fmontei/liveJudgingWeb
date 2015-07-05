@@ -19,9 +19,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	judgeManagementService.getJudges();
 
 	$scope.tabs = [
-    	{ title:'Teams Judging', content:'Dynamic content 1' , active: true, view: 'teams' },
-    	{ title:'Criteria Rules', content:'Dynamic content 2', view: 'criteria' }
-  	];
+		{ title: 'Teams Judging', active: true, view: 'teams' },
+		{ title: 'Criteria Rules', view: 'criteria' }
+	];
 
 	$scope.judgeModalView = 'teams';
 	$scope.selectedTeams = [];
@@ -250,9 +250,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	return function($scope, $cookies) {
 		var service = {};
 		$scope.$watch(function() {
-				return sessionStorage.getObject('judges');
+			return sessionStorage.getObject('judges');
 		}, function(newValue) {
-				$scope.judges = newValue;
+			$scope.judges = newValue;
 		}, true);
 		
 		service.init = function() {
