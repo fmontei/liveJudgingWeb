@@ -9,10 +9,10 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
   });
 }])
 
-.controller('RubricsCtrl', ['$scope', '$cookies', 'sessionStorage', 'RubricManagementService',
-						function($scope, $cookies, sessionStorage, RubricManagementSerive) {
+.controller('RubricsCtrl', ['$scope', 'sessionStorage', 'RubricManagementService',
+						function($scope, sessionStorage, RubricManagementSerive) {
 							
-	var rubricManagementService = RubricManagementSerive($scope, $cookies);
+	var rubricManagementService = RubricManagementSerive($scope, sessionStorage);
 							
 	$scope.modalCriteria = [{name: 'Flavor'}, {name: 'Texture'}, {name: 'Size'}];
 	
@@ -39,27 +39,27 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		rubricManagementService.changeView(view);
 	}
 	
-	$cookies.put('rubricView', 'default');
+	sessionStorage.put('rubricView', 'default');
 	
 	$scope.$watch(function() {
-		return $cookies.get('rubricView');
+		return sessionStorage.get('rubricView');
 	}, function(newValue) {
 		$scope.rubricView = newValue;
 	});
 							
 	$scope.$watch(function() {
-		return $cookies.getObject('selectedCategory');
+		return sessionStorage.getObject('selectedCategory');
 	}, function(newValue) {
 		$scope.selectedCategory = newValue;
 	}, true);
 }])
 
 .factory('RubricManagementService', function() {
-	return function($scope, $cookies) {
+	return function($scope, sessionStorage) {
 		var rubricManagement = {};
 
 		rubricManagement.changeView = function(view) {
-			$cookies.put('rubricView', view);
+			sessionStorage.put('rubricView', view);
 		}
 
 		return rubricManagement;

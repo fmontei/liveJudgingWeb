@@ -9,20 +9,20 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
   });
 }])
 
-.controller('CategoriesCtrl', ['$cookies', '$location', '$scope', 'CategoryManagementService', 'CatWatchService', 
+.controller('CategoriesCtrl', ['sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService', 
 															 'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
-    function($cookies, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService, 
+    function(sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService, 
 						 TeamManagementService, RubricManagementService) {
 
-        var catWatchService = CatWatchService($cookies, $scope);
+        var catWatchService = CatWatchService(sessionStorage, $scope);
         catWatchService.init();
 
-        var categoryManagementService = CategoryManagementService($scope, $cookies);
+        var categoryManagementService = CategoryManagementService($scope, sessionStorage);
         categoryManagementService.getCategories();
 
-        var teamManagementService = TeamManagementService($scope, $cookies);
-        var judgeManagementService = JudgeManagementService($scope, $cookies);
-			  var rubricManagementService = RubricManagementService($scope, $cookies);
+        var teamManagementService = TeamManagementService($scope, sessionStorage);
+        var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+			  var rubricManagementService = RubricManagementService($scope, sessionStorage);
 
         $scope.createNewCategory = function() {
             categoryManagementService.createNewCategory();
@@ -39,7 +39,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         $scope.deleteItem = function(itemId, itemType) {
             if ($location.path().includes('teams')) {
                 var team = teamManagementService.getTeamByID(parseInt(itemId));
-                $cookies.putObject('selectedTeam', team);
+                sessionStorage.putObject('selectedTeam', team);
                 teamManagementService.deleteTeam();
             } else if ($location.path().includes('judges')) {
                 //
@@ -55,7 +55,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             $scope.categoryModalView = view;
             $scope.openCategoryModal();
             if (view === 'edit') {
-                $scope.updateSelectedCategory(category);
+                $scope.updateStoredCategory(category);
                 $scope.populateCategoryModal(category);
                 event.stopPropagation();
             }
@@ -64,7 +64,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         $scope.populateCategoryModal = function(category) {
             $scope.categoryID = category.id;
             $scope.categoryName = category.label;
-            $scope.categoryDesc = category.desc;
+            $scope.categoryDesc = category.description;
             $scope.categoryTime = category.time;
             $scope.categoryColor = category.color;
         }
@@ -81,18 +81,18 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             $scope.categoryColor = 'FFFFFF'; 
             $scope.categoryModalError = null;
             $('#category-modal').modal('hide');
-            $scope.updateSelectedCategory(null);
+            $scope.updateStoredCategory(null);
         }
 
-        $scope.updateSelectedCategory = function(category) {
+        $scope.updateStoredCategory = function(category) {
             if ($location.path().includes('teams')) {
-                teamManagementService.updateSelectedCategory(category);
+                teamManagementService.updateStoredCategory(category);
             }
 
             if (category) {
-               $cookies.putObject('selectedCategory', category);   
+							sessionStorage.putObject('selectedCategory', category);   
             } else {
-                $cookies.remove('selectedCategory');
+            	sessionStorage.remove('selectedCategory');
             }
         }
 
@@ -105,7 +105,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.viewCategoryDetails = function(cat) {
-            $scope.updateSelectedCategory(cat);
+            $scope.updateStoredCategory(cat);
 
             if ($location.path().includes('teams')) {
                 teamManagementService.changeView('selectedCategory');
@@ -119,29 +119,29 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 ])
 
 .factory('CatWatchService', ['$location', function($location) {
-    return function($cookies, $scope) {
+    return function(sessionStorage, $scope) {
         var service = {};
 
         service.init = function() {
             $scope.$watch(function() { 
-                return $cookies.getObject('categories');
+                return sessionStorage.getObject('categories');
             }, function(newValue) {
                 $scope.categories = newValue;
             }, true);
 
             $scope.$watch(function() {
-                return $cookies.getObject('uncategorized');
+                return sessionStorage.getObject('uncategorized');
             }, function(newValue) {
                 $scope.uncategorized = newValue;
             }, true);
 
             $scope.$watch(function() {
 							if ($location.path().includes('teams')) {
-								return $cookies.get('teamView');
+								return sessionStorage.get('teamView');
 							} else if ($location.path().includes('judges')) {
-								return $cookies.get('judgeView');
+								return sessionStorage.get('judgeView');
 							}else if ($location.path().includes('rubrics')) {
-								return $cookies.get('rubricView');
+								return sessionStorage.get('rubricView');
 							}
             }, function(newValue) {
 							$scope.currentView = newValue;
@@ -152,11 +152,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 }])
 
-.factory('CategoryManagementService', ['$cookies', '$log', '$q', 'CategoryRESTService', 'CurrentUserService',
-    function($cookies, $log, $q, CategoryRESTService, CurrentUserService) {
-    return function($scope, $cookies) {
+.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService',
+    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService) {
+    return function($scope, sessionStorage) {
         var authHeader = CurrentUserService.getAuthHeader();
-        var eventId = $cookies.getObject('selected_event').id;
+        var eventId = sessionStorage.getObject('selected_event').id;
 
         var categoryManagement = {};
             
@@ -165,11 +165,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 angular.forEach(resp.event_categories, function(category) {
                     if (category.label === 'Uncategorized') {
                         category.color = '#BBBBBB';
-                        $cookies.putObject('uncategorized', category);
+                        sessionStorage.putObject('uncategorized', category);
                     }
                     category.color = categoryManagement.convertColorToHex(category.color);
                 });
-                $cookies.putObject('categories', resp.event_categories);
+                sessionStorage.putObject('categories', resp.event_categories);
 
             }).catch(function() {
                 console.log('Error getting categories.');
@@ -200,17 +200,17 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 newCategory.id = returnedCategoryID;
                 resp.event_category.color = categoryManagement.convertColorToHex(resp.event_category.color);
                 // Save category objects in cookie.
-                var currentCats = $cookies.getObject('categories');
+                var currentCats = sessionStorage.getObject('categories');
                 if (currentCats) {
                     currentCats.push(resp.event_category);
-                    $cookies.putObject('categories', currentCats);
+                    sessionStorage.putObject('categories', currentCats);
                 } else {
-                    $cookies.putObject('categories', resp.event_category);
+                    sessionStorage.putObject('categories', resp.event_category);
                 }
 
                 $scope.closeCategoryModal();
                 $log.log("New category created: " + JSON.stringify(newCategory));
-                $log.log("Category list updated: " + $cookies.getObject('categories').length);
+                $log.log("Category list updated: " + sessionStorage.getObject('categories').length);
             }).catch(function() {
                 $scope.closeCategoryModal();
                 $scope.errorMessage = 'Error creating category on server.';
@@ -250,17 +250,17 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         categoryManagement.deleteCategory = function() {
-            var catId = $cookies.getObject('selectedCategory').id;
+            var catId = sessionStorage.getObject('selectedCategory').id;
             var connection = CategoryRESTService(authHeader);
             connection.category.delete({id: catId}).$promise.then(function(resp) {
-                var cats = $cookies.getObject('categories');
+                var cats = sessionStorage.getObject('categories');
                 for (var i = 0; i < cats.length; i++) {
                     if (cats[i].id == catId) {
                         cats.splice(i, 1);
                         break;
                     }
                 }
-                $cookies.putObject('categories', cats);
+                sessionStorage.putObject('categories', cats);
                 $scope.closeCategoryModal();
                 $log.log('Successfully deleted category.');
             }).catch(function() {
@@ -307,22 +307,22 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var name = $scope.categoryName,
                 time = $scope.categoryTime,
                 color = $scope.categoryColor/*.toLowerCase()*/;
-            $scope.categoryModalError = undefined;
+            $scope.categoryModalError = null;
             if (isEmpty(name)) {
                 $scope.categoryModalError = 'Category name is required.';
             }
-            else if (!isEdit && isNameTaken(name)) {
+            else if (isNameTaken(name)) {
                 $scope.categoryModalError = 'Category name already taken.';
             }
             else if (color === '#ffffff' || color === 'ffffff' || isEmpty(color)) {
                 $scope.categoryModalError = 'Category color is required.';
             }
-            return $scope.categoryModalError === undefined;
+            return $scope.categoryModalError === null;
         }
 
         var isNameTaken = function(name) {
             var retVal = false;
-            var cats = $cookies.getObject('categories');
+            var cats = sessionStorage.getObject('categories');
             angular.forEach(cats, function(cat) {
                 if (cat.label == name) {
                     retVal = true;
@@ -374,7 +374,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 })
 
-.directive('cngDroppableCategory', ['$cookies', function($cookies) {
+.directive('cngDroppableCategory', ['sessionStorage', function(sessionStorage) {
 
     var link = function(scope, elem, attrs) {
         elem.droppable({

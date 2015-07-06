@@ -28,7 +28,7 @@ angular.module('liveJudgingAdmin', [
   })
 })
 
-.controller('MainCtrl', ['$cookies',
+.controller('MainCtrl', ['sessionStorage',
                          '$location',
                          '$rootScope',
                          '$route',
@@ -36,13 +36,13 @@ angular.module('liveJudgingAdmin', [
                          '$scope',
                          'CurrentUserService',
                          'LogoutService',
-	function($cookies, $location, $rootScope, $route, $routeParams, $scope, CurrentUserService, LogoutService) {
+	function(sessionStorage, $location, $rootScope, $route, $routeParams, $scope, CurrentUserService, LogoutService) {
 		$scope.$on('$routeChangeSuccess', function() {
 			$scope.currentPath = $location.path();
 		});
 
     $scope.$on('$locationChangeStart', function(event, next, current) {
-      if ($location.path() !== '/login' && !$cookies.getObject('current_user')) {
+      if ($location.path() !== '/login' && !sessionStorage.getObject('current_user')) {
         event.preventDefault();
         // Occassionally preventDefault() would
         // still allow part of the page to load.
@@ -52,7 +52,7 @@ angular.module('liveJudgingAdmin', [
 
     // Used to determine if the sidebar should be hidden.
     $scope.isDashboard = function() {
-      if ($scope.currentPath === '/login' || $scope.currentPath === '/eventSelect' || !$cookies.get('selected_event')) {
+      if ($scope.currentPath === '/login' || $scope.currentPath === '/eventSelect' || !sessionStorage.get('selected_event')) {
         return false;
       }
       return true;
@@ -63,7 +63,7 @@ angular.module('liveJudgingAdmin', [
     });
 
     $scope.$watch(function() {
-      return CurrentUserService.getCurrentUser()
+      return CurrentUserService.getCurrentUser();
     }, function(newVal, oldVal) {
       $scope.user = newVal;
     });
@@ -81,7 +81,7 @@ angular.module('liveJudgingAdmin', [
     }
 
     sessionStorage.put = function(key, value) {
-      $window.sessionStorage.setItem(key, stringValue);
+      $window.sessionStorage.setItem(key, value);
     }
 
     sessionStorage.getObject = function(key) {
@@ -92,6 +92,10 @@ angular.module('liveJudgingAdmin', [
     sessionStorage.get = function(key) {
       return $window.sessionStorage.getItem(key);
     }
+		
+		sessionStorage.remove = function(key) {
+			$window.sessionStorage.removeItem(key);
+		}
 
     sessionStorage.clear = function() {
       return $window.sessionStorage.clear();

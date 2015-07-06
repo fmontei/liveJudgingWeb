@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
+angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/judges', {
@@ -9,13 +9,13 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
   });
 }])
 
-.controller('JudgesCtrl', ['$scope', '$cookies', '$log', 'filterFilter', 'JudgeManagementService', 'JudgeWatchService', 'sessionStorage',
-	function($scope, $cookies, $log, filterFilter, JudgeManagementService, JudgeWatchService, sessionStorage) {
+.controller('JudgesCtrl', ['$scope', 'sessionStorage', '$log', 'filterFilter', 'JudgeManagementService', 'JudgeWatchService',
+	function($scope, sessionStorage, $log, filterFilter, JudgeManagementService, JudgeWatchService) {
 	
-	var judgeWatchService = JudgeWatchService($scope, $cookies);
+	var judgeWatchService = JudgeWatchService($scope, sessionStorage);
 	judgeWatchService.init();
 
-	var judgeManagementService = JudgeManagementService($scope, $cookies);
+	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
 	judgeManagementService.getJudges();
 
 	$scope.tabs = [
@@ -176,16 +176,16 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 																		'sessionStorage', 'TeamManagementService', 'UserRESTService',
 	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService, 
 					 sessionStorage, TeamManagementService, UserRESTService) {
-	return function($scope, $cookies) {
+	return function($scope, sessionStorage) {
 
 		var judgeManagement = {};
 
-		var categoryManagementService = CategoryManagementService($scope, $cookies);
-		var teamManagementService = TeamManagementService($scope, $cookies);
+		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
+		var teamManagementService = TeamManagementService($scope, sessionStorage);
 
 		judgeManagement.getJudges = function() {
 			var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
-			var eventId = $cookies.getObject('selected_event').id;
+			var eventId = sessionStorage.getObject('selected_event').id;
 			judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
 					sessionStorage.putObject('judges', resp.event_judges);
 				}).then(function() {
@@ -222,7 +222,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 
 			// Register judge as a user & adds them to the event.
 			UserRESTService.register(judgeReq).$promise.then(function(resp) {
-				var eventId = $cookies.getObject('selected_event').id;
+				var eventId = sessionStorage.getObject('selected_event').id;
 				judgeId = resp.user.id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId}).$promise.then(function(resp) {
 					console.log('Judge successfully registered & added to event');
@@ -265,11 +265,11 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		}
 		
 		judgeManagement.changeView = function(view) {
-			$cookies.put('judgeView', view);
+			sessionStorage.put('judgeView', view);
 		}
 
 		judgeManagement.assignTeamsToJudge = function(teams) {
-			var judgeId = $cookies.getObject('draggedJudge').id;
+			var judgeId = sessionStorage.getObject('draggedJudge').id;
 			angular.forEach(teams, function(team) {
 				judgeManagement.assignTeamToJudge(team.id, judgeId);
 			});
@@ -278,7 +278,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		judgeManagement.assignTeamToJudge = function(teamId) {
 			var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
 			var teamName = teamManagementService.getTeamByID(teamId).name;
-			var judge = $cookies.getObject('draggedJudge').judge;
+			var judge = sessionStorage.getObject('draggedJudge').judge;
 
 			judgeRESTService.judgeTeams.assign({judge_id: judge.id}, {team_id: teamId}).$promise.then(function(resp) {
 				console.log(resp);
@@ -301,7 +301,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 
 		judgeManagement.openAssignByCatModal = function(categoryId, judgeId) {
 			var judge = judgeManagement.getJudgeByID(judgeId);
-			$cookies.putObject('draggedJudge', judge);
+			sessionStorage.putObject('draggedJudge', judge);
 
 			// Getting a list of teamIds in a category
 			categoryManagementService.getTeamsInCategory(categoryId).then(function(teams) {
@@ -315,11 +315,11 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 }])
 
 .factory('JudgeWatchService', ['sessionStorage', function (sessionStorage) {
-	return function($scope, $cookies) {
+	return function($scope, sessionStorage) {
 		var service = {};
 		
 		service.init = function() {
-			$cookies.put('judgeView', 'default');
+			sessionStorage.put('judgeView', 'default');
 			
 			$scope.$watch(function() {
 				return sessionStorage.getObject('judges');
@@ -335,7 +335,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 			}, true);
 			
 			$scope.$watch(function() {
-				return $cookies.getObject('selectedCategory');
+				return sessionStorage.getObject('selectedCategory');
 			}, function(newValue) {
 				$scope.selectedCategory = newValue;
 			}, true);
@@ -347,7 +347,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 			}, true);
 
 			$scope.$watch(function() {
-				return $cookies.get('judgeView');
+				return sessionStorage.get('judgeView');
 			}, function(newValue) {
 				$scope.judgeView = newValue;
 			});

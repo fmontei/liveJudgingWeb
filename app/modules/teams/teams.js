@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAdmin.login'])
+angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/teams', {
@@ -9,23 +9,23 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
   });
 }])
 
-.controller('TeamsCtrl', ['$scope', '$cookies', 'TeamInitService', 'CategoryManagementService', 'ScopeInitService', 'TeamManagementService',
-	function($scope, $cookies, TeamInitService, CategoryManagementService, ScopeInitService, TeamManagementService) {
+.controller('TeamsCtrl', ['$scope', 'sessionStorage', 'TeamInitService', 'CategoryManagementService', 'ScopeInitService', 'TeamManagementService',
+	function($scope, sessionStorage, TeamInitService, CategoryManagementService, ScopeInitService, TeamManagementService) {
 
 		/*
 		 * Automatic synchronization between scope and cookies
 		 */
 
-	 	var scopeInitService = ScopeInitService($scope, $cookies);
+	 	var scopeInitService = ScopeInitService($scope, sessionStorage);
 		scopeInitService.init();
 
-		var teamInitService = TeamInitService($scope, $cookies);
+		var teamInitService = TeamInitService($scope, sessionStorage);
 		teamInitService.initDefaultCookies();
 		teamInitService.initTeams();
 
-		var categoryManagementService = CategoryManagementService($scope, $cookies);		
+		var categoryManagementService = CategoryManagementService($scope, sessionStorage);		
 
-		var teamManagementService = TeamManagementService($scope, $cookies);
+		var teamManagementService = TeamManagementService($scope, sessionStorage);
 		$scope.teamNumberOptions = teamManagementService.getTeamNumberOptions();		
 
 		/*
@@ -67,7 +67,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			$scope.openTeamModal();
 			if (view === 'edit') {
 				$scope.populateTeamModal(team);
-				$cookies.putObject('selectedTeam', team);
+				sessionStorage.putObject('selectedTeam', team);
 			}
 		}
 
@@ -89,7 +89,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			$scope.teamLogo = '';
 			$scope.teamDesc = '';
 			$('#team-modal').modal('hide');
-			$cookies.remove('selectedTeam');
+			sessionStorage.remove('selectedTeam');
 		}
 
 }])
@@ -98,14 +98,14 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		'CategoryManagementService', 'CurrentUserService', 'sessionStorage',
 	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService, 
 		CategoryManagementService, CurrentUserService, sessionStorage) {
-	return function($scope, $cookies) {
+	return function($scope, sessionStorage) {
 		var teamInitService = {};
-		var selectedEvent = $cookies.getObject('selected_event');
-		var categoryManagementService = CategoryManagementService($scope, $cookies);	
+		var selectedEvent = sessionStorage.getObject('selected_event');
+		var categoryManagementService = CategoryManagementService($scope, sessionStorage);	
 
 		teamInitService.initDefaultCookies = function() {
-			$cookies.put('teamView', 'default');
-			$cookies.categoryTime = Date();
+			sessionStorage.put('teamView', 'default');
+			sessionStorage.categoryTime = Date();
 		}	
 
 		teamInitService.initTeams = function() {
@@ -157,24 +157,24 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 }])
 
 .factory('ScopeInitService', function(sessionStorage) {
-	return function($scope, $cookies) {
+	return function($scope, sessionStorage) {
 		var initService = {};
 
 		initService.init = function() {
 			$scope.$watch(function() {
-				return $cookies.getObject('selectedCategory');
+				return sessionStorage.getObject('selectedCategory');
 			}, function(newValue) {
 				$scope.selectedCategory = newValue;
 			}, true);
 
 			$scope.$watch(function() {
-				return $cookies.getObject('selectedTeam');
+				return sessionStorage.getObject('selectedTeam');
 			}, function(newValue) {
 				$scope.selectedTeam = newValue;
 			}, true);
 
 			$scope.$watch(function() {
-				return $cookies.get('teamView');
+				return sessionStorage.get('teamView');
 			}, function(newValue) {
 				$scope.teamView = newValue;
 			});
@@ -186,12 +186,12 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			}, true);
 				
 			$scope.$watch(function() {
-				return $cookies.getObject('categories');
+				return sessionStorage.getObject('categories');
 			}, function(newValue) {
 				$scope.categories = newValue;
 			}, true);
 
-			$scope.selectedEvent = $cookies.getObject('selected_event');
+			$scope.selectedEvent = sessionStorage.getObject('selected_event');
 		}
 
 		return initService;
@@ -201,10 +201,10 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 .factory('TeamManagementService', ['$log', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService', 'sessionStorage',
 	function($log, CategoryManagementService, CurrentUserService, TeamRESTService, sessionStorage) {
-	return function($scope, $cookies) {
+	return function($scope, sessionStorage) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
-		var categoryManagementService = CategoryManagementService($scope, $cookies);
+		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 
 		teamManagement.createNewTeam = function() {	
 			if (!validateForm(false)) 
@@ -223,17 +223,17 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		}
 
 		var createTeamOnServer = function(newTeam, teamReq) {
-			var eventId = $cookies.getObject('selected_event').id;
+			var eventId = sessionStorage.getObject('selected_event').id;
 			var connection = TeamRESTService(authHeader);
 			connection.teams.create({event_id: eventId}, teamReq).$promise.then(function(resp) {
 
 				// Add new team to uncategorized (or to the selected category if there is one).
 				var returnedTeamID = resp.event_team.id;
 				var catId;
-				if ($cookies.getObject('selectedCategory')) {
-					catId = $cookies.getObject('selectedCategory').id;
+				if (sessionStorage.getObject('selectedCategory')) {
+					catId = sessionStorage.getObject('selectedCategory').id;
 				} else {
-					catId = $cookies.getObject('uncategorized').id;
+					catId = sessionStorage.getObject('uncategorized').id;
 				}
 				teamManagement.transferTeamToCategory(catId, returnedTeamID, false);
 
@@ -296,10 +296,10 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		teamManagement.deleteTeam = function() {
 			var connection = TeamRESTService(authHeader);
-			connection.team.delete({id: $cookies.getObject('selectedTeam').id}).$promise.then(function(resp) {
+			connection.team.delete({id: sessionStorage.getObject('selectedTeam').id}).$promise.then(function(resp) {
 				var teams = sessionStorage.getObject('teams');
 				for (var i = 0; i < teams.length; i++) {
-					if (teams[i].id == $cookies.getObject('selectedTeam').id) {
+					if (teams[i].id == sessionStorage.getObject('selectedTeam').id) {
 						teams.splice(i, 1);
 						break;
 					}
@@ -335,7 +335,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			var connection = TeamRESTService(authHeader);
 			connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
 				// TODO: update category in cookies
-				var category = $cookies.getObject('selectedCategory');
+				var category = sessionStorage.getObject('selectedCategory');
 				for (var i = 0; i < category.teams.length; i++) {
 					if (category.teams[i].id === parseInt(teamId)) {
 						category.teams.splice(i, 1);
@@ -346,8 +346,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			});
 		}
 
-		teamManagement.updateSelectedCategory = function(category) {
-			$cookies.putObject('selectedCategory', category);
+		teamManagement.updateStoredCategory = function(category) {
+			sessionStorage.putObject('selectedCategory', category);
 		}
 
 		teamManagement.getTeamNumberOptions = function() { // TODO: remove numbers that are unavailable
@@ -379,7 +379,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		}
 
 		teamManagement.changeView = function(view) {
-			$cookies.put('teamView', view);
+			sessionStorage.put('teamView', view);
 		}
 
 		var validateForm = function(isEdit) {
