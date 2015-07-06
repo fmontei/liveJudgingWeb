@@ -527,12 +527,22 @@
                   
              <!--Event Standing Section-->
             <div class="beneath-tab" id="team-standing-section" style="display:none">
-              
-							<div class="btn-group" role="group">
-								<button type="button" class="btn btn-default" ng-click="rankAllCategories()">Show All</button>
-								<button type="button" class="btn btn-default" ng-click="rankNext3Categories()">
+           		
+							<div class="btn-group">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+									Show <span class="caret"></span>
+								</button>
+								<button type="button" 
+												class="btn btn-default" 
+												ng-click="rankNext3Categories()"
+												ng-style="next3Button"
+												ng-init="next3Button={'display': 'none'}">
 									Next 3 <span class="glyphicon glyphicon-forward"></span>
 								</button>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="javascript:void(0)" ng-click="rankAllCategories(); next3Button={'display': 'none'}">All teams</a></li>
+									<li><a href="javascript:void(0)" ng-click="rankNext3Categories(); next3Button={'display': 'block'}">3 at a time</a></li>
+								</ul>
 							</div>
 							
 							<div class="row">

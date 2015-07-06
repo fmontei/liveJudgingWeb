@@ -55,11 +55,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		 */
 
 		$scope.changeView = function(view) {
-			if (view == 'category') {
-				$scope.categories = $cookies.getObject('categories');
-				$scope.uncategorized = $cookies.getObject('uncategorized');
-			}
-			$cookies.put('teamView', view);
+			teamManagementService.changeView(view);
 		}
 
 		/*
@@ -378,7 +374,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 		}
 
 		teamManagement.changeView = function(view) {
-			$scope.changeView(view);
+			$cookies.put('teamView', view);
 		}
 
 		var validateForm = function(isEdit) {

@@ -9,7 +9,11 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
   });
 }])
 
-.controller('RubricsCtrl', ['$scope', function($scope) {
+.controller('RubricsCtrl', ['$scope', '$cookies', 'sessionStorage', 'RubricManagementService',
+						function($scope, $cookies, sessionStorage, RubricManagementSerive) {
+							
+	var rubricManagementService = RubricManagementSerive($scope, $cookies);
+							
 	$scope.modalCriteria = [{name: 'Flavor'}, {name: 'Texture'}, {name: 'Size'}];
 	
 	$scope.createNewAccordionCriterion = function() {
@@ -30,4 +34,34 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	$scope.updateRatingType = function(index, type) {
 		$scope.modalCriteria[index].ratingType = type;
 	}
-}]);
+	
+	$scope.changeView = function(view) {
+		rubricManagementService.changeView(view);
+	}
+	
+	$cookies.put('rubricView', 'default');
+	
+	$scope.$watch(function() {
+		return $cookies.get('rubricView');
+	}, function(newValue) {
+		$scope.rubricView = newValue;
+	});
+							
+	$scope.$watch(function() {
+		return $cookies.getObject('selectedCategory');
+	}, function(newValue) {
+		$scope.selectedCategory = newValue;
+	}, true);
+}])
+
+.factory('RubricManagementService', function() {
+	return function($scope, $cookies) {
+		var rubricManagement = {};
+
+		rubricManagement.changeView = function(view) {
+			$cookies.put('rubricView', view);
+		}
+
+		return rubricManagement;
+	}
+});

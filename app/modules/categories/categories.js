@@ -9,8 +9,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
   });
 }])
 
-.controller('CategoriesCtrl', ['$cookies', '$location', '$scope', 'CategoryManagementService', 'CatWatchService', 'JudgeManagementService', 'TeamManagementService',
-    function($cookies, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService, TeamManagementService) {
+.controller('CategoriesCtrl', ['$cookies', '$location', '$scope', 'CategoryManagementService', 'CatWatchService', 
+															 'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
+    function($cookies, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService, 
+						 TeamManagementService, RubricManagementService) {
 
         var catWatchService = CatWatchService($cookies, $scope);
         catWatchService.init();
@@ -20,6 +22,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         var teamManagementService = TeamManagementService($scope, $cookies);
         var judgeManagementService = JudgeManagementService($scope, $cookies);
+			  var rubricManagementService = RubricManagementService($scope, $cookies);
 
         $scope.createNewCategory = function() {
             categoryManagementService.createNewCategory();
@@ -108,13 +111,14 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().includes('judges')) {
 								judgeManagementService.changeView('selectedCategory');
+						} else if ($location.path().includes('rubrics')) {
+								rubricManagementService.changeView('selectedCategory');
 						}
-            // if ($location.path().includes('rubrics'))
         }
     }
 ])
 
-.factory('CatWatchService', function() {
+.factory('CatWatchService', ['$location', function($location) {
     return function($cookies, $scope) {
         var service = {};
 
@@ -132,15 +136,21 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }, true);
 
             $scope.$watch(function() {
-                return $cookies.get('teamView');
+							if ($location.path().includes('teams')) {
+								return $cookies.get('teamView');
+							} else if ($location.path().includes('judges')) {
+								return $cookies.get('judgeView');
+							}else if ($location.path().includes('rubrics')) {
+								return $cookies.get('rubricView');
+							}
             }, function(newValue) {
-                $scope.teamView = newValue;
+							$scope.currentView = newValue;
             }, true);
         };
 
         return service;
     }
-})
+}])
 
 .factory('CategoryManagementService', ['$cookies', '$log', '$q', 'CategoryRESTService', 'CurrentUserService',
     function($cookies, $log, $q, CategoryRESTService, CurrentUserService) {

@@ -172,8 +172,10 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	}
 })
 
-.factory('JudgeManagementService', ['$q', 'CategoryManagementService', 'CurrentUserService', 'JudgeRESTService', 'sessionStorage', 'TeamManagementService', 'UserRESTService',
-	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService, sessionStorage, TeamManagementService, UserRESTService) {
+.factory('JudgeManagementService', ['$q', 'CategoryManagementService', 'CurrentUserService', 'JudgeRESTService', 
+																		'sessionStorage', 'TeamManagementService', 'UserRESTService',
+	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService, 
+					 sessionStorage, TeamManagementService, UserRESTService) {
 	return function($scope, $cookies) {
 
 		var judgeManagement = {};
@@ -312,16 +314,19 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 	}
 }])
 
-.factory('JudgeWatchService', function (sessionStorage) {
+.factory('JudgeWatchService', ['sessionStorage', function (sessionStorage) {
 	return function($scope, $cookies) {
 		var service = {};
-		$scope.$watch(function() {
-			return sessionStorage.getObject('judges');
-		}, function(newValue) {
-			$scope.judges = newValue;
-		}, true);
 		
 		service.init = function() {
+			$cookies.put('judgeView', 'default');
+			
+			$scope.$watch(function() {
+				return sessionStorage.getObject('judges');
+			}, function(newValue) {
+				$scope.judges = newValue;
+			}, true);
+			
 			$scope.$watch(function() {
 				return sessionStorage.getObject('teams');
 			}, function(newValue) {
@@ -356,7 +361,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute', 'ngCookies'])
 		
 		return service;
 	}
-})
+}])
 
 .factory('JudgeRESTService', function($resource) {
 	return function(authHeader) {

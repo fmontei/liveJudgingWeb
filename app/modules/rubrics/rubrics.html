@@ -1,12 +1,19 @@
-
-
 <div class="container-fluid">
 	<div class="row">
 		<div class="col col-sm-8 col-md-8 col-lg-8">
-			<div ng-switch on="currentView">
+			<div ng-switch on="rubricView">
 				<div ng-switch-default>
 					<div class="row">
 						<h1>Rubrics <span class="label label-default">{{rubrics.length}}</span></h1>
+						<hr>
+					</div>
+				</div>
+				<div ng-switch-when="selectedCategory">
+					<div class="row">
+						<h1 id="breadcrumb-symbol">
+							<a ng-click="changeView('default')">Rubrics</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}} 
+							<span class="label label-default">TODO</span>
+						</h1>
 						<hr>
 					</div>
 				</div>
@@ -41,14 +48,23 @@
 				</div>
 			</div>
 			
-			<div class="row">
-				<div class="col col-sm-12 col-md-12 col-lg-12">
-					<button class="btn btn-lg btn-success add-entity-btn"
-									data-toggle="modal"
-									data-target="#rubric-modal">
-						<span class="glyphicon glyphicon-plus"></span> Add Rubric
-					</button>
+			<div ng-switch on="rubricView">
+				<div ng-switch-default>
+					<div class="row">
+						<div class="col col-sm-12 col-md-12 col-lg-12">
+							<button class="btn btn-lg btn-success add-entity-btn"
+											data-toggle="modal"
+											data-target="#rubric-modal">
+								<span class="glyphicon glyphicon-plus"></span> Add Rubric
+							</button>
+						</div>
+					</div>
 				</div>
+				<div ng-switch-when="selectedCategory">
+					<div class="row">
+						Selected Category View
+					</div>
+				</div> <!-- ng-switch-when="selectedCategory" -->
 			</div>
 			
 		</div> <!-- ./col col-sm-8 col-md-8 col-lg-8 -->
