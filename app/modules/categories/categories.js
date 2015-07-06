@@ -290,7 +290,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             if (lengthDiff > 0) {
                 prefix += Array(lengthDiff + 1).join('0');
             }
-            return prefix + hexColor;
+            return (hexColor.indexOf('#') === -1) ? prefix + hexColor : hexColor;
         }
 
         var validateForm = function(isEdit) {

@@ -178,6 +178,11 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
             EVENT_IN_PROGRESS_VIEW: EventUtilService.views.EVENT_IN_PROGRESS_VIEW,
             current_view: $cookies.get('event_view')
         };
+				
+				$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
+														{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
+														{name: 'Category Progress', id: 'category-progress-tab', sectionId: 'category-progress-section'},
+														{name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
 
         $scope.getSelectedEvent = function() {
             return $cookies.getObject('selected_event');
@@ -201,7 +206,30 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
         $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
         $scope.recipient_list = []; // Contains list of judges to be notified
         $scope.project_list = ["Sample Project 1", "Sample Project 2"];
-        $scope.category_list = ["Sample Category 1", "Sample Category 2", "Sample Category 3", "Sample Category 4"];
+			
+				$scope.$watch(function() {
+					return $cookies.getObject('categories');
+				}, function(newValue) {
+					$scope.categories = newValue;
+				}, true);
+			
+				$scope.rankedCategories = $cookies.getObject('categories');
+				$scope.increment = 0;
+			
+				$scope.rankAllCategories = function() {
+					$scope.rankedCategories = $scope.categories;
+					$scope.increment = 0;
+				}
+				
+				$scope.rankNext3Categories = function() {
+					$scope.rankedCategories = [];
+					for (var i = $scope.increment; i < $scope.increment + 3; i++) {
+						if (i < $scope.categories.length) {
+							$scope.rankedCategories.push($scope.categories[i]);
+						}
+					}
+					$scope.increment = ($scope.increment + 3 > $scope.categories.length) ? 0 : $scope.increment + 3;
+				}
         
         $scope.times = [];
         for (var i = 1; i <= 12; i++) {
@@ -278,45 +306,38 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
     }
 })
 
-.directive('changeTabWidget', function() {
+.filter('formatTab', function() {
+	return function(tab) {
+		var tabParts = tab.split('-');
+		var tabName = tabParts[0] + ' ' + tabParts[1];
+		tabName = tabName.toLocaleUpperCase();
+		return tabName;
+	}
+})
 
-    var link = function(scope, elem, attrs) {
-        var judge_progress_tab = $("#judge-progress-tab"),
-            judge_progress_section = $("#judge-progress-section"),
-            project_progress_tab = $("#project-progress-tab"),
-            project_progress_section = $("#project-progress-section"),
-            category_progress_tab = $("#category-progress-tab"),
-            category_progress_section = $("#category-progress-section");
-
-        judge_progress_tab.click(function() {
-            project_progress_section.hide();
-            category_progress_section.hide();
-            judge_progress_section.show();
-            $(project_progress_tab).removeClass("active");
-            $(category_progress_tab).removeClass("active");
-            $(judge_progress_tab).addClass("active");
-        });
-        project_progress_tab.click(function() {
-            judge_progress_section.hide();
-            category_progress_section.hide();
-            project_progress_section.show();
-            $(judge_progress_tab).removeClass("active");
-            $(category_progress_tab).removeClass("active");
-            $(this).addClass("active");
-        });
-        category_progress_tab.click(function() {
-            judge_progress_section.hide();
-            project_progress_section.hide();
-            category_progress_section.show();
-            $(judge_progress_tab).removeClass("active");
-            $(project_progress_tab).removeClass("active");
-            $(this).addClass("active");
-        });
-    }
-
-    return {
-        link: link
-  };
+.directive('cngEventTab', function() {
+	var link = function(scope, elem, attrs) {
+		elem.bind('click', function() {
+			var eventTabs = elem.parent().find('li');
+			eventTabs.each(function() {
+				if ($(this).hasClass('active')) {
+					$(this).removeClass('active');
+					var eventSection = '#' + $(this).attr('event-section');
+					$(eventSection).hide();
+				}
+			});
+			$(this).addClass('active');
+			var eventSection = '#' + scope.eventSection;
+			$(eventSection).show();
+		});
+	}
+	return {
+		restrict: 'A', 
+		scope: {
+			eventSection: '@'
+	  },
+		link: link
+	};
 })
 
 .directive('expandAllAccordions', function() {
