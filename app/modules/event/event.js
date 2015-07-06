@@ -34,6 +34,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         }
 
         $scope.selectEvent = function(event) {
+            sessionStorage.clearAllButUser();
             sessionStorage.putObject('selected_event', event);
             if (EventUtilService.isEventRunning(event)) {
                 EventUtilService.setEventView(EventUtilService.views.EVENT_IN_PROGRESS_VIEW);
