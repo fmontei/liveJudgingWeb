@@ -81,7 +81,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             $scope.categoryColor = 'FFFFFF'; 
             $scope.categoryModalError = null;
             $('#category-modal').modal('hide');
-            $scope.updateSelectedCategory($cookies.getObject('uncategorized'));
+            $scope.updateSelectedCategory(null);
         }
 
         $scope.updateSelectedCategory = function(category) {

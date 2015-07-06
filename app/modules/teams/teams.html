@@ -60,9 +60,8 @@
 						</div>
 					</div><br />
 					
-					<div ng-repeat="team in teams | orderBy: '+name'">
-						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-						<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
+					<div class="draggable-items-wrapper">
+						<div ng-repeat="team in teams | orderBy: '+name'">
 							<div class="media draggable-item" 
 									 cng-draggable-item
 									 itemId="{{team.id}}" 
@@ -73,18 +72,18 @@
 										<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
 									</a>
 								</div>
-									<div class="media-body">
-										<h4 class="media-heading">
-											{{team.id}}
-											<div class="glyphicon glyphicon-cog" 
-													 ng-click="changeTeamModalView('edit', team)">
-											</div>
-										</h4>
-										<div class="media-text" cng-wrap-word word="{{team.name}}"
-										     line-width="18"
-												 total-width="36">
+								<div class="media-body">
+									<h4 class="media-heading">
+										{{team.id}}
+										<div class="glyphicon glyphicon-cog"
+												 ng-click="changeTeamModalView('edit', team)">
 										</div>
+									</h4>
+									<div class="media-text" cng-wrap-word word="{{team.name}}"
+									     line-width="18"
+											 total-width="36">
 									</div>
+								</div>
 							</div>
 						</div>
 					</div>

@@ -342,7 +342,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		teamManagement.updateSelectedCategory = function(category) {
 			$cookies.putObject('selectedCategory', category);
-			$cookies.put('teamView', 'selectedCategory');
 		}
 
 		teamManagement.getTeamNumberOptions = function() { // TODO: remove numbers that are unavailable

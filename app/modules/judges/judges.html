@@ -62,9 +62,8 @@
 					</div>
 
 					<div class="row">
-						<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
-							<div ng-if="$index != 0 && $index % 3 == 0" class="row"></div>
-							<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
+						<div class="draggable-item-wrapper">
+							<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
 								<div class="media draggable-item"
 										 cng-draggable-item
 										 itemId="{{judgeObj.judge.id}}" 

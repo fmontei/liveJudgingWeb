@@ -33,56 +33,12 @@
 	width: 220px;
 }
 
-.draggable-item {
-	position: relative;
-	background-color: white;
-	cursor: move;
-	margin-bottom: 20px;
-	margin-right: -10px;
-	font-size: 12px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	height: 100px;
-}
-
-.draggable-item a {
-	cursor: move;
-}
-
 .draggable-item:hover, .category-specific-team:hover {
 	background-color: white !important;
 	border-color: rgba(126, 239, 104, 0.8);
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
 	outline: 0 none;
 	cursor: move;
-}
-
-.draggable-item .glyphicon-cog, .glyphicon-cog {
-	margin-right: 5px;
-	float: right;
-	color: #398439;
-	display: none;
-	cursor: pointer;
-	font-size: 15px;
-}
-
-.draggable-item .media-text {
-	width: 100px; 
-}
-
-.draggable-item .media-text p {
-	padding: 0;
-	margin: 0;
-}
-
-.category-specific-team .glyphicon-cog {
-	margin-right: 5px;
-	float: right;
-	display: none;
-	color: #398439;
-	cursor: pointer;
-	font-size: 15px;
 }
 
 .modal-col {
