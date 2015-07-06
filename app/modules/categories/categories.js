@@ -78,7 +78,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             $scope.categoryColor = 'FFFFFF'; 
             $scope.categoryModalError = null;
             $('#category-modal').modal('hide');
-            $scope.updateSelectedCategory($cookies.getObject('uncategorized'));
+            $scope.updateSelectedCategory(null);
         }
 
         $scope.updateSelectedCategory = function(category) {
@@ -107,7 +107,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             if ($location.path().includes('teams')) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().includes('judges')) {
-								judgeManagementService.changeView('selectedCategory');
+				judgeManagementService.changeView('selectedCategory');
 						}
             // if ($location.path().includes('rubrics'))
         }
