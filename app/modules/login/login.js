@@ -31,17 +31,28 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
         /* TODO: Use hash not base64 */
 
         $scope.newUser = {};
+			
         $scope.returningUser = {};
+			
+				$scope.tabs = [{active: true}, {active: false}];
+			
 				$scope.$watch(function() {
 						return CurrentUserService.hasLoginError;
 				 }, function(newValue) {
-						$scope.error = (newValue) ? 'Error logging in.' : null;
+						$scope.error = (newValue) ? 'Error logging in.' : undefined;
 				 });
 
         $scope.register = function(user) {
+		  	if (user.password !== user.password_confirmation) {
+			  	$scope.registerError = 'Passwords do not match.';
+			  	return;
+			} else {
+			  	$scope.registerError = undefined;
+			}
             UserRESTService.register(user).$promise.then(function(user) {
                 console.log('User registered.');
-                alert("Successfully registered.");
+				$scope.tabs = [{active: true}, {active: false}];
+				$scope.success = 'Successfully registered.';
             });
         };
 
@@ -160,4 +171,27 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
     }
 
     return service;
+})
+
+.directive('loginValidation', function() {
+  	return {
+		require: "ngModel",
+		scope: {
+			otherModelValue: "=compareTo"
+		},
+		link: function(scope, element, attributes, ngModel) {
+
+			ngModel.$validators.compareTo = function(modelValue) {
+			  	if (modelValue != scope.otherModelValue)
+				  	element.addClass('invalid-password');
+				else
+				  	element.removeClass('invalid-password');
+				return modelValue == scope.otherModelValue;
+			};
+
+			scope.$watch("otherModelValue", function() {
+				ngModel.$validate();
+			});
+		}
+  	};
 });
