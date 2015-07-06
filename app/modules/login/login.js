@@ -182,11 +182,11 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
 		link: function(scope, element, attributes, ngModel) {
 
 			ngModel.$validators.compareTo = function(modelValue) {
-			  	if (modelValue != scope.otherModelValue)
+			  	if (modelValue !== scope.otherModelValue)
 				  	element.addClass('invalid-password');
 				else
 				  	element.removeClass('invalid-password');
-				return modelValue == scope.otherModelValue;
+				return modelValue === scope.otherModelValue;
 			};
 
 			scope.$watch("otherModelValue", function() {

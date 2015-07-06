@@ -113,77 +113,26 @@
 				</div> <!--ng-switch-default-->
 				
 				<div ng-switch-when="category">
-					<div class="accordion team-accordion">
-						<div class="panel panel-default accordion-group" 
-						     cng-category-accordion color="{{uncategorized.color}}" 
-								 category-name="{{uncategorized.name}}" 
-								 change-category="updateSelectedCategory(uncategorized)">
-							<div class="panel-heading">
-								<div class="row">
-									<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
-										<div class="truncate">
-											<div class="accordion-heading">
-												<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
-													<span class="glyphicon glyphicon-chevron-right"></span> {{uncategorized.label}} 
-												</a>
-											</div>
-										</div>
-									</span>
-								</div> 
-							</div>
-							<div id="category{{$index}}" class="accordion-body collapse">
-								<div class="accordion-inner">
-									<div class="panel-body">
-										<div ng-repeat="team in uncategorized.teams | orderBy: '+name'">
-											<br ng-if="$index % 3 == 0 && $index > 0" />
-											
-											<div class="media draggable-item" 
-													 cng-draggable-item 
-													 itemId="{{team.id}}" 
-													 cog=".glyphicon-cog"
-													 is-transferable="true">
-												<div class="media-left">
-													<a href="javascript:void(0)">
-														<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-													</a>
-												</div>
-													<div class="media-body">
-														<h4 class="media-heading">
-															{{team.id}}
-															<div class="glyphicon glyphicon-cog" 
-																	 ng-click="changeTeamModalView('edit', team)">
-															</div>
-														</h4>
-														<div class="media-text" cng-wrap-word word="{{team.name}}"
-															 line-width="18"
-															 total-width="36">
-														</div>
-													</div>
-											</div>
-										
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div ng-repeat="category in categories | orderBy: '+name'" ng-if="category.label != 'Uncategorized'">
+					<div ng-repeat="category in categories | orderBy: '+name'">
 						<div class="accordion team-accordion">
 							<div class="panel panel-default accordion-group" 
 							     cng-category-accordion color="{{category.color}}" 
 									 category-name="{{category.label}}" 
 									 change-category="updateSelectedCategory(category)">
 								<div class="panel-heading">
-									<div class="row">
-										<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
-											<div class="truncate">
-												<div class="accordion-heading">
-													<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
-														<span class="glyphicon glyphicon-chevron-right"></span> {{category.label}} 
-													</a>
-												</div>
-											</div>
-										</span>
+									<div class="accordion-heading">
+										<a class="accordion-toggle"
+											 data-toggle="collapse" 
+											 href="#category{{$index}}" 
+										 	 onclick="return false;"
+										 	 ng-click="categoryChevron = (categoryChevron === 'glyphicon glyphicon-chevron-right') 
+															   ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-right'"> 
+												<span ng-class="categoryChevron" 
+															ng-init="categoryChevron='glyphicon glyphicon-chevron-right'">
+												</span> 
+												{{category.label}} 
+												<span class="pull-right">{{category.teams.length}} Teams</span>
+										</a>				
 									</div> 
 								</div>
 								<div id="category{{$index}}" class="accordion-body collapse">
@@ -191,7 +140,6 @@
 										<div class="panel-body">
 											<div ng-repeat="team in category.teams | orderBy: '+name'">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
-											
 												<div class="media draggable-item" 
 														 cng-draggable-item
 														 itemId="{{team.id}}" 
@@ -215,7 +163,6 @@
 															</div>
 														</div>
 												</div>
-										
 											</div>
 										</div>
 									</div>

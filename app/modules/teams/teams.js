@@ -184,6 +184,12 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 			}, function(newValue) {
 				$scope.teams = newValue;
 			}, true);
+				
+			$scope.$watch(function() {
+				return $cookies.getObject('categories');
+			}, function(newValue) {
+				$scope.categories = newValue;
+			}, true);
 
 			$scope.selectedEvent = $cookies.getObject('selected_event');
 		}
@@ -327,7 +333,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 
 		teamManagement.removeTeamFromCategory = function(teamId, categoryId) {
 			var connection = TeamRESTService(authHeader);
-			connection.team_categories_remove.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
+			connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
 				// TODO: update category in cookies
 				var category = $cookies.getObject('selectedCategory');
 				for (var i = 0; i < category.teams.length; i++) {
@@ -430,7 +436,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 				}
 			}),
 			team_categories: $resource('http://api.stevedolan.me/teams/:team_id/categories', {
-				team_id: '@id'
+				team_id: '@id', category_id: '@category_id'
 			}, {
 				get: {
 					method: 'GET',
@@ -440,11 +446,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'ngCookies', 'liveJudgingAd
 					method: 'POST',
 					headers: authHeader
 				},
-			}),
-			team_categories_remove: $resource('http://api.stevedolan.me/teams/:team_id/categories/:category_id', {
-				team_id: '@team_id', category_id: '@category_id'
-			}, {
 				remove_team: {
+					url: 'http://api.stevedolan.me/teams/:team_id/categories/:category_id',
 					method: 'DELETE',
 					headers: authHeader
 				}
