@@ -39,11 +39,22 @@
         <ul class="nav navbar-nav navbar-right lj-navbar-text">
           <li class="nav-item" ng-bind="user.name">
           </li>
-          <li class="nav-item">
-            <i class="fa fa-sign-out"
-               style="cursor:pointer"
-               ng-if="user.name"
-               ng-click="logout()"></i>
+          <li class="nav-item"
+              ng-if="user.name"
+              dropdown on-toggle="toggleDropdown()">
+            <a href
+               class="lj-dropdown-btn dropdown-toggle"
+               dropdown-toggle>
+              <i class="fa fa-bars"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href
+                   ng-click="logout()">
+                  Logout
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>
