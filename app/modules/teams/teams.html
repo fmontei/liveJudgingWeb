@@ -61,7 +61,7 @@
 					</div><br />
 					
 					<div ng-repeat="team in teams | orderBy: '+name'" ng-if="sortType === 'name'">
-						<div class="media draggable-item" 
+						<div class="media draggable-item"
 								 cng-draggable-item
 								 itemId="{{team.id}}" 
 								 cog=".glyphicon-cog"
@@ -183,8 +183,6 @@
 					</div><br />
 
 					<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
-						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-				
 						<div class="media draggable-item" 
 								 cng-draggable-item 
 								 itemId="{{team.id}}" 
