@@ -170,6 +170,14 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     category.color = categoryManagement.convertColorToHex(category.color);
                 });
                 sessionStorage.putObject('categories', resp.event_categories);
+                // Updating selected category if there is one.
+                if (sessionStorage.getObject('selectedCategory')) {
+                    for (var i = 0; i < resp.event_categories.length; i++) {
+                        if (sessionStorage.getObject('selectedCategory').id == resp.event_categories[i].id) {
+                            sessionStorage.putObject('selectedCategory', resp.event_categories[i]);
+                        }
+                    }
+                }
 
             }).catch(function() {
                 console.log('Error getting categories.');
@@ -282,6 +290,16 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             });
 
             return defer.promise;
+        }
+
+        categoryManagement.getCategoryById = function(categoryId) {
+            var cats = sessionStorage.getObject('categories');
+            for (var i = 0; i < cats.length; i++) {
+                if (cats[i].id == categoryId) {
+                    return cats[i];
+                }
+            }
+            return null;
         }
 
         var isEmpty = function(str) {

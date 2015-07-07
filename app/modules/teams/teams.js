@@ -297,6 +297,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		teamManagement.deleteTeam = function() {
 			var connection = TeamRESTService(authHeader);
 			connection.team.delete({id: sessionStorage.getObject('selectedTeam').id}).$promise.then(function(resp) {
+				categoryManagementService.getCategories();
 				var teams = sessionStorage.getObject('teams');
 				for (var i = 0; i < teams.length; i++) {
 					if (teams[i].id == sessionStorage.getObject('selectedTeam').id) {
@@ -352,7 +353,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			var connection = TeamRESTService(authHeader);
 			connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
 				categoryManagementService.getCategories();
-				//teamManagement.updateStoredCategory();
 			});
 		}
 
