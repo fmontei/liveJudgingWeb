@@ -142,7 +142,6 @@ angular.module('liveJudgingAdmin', [
         restrict: 'A',
         scope: {
             cog: '@',
-            itemId: '=itemId',
             isTransferable: '@isTransferable'
         },
         link: function(scope, elem, attrs) {
@@ -151,7 +150,6 @@ angular.module('liveJudgingAdmin', [
                 cursor: 'grab',
                 start: function(event, ui) {
                     $(this).css('zIndex', '100');
-                    scope.itemId = ui.helper.context.attributes.itemId.nodeValue;
                     if (undefined === elem.data('originalPosition')) {
                         elem.data('originalPosition', elem.offset());
                     }

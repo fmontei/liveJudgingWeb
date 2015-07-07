@@ -23,7 +23,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		{ title: 'Criteria Rules', view: 'criteria' }
 	];
 
-	$scope.judgeModalView = 'teams';
+	$scope.judgeModalView = 'create';
+	$scope.judgeModalTab = 'teams';
 	$scope.selectedTeams = [];
 	$scope.modalSortType = '+name';
 	
@@ -37,13 +38,26 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				return $scope.teams[i];
 	}
 	
-	$scope.changeModalTab = function(view) {
-		$scope.judgeModalView = view;
+	$scope.changeModalTab = function(tab) {
+		$scope.judgeModalTab = tab;
 	}
 	
 	$scope.changeModalSortType = function(type) {
 		if (type === 'name' || type === 'id')
 			$scope.modalSortType = '+' + type;
+	}
+	
+	$scope.changeJudgeModalView = function(action, judge) {
+		if (action === 'create') {
+			$scope.judgeModalView = 'create';
+		} else if (action === 'edit') {
+			$scope.judgeModalView = 'edit';
+			$scope.judgeFirstName = judge.first_name;
+			$scope.judgeLastName = judge.last_name;
+			$scope.judgeEmail = judge.email;
+			//$scope.judgeAffliation = judge.affiliation;
+			//$scope.selectedTeams = judge.teams; 
+		}
 	}
 
 	$scope.closeJudgeModal = function() {
@@ -150,6 +164,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 .filter('printAllCategories', function() {
 	return function(team) {
+		if (!team.categories)
+			return '';
 		var categoryLabels = '';
 		for (var i = 0; i < team.categories.length; i++) {
 			if (team.categories[i].label !== 'Uncategorized')
@@ -182,17 +198,18 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 		var teamManagementService = TeamManagementService($scope, sessionStorage);
+		
+		var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
+		var eventId = sessionStorage.getObject('selected_event').id;
 
 		judgeManagement.getJudges = function() {
-			var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
-			var eventId = sessionStorage.getObject('selected_event').id;
 			judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
-					sessionStorage.putObject('judges', resp.event_judges);
-				}).then(function() {
-					var judges = sessionStorage.getObject('judges');
-					judgeManagement.getJudgeTeams(judges);
-				});
-			}
+				sessionStorage.putObject('judges', resp.event_judges);
+			}).then(function() {
+				var judges = sessionStorage.getObject('judges');
+				judgeManagement.getJudgeTeams(judges);
+			});
+		}
 			
 		judgeManagement.getJudgeTeams = function(judges) {
 			angular.forEach(judges, function(judge) {
@@ -200,7 +217,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			});
 			
 			function getJudgeTeam(judge) {
-				var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
 				var judgeId = judge.judge.id;
 				judgeRESTService.judgeTeams.get({judge_id: judgeId}).$promise.then(function(resp) {
 					//judge.teams = resp;
@@ -213,7 +229,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			var defer = $q.defer();
 
 			// Todo: Check if a user with the email already exists (once that's in the API).
-			var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
 			var judgeReq = judgeFormData;
 			var judgeId = null;
 			var randomPass = judgeManagement.generatePassword();
@@ -222,22 +237,22 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 			// Register judge as a user & adds them to the event.
 			UserRESTService.register(judgeReq).$promise.then(function(resp) {
-				var eventId = sessionStorage.getObject('selected_event').id;
 				judgeId = resp.user.id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId}).$promise.then(function(resp) {
+					console.log('ID from first resp: ' + judgeId + '; Second resp: ' + JSON.stringify(resp));
 					console.log('Judge successfully registered & added to event');
+					
+					/* Assign judge to every team selected in modal */
+					angular.forEach(judgeFormData.teams, function(team) {
+						var req = {team_id: team.id};
+						judgeRESTService.judgeTeams.assign({judge_id: judgeId}, req).$promise.then(function(resp) {
+							console.log('Judge assigned to team.');
+						}).catch(function(error) {
+							console.log('Error adding judge to team.');
+						});
+					});
 				}).catch(function() {
 					console.log('Error adding judge to event');
-				});
-			}).then(function() {
-				/* Assign judge to every team selected in modal */
-				angular.forEach(judgeFormData.teams, function(team) {
-					var req = {team_id: team.id};
-					judgeRESTService.judgeTeams.assign({judge_id: judgeId}, req).$promise.then(function(resp) {
-						console.log('Judge assigned to team.');
-					}).catch(function(error) {
-						console.log(JSON.stringify(error));
-					});
 				});
 			}).catch(function(error) {
 				console.log('Error registering judge user');
@@ -276,7 +291,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		}
 
 		judgeManagement.assignTeamToJudge = function(teamId) {
-			var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
 			var teamName = teamManagementService.getTeamByID(teamId).name;
 			var judge = sessionStorage.getObject('draggedJudge').judge;
 
@@ -307,6 +321,14 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			categoryManagementService.getTeamsInCategory(categoryId).then(function(teams) {
 				sessionStorage.putObject('teamsInDropCat', teams);
 				$scope.openAssignByCatModal();
+			});
+		}
+		
+		judgeManagement.deleteJudge = function(judgeId) {
+			judgeRESTService.judge.delete({event_id: eventId, judge_id: judgeId}).$promise.then(function() {
+				console.log('Successfully deleted judge.');
+			}).catch(function(error) {
+				console.log('Error deleting judge.');
 			});
 		}
 
@@ -378,8 +400,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			judge: $resource('http://api.stevedolan.me/judges/:id', {
-				id: '@id'
+			judge: $resource('http://api.stevedolan.me/events/:event_id/judges/:judge_id', {
+				event_id: '@event_id', judge_id: '@judge_id'
 			}, {
 				delete: {
 					method: 'DELETE',

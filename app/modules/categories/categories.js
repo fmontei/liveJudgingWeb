@@ -42,13 +42,17 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 sessionStorage.putObject('selectedTeam', team);
                 teamManagementService.deleteTeam();
             } else if ($location.path().includes('judges')) {
-                //
+                judgeManagementService.deleteJudge(itemId);
             }
         }
 
-        $scope.removeTeamFromCategory = function(itemId) {
+        $scope.removeItemFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-            teamManagementService.removeTeamFromCategory(itemId, categoryId);
+						if ($location.path().includes('teams')) {
+            	teamManagementService.removeTeamFromCategory(itemId, categoryId);
+						} else if ($location.path().includes('judges')) {
+                //
+            }
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -449,21 +453,22 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         elem.droppable({
             drop: function(event, ui) {
                 var droppedItem = ui.draggable;
-                scope.itemId = droppedItem.attr('itemId').trim();
+                scope.itemId = droppedItem.attr('item-id').trim();
                 if ($(this).hasClass('destroy-special-category')) {
-                    var confirm = window.confirm('Are you sure you want to destroy this team?');
-                    if (confirm)
+                    var confirm = window.confirm('Are you sure you want to destroy this ' + scope.itemType + '?\n' +
+																								 'The ' + scope.itemType + ' will be deleted and removed from all categories.');
+                    if (confirm) 
                         scope.deleteItem(scope.itemId);
-                    else
+										else 
                         droppedItem.goBack();
                 }
                 else if ($(this).hasClass('remove-special-category')) {
-                    var confirm = window.confirm('Are you sure you want to remove this team?');
-                    if (confirm) {
-											scope.removeTeamFromCategory(scope.itemId);
-										} else {
+                    var confirm = window.confirm('Are you sure you want to remove this ' 
+																								 + scope.itemType + ' from current category?');
+                    if (confirm) 
+											scope.removeItemFromCategory(scope.itemId);
+									 	else 
 											droppedItem.goBack();
-										}
                 }
             }
         });

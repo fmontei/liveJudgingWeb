@@ -43,17 +43,17 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 				 });
 
         $scope.register = function(user) {
-		  	if (user.password !== user.password_confirmation) {
-			  	$scope.registerError = 'Passwords do not match.';
-			  	return;
-			} else {
-			  	$scope.registerError = undefined;
-			}
-            UserRESTService.register(user).$promise.then(function(user) {
-                console.log('User registered.');
-				$scope.tabs = [{active: true}, {active: false}];
-				$scope.success = 'Successfully registered.';
-            });
+					if (user.password !== user.password_confirmation) {
+						$scope.registerError = 'Passwords do not match.';
+						return;
+					} else {
+						$scope.registerError = undefined;
+					}
+					UserRESTService.register(user).$promise.then(function(user) {
+						console.log('User registered.');
+						$scope.tabs = [{active: true}, {active: false}];
+						$scope.success = 'Successfully registered.';
+					});
         };
 
         $scope.login = function(user) {

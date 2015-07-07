@@ -55,37 +55,37 @@
 						<div class="col col-sm-12 col-md-12 col-lg-12">
 							<button class="btn btn-lg btn-success add-entity-btn"
 											data-toggle="modal"
-											data-target="#judge-modal">
-								<span class="glyphicon glyphicon-plus"></span> Add Judge
+											data-target="#judge-modal"
+											ng-click="changeJudgeModalView('create', null)">
+								<span class="glyphicon glyphicon-plus"></span> 
+								Add Judge
 							</button>
 						</div>
 					</div>
-
-					<div class="row">
-						<div class="draggable-item-wrapper">
-							<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
-								<div class="media draggable-item"
-										 cng-draggable-item
-										 itemId="{{judgeObj.judge.id}}" 
-										 cog=".glyphicon-cog"
-										 is-transferable="true">
-									<div class="media-left"></div>
-									<div class="media-body">
-										<h4 class="media-heading">
-											<span class="glyphicon glyphicon-cog" 
-														ng-click="changeJudgeModalView('edit', judge)">
-											</span>
-										</h4>
-										<div class="media-text judge-media-text" 
-												 cng-wrap-word word="{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}"
-												 line-width="25"
-												 total-width="50">
-										</div>
-									</div>
-								</div>
+					
+					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
+						<div class="media draggable-item"
+								 cng-draggable-item
+								 item-id="{{judgeObj.judge.id}}" 
+								 cog=".glyphicon-cog"
+								 is-transferable="true">
+							<div class="media-left"></div>
+							<div class="media-body">
+								<h4 class="media-heading">
+									<span class="glyphicon glyphicon-cog" 
+												data-toggle="modal"
+												data-target="#judge-modal"
+												ng-click="changeJudgeModalView('edit', judgeObj.judge)">
+									</span>
+								</h4>
+								<div class="media-text judge-media-text" 
+										 cng-wrap-word word="{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}"
+										 line-width="25"
+										 total-width="50">
+								</div> {{judgeObj.judge.id}}
 							</div>
 						</div>
-					</div>
+					</div>			
 				</div> <!-- ng-switch-default -->
 				
 				<div ng-switch-when="selectedCategory">
@@ -212,14 +212,13 @@
 										 ng-repeat="tab in tabs"
 										 ng-click="changeModalTab(tab.view)"
 										 heading="{{tab.title}}"
-										 active="tab.active"
-										 disable="tab.disabled">
+										 active="tab.active">
 								</div>
 							</div>
 							
 							<div class="row" id="judge-modal-teams-view">
 								<div class="col col-sm-12 col-md-12 col-lg-12">
-									<div ng-switch on="judgeModalView">
+									<div ng-switch on="judgeModalTab">
 										<div ng-switch-when="teams" class="judge-modal-tab-content">
 										
 											<div class="row">
