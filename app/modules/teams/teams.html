@@ -11,7 +11,7 @@
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
 						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}} 
+							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
 							<span class="label label-default">{{selectedCategory.teams.length}}</span>
 						</h1>
 						<hr>
@@ -61,7 +61,7 @@
 					</div><br />
 					
 					<div ng-repeat="team in teams | orderBy: '+name'" ng-if="sortType === 'name'">
-						<div class="media draggable-item" 
+						<div class="media draggable-item"
 								 cng-draggable-item
 								 itemId="{{team.id}}" 
 								 cog=".glyphicon-cog"
@@ -183,8 +183,6 @@
 					</div><br />
 
 					<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
-						<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-				
 						<div class="media draggable-item" 
 								 cng-draggable-item 
 								 itemId="{{team.id}}" 
