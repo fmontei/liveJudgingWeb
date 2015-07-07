@@ -17,7 +17,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         var catWatchService = CatWatchService(sessionStorage, $scope);
         catWatchService.init();
 
-        var categoryManagementService = CategoryManagementService($scope, sessionStorage);
+        var categoryManagementService = CategoryManagementService($scope);
         categoryManagementService.getCategories();
 
         var teamManagementService = TeamManagementService($scope, sessionStorage);
@@ -168,7 +168,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
 .factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService',
     function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService) {
-    return function($scope, sessionStorage) {
+    return function($scope) {
         var authHeader = CurrentUserService.getAuthHeader();
         var eventId = sessionStorage.getObject('selected_event').id;
 

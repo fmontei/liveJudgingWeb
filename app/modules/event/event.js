@@ -169,11 +169,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService) {
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService', 'TeamStandingService',
+    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService,
+						 TeamStandingService) {
 
-        $scope.cookies = sessionStorage;
-
+				var teamStandingService = TeamStandingService($scope);
+				teamStandingService.init();
+			
         $scope.event = {
             EVENT_READY_VIEW: EventUtilService.views.EVENT_READY_VIEW,
             EVENT_IN_PROGRESS_VIEW: EventUtilService.views.EVENT_IN_PROGRESS_VIEW,
@@ -203,34 +205,19 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.reveal_event_desc = function(desc) {
             $('#event-selection-desc').html('<strong>Event Description:</strong><br />' + desc).show();
         };
+			
+				$scope.rankNext3Categories = function() {
+					var categoryInc = parseInt(sessionStorage.get('categoryInc')) + 3;
+					var numCategories = $scope.categories.length;
+					if (categoryInc > numCategories)
+						sessionStorage.put('categoryInc', 0);
+					else
+						sessionStorage.put('categoryInc', categoryInc);
+				}
 
         $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
         $scope.recipient_list = []; // Contains list of judges to be notified
         $scope.project_list = ["Sample Project 1", "Sample Project 2"];
-			
-				$scope.$watch(function() {
-					return sessionStorage.getObject('categories');
-				}, function(newValue) {
-					$scope.categories = newValue;
-				}, true);
-			
-				$scope.rankedCategories = sessionStorage.getObject('categories');
-				$scope.increment = 0;
-			
-				$scope.rankAllCategories = function() {
-					$scope.rankedCategories = $scope.categories;
-					$scope.increment = 0;
-				}
-				
-				$scope.rankNext3Categories = function() {
-					$scope.rankedCategories = [];
-					for (var i = $scope.increment; i < $scope.increment + 3; i++) {
-						if (i < $scope.categories.length) {
-							$scope.rankedCategories.push($scope.categories[i]);
-						}
-					}
-					$scope.increment = ($scope.increment + 3 > $scope.categories.length) ? 0 : $scope.increment + 3;
-				}
         
         $scope.times = [];
         for (var i = 1; i <= 12; i++) {
@@ -250,6 +237,28 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.event.current_view = view;
     }
 ])
+
+.factory('TeamStandingService', ['sessionStorage', 'CategoryManagementService', 
+				 function(sessionStorage, CategoryManagementService) {
+	return function($scope) {
+		var service = {};
+		
+		service.init =  function() {
+			var categoryManagementService = CategoryManagementService($scope);
+			categoryManagementService.getCategories();
+			
+			$scope.$watch(function() {
+				return sessionStorage.getObject('categories');
+			}, function(newValue) {
+				$scope.categories = newValue;
+			}, true);
+			
+			sessionStorage.put('categoryInc', '0');
+		}
+
+		return service;
+	}
+}])
 
 .factory('EventUtilService', function(sessionStorage) {
     var service = {
@@ -315,6 +324,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		return tabName;
 	}
 })
+
+.filter('filter3Categories', ['sessionStorage', function(sessionStorage) {
+	return function(items) {
+		return items.filter(function(element, index, array) {
+			var start = parseInt(sessionStorage.get('categoryInc'));
+			var end = start + 3;
+			return index >= start && index < end;
+		});
+	}
+}])
 
 .directive('cngEventTab', function() {
 	var link = function(scope, elem, attrs) {
