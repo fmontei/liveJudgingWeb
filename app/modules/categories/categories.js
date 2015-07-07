@@ -165,6 +165,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         var categoryManagement = {};
             
         categoryManagement.getCategories = function() {
+            var defer = $q.defer();
+
             CategoryRESTService(authHeader).categories.get({event_id: eventId}).$promise.then(function(resp) {
                 angular.forEach(resp.event_categories, function(category) {
                     if (category.label === 'Uncategorized') {
@@ -182,10 +184,14 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                         }
                     }
                 }
+                defer.resolve();
 
             }).catch(function() {
                 console.log('Error getting categories.');
+                defer.reject();
             });
+
+            return defer.promise;
         };
 
         categoryManagement.createNewCategory = function() {

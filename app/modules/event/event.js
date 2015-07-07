@@ -147,18 +147,18 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
             eventForm.startDateTime = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss');
             eventForm.endDateTime = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss');
-        };            
+        };
 
         $scope.toggleDatePicker = function($event, picker) {
             $event.preventDefault();
             $event.stopPropagation();
 
             if (picker === 'start') {
-                $scope.datePicker.startOpened = !$scope.datePicker.startOpened; 
+                $scope.datePicker.startOpened = !$scope.datePicker.startOpened;
             } else if (picker === 'end') {
-                $scope.datePicker.endOpened = !$scope.datePicker.endOpened; 
+                $scope.datePicker.endOpened = !$scope.datePicker.endOpened;
             }
-            console.log($scope.eventForm);      
+            console.log($scope.eventForm);
         }
 
         if ($scope.isCreation) {
@@ -170,7 +170,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 ])
 
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService) { 
+    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService) {
 
         $scope.cookies = sessionStorage;
 

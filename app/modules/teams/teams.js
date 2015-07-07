@@ -109,15 +109,21 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		}	
 
 		teamInitService.initTeams = function() {
+			var defer = $q.defer();
+
 			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
 			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
 				return getCategoriesForEachTeam(resp.event_teams);
 			}).then(function(filledTeams) {
 				sessionStorage.putObject('teams', filledTeams);
+				defer.resolve('Successfully got teams.');
 			}).catch(function() {
 				var errorMessage = 'Error getting teams from server.';
+				defer.reject('Error getting teams.');
 				$log.log(errorMessage);
 			});
+
+			return defer.promise;
 		}
 		
 		var getCategoriesForEachTeam = function(eventTeams) {
@@ -199,12 +205,13 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 })
 
 
-.factory('TeamManagementService', ['$log', '$q', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService', 'sessionStorage',
-	function($log, $q, CategoryManagementService, CurrentUserService, TeamRESTService, sessionStorage) {
+.factory('TeamManagementService', ['$log', '$q', 'CategoryManagementService', 'CurrentUserService', 'TeamInitService', 'TeamRESTService', 'sessionStorage',
+	function($log, $q, CategoryManagementService, CurrentUserService, TeamInitService, TeamRESTService, sessionStorage) {
 	return function($scope, sessionStorage) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
+		var teamInitService = TeamInitService($scope, sessionStorage);
 
 		teamManagement.createNewTeam = function() {	
 			if (!validateForm(false)) 
@@ -353,6 +360,12 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			var connection = TeamRESTService(authHeader);
 			connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
 				categoryManagementService.getCategories();
+				teamInitService.initTeams().then(function() {
+					var removedTeam = teamManagement.getTeamByID(teamId);
+					if (removedTeam.categories.length == 0) {
+						teamManagement.addTeamToUncategorized(teamId);
+					}
+				});
 			});
 		}
 
@@ -378,14 +391,13 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		}
 
 		teamManagement.getTeamByID = function(teamId) {
-			var retVal = null;
 			var teams = sessionStorage.getObject('teams');
-			angular.forEach(teams, function(team) {
-				if (team.id === teamId) {
-					retVal = team;
+			for (var i = 0; i < teams.length; i++) {
+				if (teams[i].id == teamId) {
+					return teams[i];
 				}
-			});
-			return retVal;
+			}
+			return null;
 		}
 
 		teamManagement.isTeamAlreadyInCategory = function(teamId, categoryId) {
