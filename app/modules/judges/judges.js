@@ -143,7 +143,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		}
 		if (teamsToAdd.length > 0) {
 			judgeManagementService.assignTeamsToJudge(teamsToAdd);
-		}		
+		}
 		$scope.closeAssignByCatModal();
 	}
 }])

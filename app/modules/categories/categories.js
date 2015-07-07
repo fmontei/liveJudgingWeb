@@ -453,7 +453,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 
     return {
-        restrict: 'A', 
+        restrict: 'A',
         link: link
     }
 

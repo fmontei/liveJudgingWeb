@@ -199,8 +199,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 })
 
 
-.factory('TeamManagementService', ['$log', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService', 'sessionStorage',
-	function($log, CategoryManagementService, CurrentUserService, TeamRESTService, sessionStorage) {
+.factory('TeamManagementService', ['$log', '$q', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService', 'sessionStorage',
+	function($log, $q, CategoryManagementService, CurrentUserService, TeamRESTService, sessionStorage) {
 	return function($scope, sessionStorage) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
@@ -320,6 +320,13 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			var connection = TeamRESTService(authHeader);
 			var req = {category_id: categoryId};
 			connection.team_categories.add_team({team_id: teamId}, req).$promise.then(function(resp) {
+				if (sessionStorage.getObject('uncategorized').id != categoryId) {
+					teamManagement.isTeamAlreadyInCategory(teamId, sessionStorage.getObject('uncategorized').id).then(function(resp) {
+						if (resp) {
+							teamManagement.removeTeamFromUncategorized(teamId);
+						}
+					});
+				}
 				// Update the category view
 				categoryManagementService.getCategories();
 				if (!isDragNDrop) {
@@ -331,18 +338,21 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			});
 		}
 
+		teamManagement.removeTeamFromUncategorized = function(teamId) {
+			var uncatId = sessionStorage.getObject('uncategorized').id;
+			teamManagement.removeTeamFromCategory(teamId, uncatId);
+		}
+
+		teamManagement.addTeamToUncategorized = function(teamId) {
+			var uncatId = sessionStorage.getObject('uncategorized').id;
+			teamManagement.transferTeamToCategory(uncatId, teamId, false);
+		}
+
 		teamManagement.removeTeamFromCategory = function(teamId, categoryId) {
 			var connection = TeamRESTService(authHeader);
 			connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
-				// TODO: update category in cookies
-				var category = sessionStorage.getObject('selectedCategory');
-				for (var i = 0; i < category.teams.length; i++) {
-					if (category.teams[i].id === parseInt(teamId)) {
-						category.teams.splice(i, 1);
-						break;
-					}
-				}
-				teamManagement.updateSelectedCategory(category);
+				categoryManagementService.getCategories();
+				//teamManagement.updateStoredCategory();
 			});
 		}
 
@@ -378,8 +388,28 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			return retVal;
 		}
 
+		teamManagement.isTeamAlreadyInCategory = function(teamId, categoryId) {
+			var defer = $q.defer();
+
+			categoryManagementService.getTeamsInCategory(categoryId).then(function(teamsInCat) {
+				for (var i = 0; i < teamsInCat.length; i++) {
+					if (teamId == teamsInCat[i].id) {
+						defer.resolve(true);
+					}
+				}
+				defer.resolve(false);
+			}).catch(function() {
+				defer.reject('Error getting teams in category');
+			});
+
+			return defer.promise;
+		}
+
 		teamManagement.changeView = function(view) {
 			sessionStorage.put('teamView', view);
+			if (view == 'default') {
+				sessionStorage.remove('selectedCategory');
+			}
 		}
 
 		var validateForm = function(isEdit) {
