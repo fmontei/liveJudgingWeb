@@ -145,8 +145,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             var endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(),
                                        endTime.getHours(), endTime.getMinutes(), endTime.getSeconds());
 
-            eventForm.startDateTime = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss Z');
-            eventForm.endDateTime = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss Z');
+            eventForm.startDateTime = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss');
+            eventForm.endDateTime = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss');
         };            
 
         $scope.toggleDatePicker = function($event, picker) {
