@@ -48,7 +48,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.removeTeamFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-            teamManagementService.removeTeamFromCategory(itemId, categoryId);
+            return teamManagementService.removeTeamFromCategory(itemId, categoryId);
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -181,8 +181,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 return;
             }
             var newCategory = {
-                name: $scope.categoryName,
-                desc: $scope.categoryDesc,
+                name: $scope.categoryName.trim(),
+                desc: ($scope.categoryDesc === undefined) ? '' : $scope.categoryDesc.trim(),
                 time: $scope.categoryTime,
                 color: $scope.categoryColor,
                 teams: [],
@@ -306,15 +306,13 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         var validateForm = function(isEdit) {
             var name = $scope.categoryName,
                 time = $scope.categoryTime,
-                color = $scope.categoryColor/*.toLowerCase()*/;
+                color = $scope.categoryColor;
             $scope.categoryModalError = null;
             if (isEmpty(name)) {
                 $scope.categoryModalError = 'Category name is required.';
-            }
-            else if (isNameTaken(name)) {
+            } else if (isNameTaken(name.trim())) {
                 $scope.categoryModalError = 'Category name already taken.';
-            }
-            else if (color === '#ffffff' || color === 'ffffff' || isEmpty(color)) {
+            } else if (color === '#ffffff' || color === 'ffffff' || isEmpty(color)) {
                 $scope.categoryModalError = 'Category color is required.';
             }
             return $scope.categoryModalError === null;
@@ -324,7 +322,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var retVal = false;
             var cats = sessionStorage.getObject('categories');
             angular.forEach(cats, function(cat) {
-                if (cat.label == name) {
+                if (cat.label === name && $scope.selectedCategory.label !== cat.label) {
                     retVal = true;
                 }
             });
@@ -443,10 +441,16 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 }
                 else if ($(this).hasClass('remove-special-category')) {
                     var confirm = window.confirm('Are you sure you want to remove this team?');
-                    if (confirm)
-                        scope.removeTeamFromCategory(scope.itemId);
-                    else
+                    if (confirm) {
+												scope.removeTeamFromCategory(scope.itemId).then(function(wasRemoved) {
+												if (wasRemoved) 
+													droppedItem.remove();
+												else
+													droppedItem.goBack();
+												});
+										} else {
                         droppedItem.goBack();
+										}
                 }
             }
         });
