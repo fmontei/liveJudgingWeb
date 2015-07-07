@@ -405,7 +405,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     droppedTeam.goBack();
                     return;
                 }
-                scope.itemId = droppedTeam.attr('itemId').trim();
+                scope.itemId = droppedTeam.attr('item-id').trim();
                 // TODO: make the draggables generic (perhaps in another module).
                 scope.categoryId = event.target.getAttribute('category-id');
                 //var alreadyExists = scope.checkCategory({categoryName: categoryName, teamId: teamId});
@@ -454,6 +454,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             drop: function(event, ui) {
                 var droppedItem = ui.draggable;
                 scope.itemId = droppedItem.attr('item-id').trim();
+								scope.itemType = droppedItem.attr('item-type').trim();
                 if ($(this).hasClass('destroy-special-category')) {
                     var confirm = window.confirm('Are you sure you want to destroy this ' + scope.itemType + '?\n' +
 																								 'The ' + scope.itemType + ' will be deleted and removed from all categories.');
