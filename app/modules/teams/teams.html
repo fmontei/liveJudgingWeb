@@ -11,23 +11,23 @@
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
 						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}} 
+							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
 							<span class="label label-default">{{selectedCategory.teams.length}}</span>
 						</h1>
 						<hr>
 					</div>
 				</div>
 			</div>
-			
+
 			<div class="row">
 				<div class="col-sm-8 col-md-8 col-lg-8">
-					<em>Drag-'n-drop teams into categories.</em>
+					<em>Drag-'n-drop teams into categories.</em> 
 				</div>
 				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
 					<div class="row">
 						<div class="col-sm-12 col-md-12 col-lg-12">
 							<div class="btn-group" role="group" id="team-buttons">
-								<button class="btn btn-default" type="button" cng-organize-teams>
+								<button class="btn btn-default" type="button" cng-organize-items>
 									Organize
 									<span class="glyphicon glyphicon-th-large"></span>
 								</button>
@@ -37,10 +37,10 @@
 										Sort by
 										<span class="caret"></span>
 									</button>
-									<ul class="dropdown-menu" aria-labelledby="teams-dropdown">
-										<li><a href="javascript:void(0)" ng-click="changeView('default')">Name</a></li>
+									<ul class="dropdown-menu" aria-labelledby="teams-dropdown" ng-init="sortType = 'name'">
+										<li><a href="javascript:void(0)" ng-click="changeView('default'); sortType = 'name'">Name</a></li>
 										<li><a href="javascript:void(0)" ng-click="changeView('category')">Category</a></li>
-										<li><a href="javascript:void(0)">Number</a></li>
+										<li><a href="javascript:void(0)" ng-click="changeView('default'); sortType = 'number'">Number</a></li>
 									</ul>
 								</div>
 							</div>
@@ -49,7 +49,7 @@
 				</div>
 			</div>
 			
-			<div class="row" ng-switch on="teamView">
+			<div ng-switch on="teamView">
 				<div ng-switch-default>
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
@@ -60,31 +60,54 @@
 						</div>
 					</div><br />
 					
-					<div class="draggable-team-wrapper">
-						<div ng-repeat="team in teams track by $index | orderBy: '+name'">
-							<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-							<div class="col col-sm-4 col-md-4 col-lg-3">
-								<div class="media draggable-team" 
-								     cng-draggable-team 
-								     teamId="{{team.id}}" 
-								     cog=".glyphicon-cog"
-								     is-transferable="true">
-									<div class="media-left">
-										<a href="#">
-											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-										</a>
+					<div ng-repeat="team in teams | orderBy: '+name'" ng-if="sortType === 'name'">
+						<div class="media draggable-item"
+								 cng-draggable-item
+								 item-id="{{team.id}}" 
+								 item-type="team"
+								 cog=".glyphicon-cog"
+								 is-transferable="true">
+							<div class="media-left">
+								<a href="javascript:void(0)">
+									<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+								</a>
+							</div>
+							<div class="media-body">
+								<h4 class="media-heading">
+									{{team.id}}
+									<div class="glyphicon glyphicon-cog"
+											 ng-click="changeTeamModalView('edit', team)">
 									</div>
-										<div class="media-body">
-											<h4 class="media-heading">
-												{{team.id}}
-												<span class="glyphicon glyphicon-cog" 
-											        ng-click="changeTeamModalView('edit', team)">
-								        </span>
-											</h4>
-											<div class="draggable-team-name">
-												<span>{{team.name}}</span>
-											</div>
-										</div>
+								</h4>
+								<div class="media-text" cng-wrap-word word="{{team.name}}"
+										 line-width="18"
+										 total-width="36">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div ng-repeat="team in teams | orderBy: '+id'" ng-if="sortType === 'number'">
+						<div class="media draggable-item" 
+								 cng-draggable-item
+								 item-id="{{team.id}}" 
+								 item-type="team"
+								 cog=".glyphicon-cog"
+								 is-transferable="true">
+							<div class="media-left">
+								<a href="javascript:void(0)">
+									<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+								</a>
+							</div>
+							<div class="media-body">
+								<h4 class="media-heading">
+									{{team.id}}
+									<div class="glyphicon glyphicon-cog"
+											 ng-click="changeTeamModalView('edit', team)">
+									</div>
+								</h4>
+								<div class="media-text" cng-wrap-word word="{{team.name}}"
+										 line-width="18"
+										 total-width="36">
 								</div>
 							</div>
 						</div>
@@ -92,104 +115,56 @@
 				</div> <!--ng-switch-default-->
 				
 				<div ng-switch-when="category">
-					<div class="accordion team-accordion">
-						<div class="panel panel-default accordion-group" 
-						     cng-category-accordion color="{{uncategorized.color}}" 
-								 category-name="{{uncategorized.name}}" 
-								 change-category="updateSelectedCategory(uncategorized)">
-							<div class="panel-heading">
-								<div class="row">
-									<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
-										<div class="truncate">
-											<div class="accordion-heading">
-												<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
-													<span class="glyphicon glyphicon-chevron-right"></span> {{uncategorized.label}} 
-												</a>
-											</div>
-										</div>
-									</span>
-								</div> 
-							</div>
-							<div id="category{{$index}}" class="accordion-body collapse">
-								<div class="accordion-inner">
-									<div class="panel-body">
-										<div ng-repeat="team in uncategorized.teams | orderBy: '+name'"">
-											<br ng-if="$index % 3 == 0 && $index > 0" />
-											<div class="col col-sm-4 col-md-4 col-lg-4">
-												<div class="media category-accordion-media category-specific-team" 
-												     cng-draggable-team 
-												     teamId="{{team.id}}" 
-												     cog=".glyphicon-cog"
-												     is-transferable="false">
-													<div class="media-left">
-														<a href="#">
-															<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-														</a>
-													</div>
-													<div class="media-body">
-														<h4 class="media-heading">
-															{{team.id}}
-															<span class="glyphicon glyphicon-cog" 
-														        ng-click="changeTeamModalView('edit', team)">
-											        		</span>
-														</h4>
-														<div class="draggable-team-name">
-															<span>{{team.name}}</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div ng-repeat="category in categories | orderBy: '+name'" ng-if="category.label != 'Uncategorized'">
+					<div ng-repeat="category in categories | orderBy: '+name'">
 						<div class="accordion team-accordion">
 							<div class="panel panel-default accordion-group" 
 							     cng-category-accordion color="{{category.color}}" 
 									 category-name="{{category.label}}" 
 									 change-category="updateSelectedCategory(category)">
 								<div class="panel-heading">
-									<div class="row">
-										<span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
-											<div class="truncate">
-												<div class="accordion-heading">
-													<a class="accordion-toggle" data-toggle="collapse" href="#category{{$index}}" onclick="return false;"> 
-														<span class="glyphicon glyphicon-chevron-right"></span> {{category.label}} 
-													</a>
-												</div>
-											</div>
-										</span>
+									<div class="accordion-heading">
+										<a class="accordion-toggle"
+											 data-toggle="collapse" 
+											 href="#category{{$index}}" 
+										 	 onclick="return false;"
+										 	 ng-click="categoryChevron = (categoryChevron === 'glyphicon glyphicon-chevron-right') 
+															   ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-right'"> 
+												<span ng-class="categoryChevron" 
+															ng-init="categoryChevron='glyphicon glyphicon-chevron-right'">
+												</span> 
+												{{category.label}} 
+												<span class="pull-right">{{category.teams.length}} Teams</span>
+										</a>				
 									</div> 
 								</div>
 								<div id="category{{$index}}" class="accordion-body collapse">
 									<div class="accordion-inner">
 										<div class="panel-body">
-											<div ng-repeat="team in category.teams | orderBy: '+name'"">
+											<div ng-repeat="team in category.teams | orderBy: '+name'">
 												<br ng-if="$index % 3 == 0 && $index > 0" />
-												<div class="col col-sm-4 col-md-4 col-lg-4">
-													<div class="media category-accordion-media category-specific-team" 
-													     cng-category-specific-team 
-													     cog=".glyphicon-cog">
-														<div class="media-left">
-															<a href="#">
-																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-															</a>
-														</div>
+												<div class="media draggable-item" 
+														 cng-draggable-item
+														 item-id="{{team.id}}" 
+														 item-type="team"
+														 cog=".glyphicon-cog"
+														 is-transferable="true">
+													<div class="media-left">
+														<a href="javascript:void(0)">
+															<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+														</a>
+													</div>
 														<div class="media-body">
 															<h4 class="media-heading">
-																{{team.id}}
-																<span class="glyphicon glyphicon-cog" 
-															        ng-click="changeTeamModalView('edit', category, team)">
-												        		</span>
+																{{team.id}} P
+																<div class="glyphicon glyphicon-cog" 
+																		 ng-click="changeTeamModalView('edit', team)">
+																</div>
 															</h4>
-															<div class="draggable-team-name">
-																<span>{{team.name}}</span>
+															<div class="media-text" cng-wrap-word word="{{team.name}}"
+																	 line-width="18"
+																	 total-width="36">
 															</div>
 														</div>
-													</div>
 												</div>
 											</div>
 										</div>
@@ -210,34 +185,32 @@
 						</div>
 					</div><br />
 
-					<div class="draggable-team-wrapper">
-						<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
-							<div ng-if="$index != 0 && $index % 4 == 0" class="row"></div>
-							<div class="col col-sm-4 col-md-4 col-lg-3">
-								<div class="media draggable-team" 
-								     cng-draggable-team 
-								     teamId="{{team.id}}" 
-								     cog=".glyphicon-cog"
-								     is-transferable="false">
-									<div class="media-left">
-										<a href="#">
-											<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-										</a>
-									</div>
-										<div class="media-body">
-											<h4 class="media-heading">
-												{{team.id}}
-												<span class="glyphicon glyphicon-cog" 
-											        ng-click="changeTeamModalView('edit', team)">
-								        </span>
-											</h4>
-											<div class="draggable-team-name">
-												<span>{{team.name}}</span>
-											</div>
-										</div>
-								</div>
+					<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
+						<div class="media draggable-item" 
+								 cng-draggable-item 
+								 item-id="{{team.id}}"
+								 item-type="team"
+								 cog=".glyphicon-cog"
+								 is-transferable="true">
+							<div class="media-left">
+								<a href="javascript:void(0)">
+									<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+								</a>
 							</div>
+								<div class="media-body">
+									<h4 class="media-heading">
+										{{team.id}}
+										<div class="glyphicon glyphicon-cog" 
+												 ng-click="changeTeamModalView('edit', team)">
+										</div>
+									</h4>
+									<div class="media-text" cng-wrap-word word="{{team.name}}"
+											 line-width="18"
+											 total-width="36">
+									</div>
+								</div>
 						</div>
+
 					</div>
 				</div> <!--ng-switch-when-->
 				

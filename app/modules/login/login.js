@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
+angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
         $routeProvider.when('/login', {
@@ -10,7 +10,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
 }])
 
 .controller('LoginCtrl', ['$base64', 
-                          '$cookies',
+                          'sessionStorage',
                           '$location',
                           '$rootScope',
                           '$scope',
@@ -19,7 +19,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
                           'LogoutService',
                           'UserRESTService', 
     function($base64,
-             $cookies,
+             sessionStorage,
              $location,
              $rootScope,
              $scope,
@@ -31,21 +31,33 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
         /* TODO: Use hash not base64 */
 
         $scope.newUser = {};
+			
         $scope.returningUser = {};
-        $scope.error = '';
+			
+				$scope.tabs = [{active: true}, {active: false}];
+			
+				$scope.$watch(function() {
+						return CurrentUserService.hasLoginError;
+				 }, function(newValue) {
+						$scope.error = (newValue) ? 'Error logging in.' : undefined;
+				 });
 
         $scope.register = function(user) {
-            UserRESTService.register(user).$promise.then(function(user) {
-                console.log('User registered.');
-                alert("Successfully registered.");
-            });
+					if (user.password !== user.password_confirmation) {
+						$scope.registerError = 'Passwords do not match.';
+						return;
+					} else {
+						$scope.registerError = undefined;
+					}
+					UserRESTService.register(user).$promise.then(function(user) {
+						console.log('User registered.');
+						$scope.tabs = [{active: true}, {active: false}];
+						$scope.success = 'Successfully registered.';
+					});
         };
 
         $scope.login = function(user) {
             CurrentUserService.login(user)
-            if (CurrentUserService.hasLoginError) {
-                $scope.error = 'Unable to login.';
-            }
         };
 
         $scope.logout = function() {
@@ -86,7 +98,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
 })
 
 .factory('CurrentUserService', function($base64,
-                                        $cookies,
+                                        sessionStorage,
                                         $location,
                                         $rootScope,
                                         LoginService,
@@ -98,18 +110,18 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
     };
 
     service.isLoggedIn = function() {
-        var hasUser = service.currentUser || $cookies.getObject('current_user') ? true : false;
+        var hasUser = service.currentUser || sessionStorage.getObject('current_user') ? true : false;
         service.isLoggedIn = hasUser;
         return hasUser;
     },
 
     service.login = function(user) {
-        service.hasLoginError = false;
+				service.hasLoginError = false;
         LoginService(service.getLoginAuthHeader(user.email, user.password)).login().$promise.then(function(resp) {
             console.log(service);
             service.currentUser = resp.user;
             service.isLoggedIn = true;
-            $cookies.putObject('current_user', resp.user);
+            sessionStorage.putObject('current_user', resp.user);
             $rootScope.isLoggedIn = true;
             $rootScope.$broadcast('loggedIn');
             $location.path('/eventSelect');
@@ -122,13 +134,14 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
         LogoutService(service.getAuthHeader()).logout().$promise.catch(function() {
             console.log("Server failed to logout.");
         }).finally(function() {
-            $cookies.remove('current_user');
-            $cookies.remove('event_view');
-            $cookies.remove('selected_event');
-            $cookies.remove('prev_event_view');
-            $cookies.remove('teamView');
-            $cookies.remove('selectedTeam');
-            $cookies.remove('categories');
+            sessionStorage.remove('current_user');
+            sessionStorage.remove('event_view');
+            sessionStorage.remove('selected_event');
+            sessionStorage.remove('prev_event_view');
+            sessionStorage.remove('teamView');
+            sessionStorage.remove('selectedTeam');
+            sessionStorage.remove('categories');
+						sessionStorage.clear();
 
             service.currentUser = null;
             $rootScope.isLoggedIn = false;
@@ -149,7 +162,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
 
     service.getCurrentUser = function() {
         if (!service.currentUser) {
-            service.currentUser = $cookies.getObject('current_user');
+            service.currentUser = sessionStorage.getObject('current_user');
         }
         return service.currentUser;
     },
@@ -159,4 +172,27 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngCookies', 'ngRoute'])
     }
 
     return service;
+})
+
+.directive('loginValidation', function() {
+  	return {
+		require: "ngModel",
+		scope: {
+			otherModelValue: "=compareTo"
+		},
+		link: function(scope, element, attributes, ngModel) {
+
+			ngModel.$validators.compareTo = function(modelValue) {
+			  	if (modelValue !== scope.otherModelValue)
+				  	element.addClass('invalid-password');
+				else
+				  	element.removeClass('invalid-password');
+				return modelValue === scope.otherModelValue;
+			};
+
+			scope.$watch("otherModelValue", function() {
+				ngModel.$validate();
+			});
+		}
+  	};
 });

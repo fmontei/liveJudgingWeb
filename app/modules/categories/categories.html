@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        <div ng-switch on="teamView">
+        <div ng-switch on="currentView">
             <div ng-switch-default 
                 ng-style="specialCategoryShow">
                 <li class="droppable-category destroy-special-category" 
@@ -30,8 +30,8 @@
                     delete-team="$parent.deleteTeam(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
-                            <div><u>Destroy</u></div>
-                            <span>Destroy Team.</span>
+                            <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
+                            <span>Drag item here to destroy.</span>
                         </div>
                     </a>
                 </li>
@@ -46,8 +46,8 @@
                     delete-team="$parent.deleteTeam(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
-                            <div><u>Destroy</u></div>
-                            <span>Destroy Team.</span>
+                            <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
+                            <span>Drag item here to destroy.</span>
                         </div>
                     </a>
                 </li>
@@ -62,8 +62,8 @@
                     delete-team="$parent.deleteTeam(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
-                            <div><u>Destroy</u></div>
-                            <span>Destroy Team.</span>
+                            <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
+                            <span>Drag item here to destroy.</span>
                         </div>
                     </a>
                 </li>
@@ -72,8 +72,8 @@
                     remove-team-from-category="$parent.removeTeamFromCategory(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
-                            <div><u>Remove</u></div>
-                            <span>Remove team from:<br />{{selectedCategory.label}}</span>
+                            <div><u>Remove</u> <i class="glyphicon glyphicon-scissors"></i></div>
+                            <span>Drag item here to remove<br />from current category</span>
                         </div>
                     </a>
                 </li>
@@ -97,7 +97,10 @@
                 update-category="$parent.transferTeamToCategory(categoryId, projectId, true)">
                 <a class="btn" style="background-color: {{category.color}}" ng-click="viewCategoryDetails(category)">
                     <h3>
-                        <span class="glyphicon-wrapper"><span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)"></span></span>
+                        <span class="glyphicon-wrapper">
+													<span class="glyphicon glyphicon-cog" ng-click="changeCategoryModalView('edit', $event, category)">
+													</span>
+												</span>
                     </h3>
                     <div>
                         <div><u>{{category.label}}</u></div>
@@ -156,8 +159,8 @@
                             <div class="row">
                                 <div class="col-sm-8 col-md-8 col-lg-8">
                                     <timepicker minute-step="1"
-                                                          ng-model="categoryTime"
-                                                          required>
+																								ng-model="categoryTime"
+																								required>
                                     </timepicker>
                                 </div>
                             </div>
@@ -182,7 +185,9 @@
                         </div>
                         <div class="col col-lg-9 col-md-9 col-sm-3 modal-col">
                             <div ng-switch on="categoryModalError">
-                                <div ng-switch-when="undefined">
+                                <div ng-switch-when="null">
+                                </div>
+																<div ng-switch-when="undefined">
                                 </div>
                                 <div ng-switch-default>
                                     <div class="alert alert-danger modal-alert">

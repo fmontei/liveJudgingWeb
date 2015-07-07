@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
+angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/event', {
@@ -15,12 +15,12 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
     });
 }])
 
-.run(['$cookies', function($cookies) {
-    $cookies.put("event_view", undefined);
+.run(['sessionStorage', function(sessionStorage) {
+    sessionStorage.put("event_view", undefined);
 }])
 
-.controller('EventSelectCtrl', ['$cookies', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function($cookies, $location, $scope, CurrentUserService, EventService, EventUtilService) {
+.controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
+    function(sessionStorage, $location, $scope, CurrentUserService, EventService, EventUtilService) {
         EventService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
             console.log(resp);
             $scope.eventList = resp.events;
@@ -29,12 +29,13 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
         });
 
         $scope.showCreateEventForm = function() {
-            $cookies.remove('selected_event');
+            sessionStorage.remove('selected_event');
             $location.path('/eventEdit');
         }
 
         $scope.selectEvent = function(event) {
-            $cookies.putObject('selected_event', event);
+            sessionStorage.clearAllButUser();
+            sessionStorage.putObject('selected_event', event);
             if (EventUtilService.isEventRunning(event)) {
                 EventUtilService.setEventView(EventUtilService.views.EVENT_IN_PROGRESS_VIEW);
             } else {
@@ -45,9 +46,9 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
     }
 ])
 
-.controller('EventEditCtrl', ['$cookies', '$filter', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function($cookies, $filter, $location, $scope, CurrentUserService, EventService, EventUtilService) {
-        $scope.isCreation = $cookies.getObject('selected_event') ? false : true;
+.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
+    function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventService, EventUtilService) {
+        $scope.isCreation = sessionStorage.getObject('selected_event') ? false : true;
 
         $scope.datePicker = {
             startOpened: false,
@@ -71,7 +72,7 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
             if ($scope.isCreation) {
                 EventService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
-                    $cookies.putObject('selected_event', resp.event);
+                    sessionStorage.putObject('selected_event', resp.event);
                     EventUtilService.setEventView(EventUtilService.views.EVENT_READY_VIEW);
                     $location.path('/event');
                 }).catch(function() {
@@ -79,9 +80,9 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
                     console.log($scope.errorMessage);
                 });
             } else {
-                var eventId = $cookies.getObject('selected_event').id;
+                var eventId = sessionStorage.getObject('selected_event').id;
                 EventService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq).$promise.then(function(resp) {
-                    $cookies.putObject('selected_event', resp.event);
+                    sessionStorage.putObject('selected_event', resp.event);
                     $location.path('/event');
                 }).catch(function() {
                     $scope.errorMessage = 'Error updating event.';
@@ -144,43 +145,48 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
             var endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(),
                                        endTime.getHours(), endTime.getMinutes(), endTime.getSeconds());
 
-            eventForm.startDateTime = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss Z');
-            eventForm.endDateTime = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss Z');
-        };            
+            eventForm.startDateTime = $filter('date')(startDateTime, 'yyyy-MM-dd HH:mm:ss');
+            eventForm.endDateTime = $filter('date')(endDateTime, 'yyyy-MM-dd HH:mm:ss');
+        };
 
         $scope.toggleDatePicker = function($event, picker) {
             $event.preventDefault();
             $event.stopPropagation();
 
             if (picker === 'start') {
-                $scope.datePicker.startOpened = !$scope.datePicker.startOpened; 
+                $scope.datePicker.startOpened = !$scope.datePicker.startOpened;
             } else if (picker === 'end') {
-                $scope.datePicker.endOpened = !$scope.datePicker.endOpened; 
+                $scope.datePicker.endOpened = !$scope.datePicker.endOpened;
             }
-            console.log($scope.eventForm);      
+            console.log($scope.eventForm);
         }
 
         if ($scope.isCreation) {
             resetEventForm();
         } else {
-            loadEventForm($cookies.getObject('selected_event'));
+            loadEventForm(sessionStorage.getObject('selected_event'));
         }
     }
 ])
 
-.controller('EventCtrl', ['$cookies', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function($cookies, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService) { 
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
+    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService) {
 
-        $scope.cookies = $cookies;
+        $scope.cookies = sessionStorage;
 
         $scope.event = {
             EVENT_READY_VIEW: EventUtilService.views.EVENT_READY_VIEW,
             EVENT_IN_PROGRESS_VIEW: EventUtilService.views.EVENT_IN_PROGRESS_VIEW,
-            current_view: $cookies.get('event_view')
+            current_view: sessionStorage.get('event_view')
         };
+				
+				$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
+														{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
+														{name: 'Category Progress', id: 'category-progress-tab', sectionId: 'category-progress-section'},
+														{name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
 
         $scope.getSelectedEvent = function() {
-            return $cookies.getObject('selected_event');
+            return sessionStorage.getObject('selected_event');
         };
 
         $scope.editEvent = function() {
@@ -189,7 +195,7 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
 
         $scope.beginEvent = function() {
             var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
-            $cookies.put('event_view', view);
+            sessionStorage.put('event_view', view);
             $scope.event.current_view = view;
             console.log("Event started.");
         };
@@ -201,7 +207,30 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
         $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
         $scope.recipient_list = []; // Contains list of judges to be notified
         $scope.project_list = ["Sample Project 1", "Sample Project 2"];
-        $scope.category_list = ["Sample Category 1", "Sample Category 2", "Sample Category 3", "Sample Category 4"];
+			
+				$scope.$watch(function() {
+					return sessionStorage.getObject('categories');
+				}, function(newValue) {
+					$scope.categories = newValue;
+				}, true);
+			
+				$scope.rankedCategories = sessionStorage.getObject('categories');
+				$scope.increment = 0;
+			
+				$scope.rankAllCategories = function() {
+					$scope.rankedCategories = $scope.categories;
+					$scope.increment = 0;
+				}
+				
+				$scope.rankNext3Categories = function() {
+					$scope.rankedCategories = [];
+					for (var i = $scope.increment; i < $scope.increment + 3; i++) {
+						if (i < $scope.categories.length) {
+							$scope.rankedCategories.push($scope.categories[i]);
+						}
+					}
+					$scope.increment = ($scope.increment + 3 > $scope.categories.length) ? 0 : $scope.increment + 3;
+				}
         
         $scope.times = [];
         for (var i = 1; i <= 12; i++) {
@@ -217,12 +246,12 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
         } else {
             var view = EventUtilService.views.EVENT_READY_VIEW;
         }
-        $cookies.put('event_view', view);
+        sessionStorage.put('event_view', view);
         $scope.event.current_view = view;
     }
 ])
 
-.factory('EventUtilService', function($cookies) {
+.factory('EventUtilService', function(sessionStorage) {
     var service = {
         views: {
             EVENT_EDIT_VIEW: "event_edit_view",
@@ -230,15 +259,15 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
             EVENT_IN_PROGRESS_VIEW: "event_in_progress_view",
         },
         getEventView: function() {
-            $cookies.get('event_view');
+            sessionStorage.get('event_view');
         },
         setEventView: function(view) {
-            $cookies.put('event_view', view);
+            sessionStorage.put('event_view', view);
         },
         isEventRunning: function(event) {
             var startDateTime = new Date(Date.parse(event.start_time));
             if (startDateTime <= Date()) {
-                $cookies.put("event" + event.id + "_running", "true");
+                sessionStorage.put("event" + event.id + "_running", "true");
                 return true;
             } else {
                 return false;
@@ -278,45 +307,38 @@ angular.module('liveJudgingAdmin.event', ['ngCookies', 'ngRoute'])
     }
 })
 
-.directive('changeTabWidget', function() {
+.filter('formatTab', function() {
+	return function(tab) {
+		var tabParts = tab.split('-');
+		var tabName = tabParts[0] + ' ' + tabParts[1];
+		tabName = tabName.toLocaleUpperCase();
+		return tabName;
+	}
+})
 
-    var link = function(scope, elem, attrs) {
-        var judge_progress_tab = $("#judge-progress-tab"),
-            judge_progress_section = $("#judge-progress-section"),
-            project_progress_tab = $("#project-progress-tab"),
-            project_progress_section = $("#project-progress-section"),
-            category_progress_tab = $("#category-progress-tab"),
-            category_progress_section = $("#category-progress-section");
-
-        judge_progress_tab.click(function() {
-            project_progress_section.hide();
-            category_progress_section.hide();
-            judge_progress_section.show();
-            $(project_progress_tab).removeClass("active");
-            $(category_progress_tab).removeClass("active");
-            $(judge_progress_tab).addClass("active");
-        });
-        project_progress_tab.click(function() {
-            judge_progress_section.hide();
-            category_progress_section.hide();
-            project_progress_section.show();
-            $(judge_progress_tab).removeClass("active");
-            $(category_progress_tab).removeClass("active");
-            $(this).addClass("active");
-        });
-        category_progress_tab.click(function() {
-            judge_progress_section.hide();
-            project_progress_section.hide();
-            category_progress_section.show();
-            $(judge_progress_tab).removeClass("active");
-            $(project_progress_tab).removeClass("active");
-            $(this).addClass("active");
-        });
-    }
-
-    return {
-        link: link
-  };
+.directive('cngEventTab', function() {
+	var link = function(scope, elem, attrs) {
+		elem.bind('click', function() {
+			var eventTabs = elem.parent().find('li');
+			eventTabs.each(function() {
+				if ($(this).hasClass('active')) {
+					$(this).removeClass('active');
+					var eventSection = '#' + $(this).attr('event-section');
+					$(eventSection).hide();
+				}
+			});
+			$(this).addClass('active');
+			var eventSection = '#' + scope.eventSection;
+			$(eventSection).show();
+		});
+	}
+	return {
+		restrict: 'A', 
+		scope: {
+			eventSection: '@'
+	  },
+		link: link
+	};
 })
 
 .directive('expandAllAccordions', function() {

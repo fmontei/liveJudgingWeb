@@ -89,13 +89,14 @@
               </div>
             </div>
 
-            <change-tab-widget>
-              <ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
-                <li class="active" id="judge-progress-tab"><a href="#/event">Judge Progress</a></li>
-                <li id="project-progress-tab"><a href="#/event">Project Progress</a></li>
-                <li id="category-progress-tab"><a href="#/event">Category Progress</a></li>
-              </ul>
-            <change-tab-widget>
+						<ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
+							<li class="active" ng-repeat="tab in eventTabs" ng-if="$index === 0" cng-event-tab event-section="{{tab.sectionId}}">
+								<a id="{{tab.id}}" href="javascript:void(0)">{{tab.name}}</a>
+							</li>
+							<li ng-repeat="tab in eventTabs" ng-if="$index !== 0" cng-event-tab event-section="{{tab.sectionId}}">
+								<a id="{{tab.id}}" href="javascript:void(0)">{{tab.name}}</a>
+							</li>
+						</ul>
 
             <!--Judge Tab-->
             <div class="beneath-tab" id="judge-progress-section">
@@ -239,7 +240,7 @@
             </div>
 
             <!--Project Tab-->
-            <div class="beneath-tab" id="project-progress-section" style="display:none">
+            <div class="beneath-tab" id="team-progress-section" style="display:none">
 
               <span style="margin-right: 20px">Sort by:</span>
               <div class="btn-group">
@@ -523,6 +524,61 @@
               </div>
 
             </div>
+                  
+             <!--Event Standing Section-->
+            <div class="beneath-tab" id="team-standing-section" style="display:none">
+           		
+							<div class="btn-group">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+									Show <span class="caret"></span>
+								</button>
+								<button type="button" 
+												class="btn btn-default" 
+												ng-click="rankNext3Categories()"
+												ng-style="next3Button"
+												ng-init="next3Button={'display': 'none'}">
+									Next 3 <span class="glyphicon glyphicon-forward"></span>
+								</button>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="javascript:void(0)" ng-click="rankAllCategories(); next3Button={'display': 'none'}">All teams</a></li>
+									<li><a href="javascript:void(0)" ng-click="rankNext3Categories(); next3Button={'display': 'block'}">3 at a time</a></li>
+								</ul>
+							</div>
+							
+							<div class="row">
+								<div ng-repeat="category in rankedCategories">
+									<div class="row" ng-if="$index !== 0 && $index % 3 == 0"></div>
+									<div class="col col-sm-4 col-md-4 col-lg-4">
+										<div class="category-standing" style="background-color: {{category.color}}">
+											{{category.label}}
+										</div>
+										<div ng-repeat="team in category.teams">
+											<div class="row">
+												<div class="col col-sm-12 col-md-12 col-lg-12">
+													<div class="media media-standing">
+														<div class="media-left">
+															<a href="javascript:void(0)">
+																<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+															</a>
+														</div>
+														<div class="media-body">
+															<h4 class="media-heading">
+																{{team.id}}
+															</h4>
+															<div class="media-text" cng-wrap-word word="{{team.name}}"
+																	 line-width="18"
+																	 total-width="36">
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+                
+            </div> <!-- ./beneath-tab -->
 
           </div>
         </div>
