@@ -48,9 +48,9 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.removeItemFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-						if ($location.path().includes('teams')) {
-            	teamManagementService.removeTeamFromCategory(itemId, categoryId);
-						} else if ($location.path().includes('judges')) {
+				if ($location.path().includes('teams')) {
+            	   teamManagementService.removeTeamFromCategory(itemId, categoryId);
+				} else if ($location.path().includes('judges')) {
                 //
             }
         }
@@ -94,7 +94,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }
 
             if (category) {
-							sessionStorage.putObject('selectedCategory', category);   
+				sessionStorage.putObject('selectedCategory', category);   
             } else {
             	sessionStorage.remove('selectedCategory');
             }
@@ -110,14 +110,13 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.viewCategoryDetails = function(cat) {
             $scope.updateStoredCategory(cat);
-
             if ($location.path().includes('teams')) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().includes('judges')) {
-								judgeManagementService.changeView('selectedCategory');
-						} else if ($location.path().includes('rubrics')) {
-								rubricManagementService.changeView('selectedCategory');
-						}
+				judgeManagementService.changeView('selectedCategory');
+			} else if ($location.path().includes('rubrics')) {
+				rubricManagementService.changeView('selectedCategory');
+		    }
         }
     }
 ])
@@ -127,6 +126,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         var service = {};
 
         service.init = function() {
+            var defaultColorList = ["FF0000", "FFFF00", "00FF00", "00FFFF", "FF00FF", "FF6347", "C0C0C0", "A0522D", "FA8072", 
+                                    "FFA500", "FFE4C4", "F0E68C", "B00000", "A0522D", "DDA0DD", "EEDD82", "8470FF"];
+            sessionStorage.putObject('colorList', defaultColorList);
+            sessionStorage.putObject('defaultColorList', defaultColorList);
+
             $scope.$watch(function() { 
                 return sessionStorage.getObject('categories');
             }, function(newValue) {
@@ -140,15 +144,21 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }, true);
 
             $scope.$watch(function() {
-							if ($location.path().includes('teams')) {
-								return sessionStorage.get('teamView');
-							} else if ($location.path().includes('judges')) {
-								return sessionStorage.get('judgeView');
-							}else if ($location.path().includes('rubrics')) {
-								return sessionStorage.get('rubricView');
-							}
+    			if ($location.path().includes('teams')) {
+    				return sessionStorage.get('teamView');
+    			} else if ($location.path().includes('judges')) {
+    				return sessionStorage.get('judgeView');
+    			} else if ($location.path().includes('rubrics')) {
+    				return sessionStorage.get('rubricView');
+    			}
             }, function(newValue) {
-							$scope.currentView = newValue;
+				$scope.currentView = newValue;
+            }, true);
+
+            $scope.$watch(function() {
+                return sessionStorage.getObject('colorList');
+            }, function(newValue) {
+                $scope.colorList = JSON.stringify(newValue);
             }, true);
         };
 
@@ -168,14 +178,17 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var defer = $q.defer();
 
             CategoryRESTService(authHeader).categories.get({event_id: eventId}).$promise.then(function(resp) {
+                var filteredColorList = sessionStorage.getObject('defaultColorList');
                 angular.forEach(resp.event_categories, function(category) {
                     if (category.label === 'Uncategorized') {
                         category.color = '#BBBBBB';
                         sessionStorage.putObject('uncategorized', category);
                     }
-                    category.color = categoryManagement.convertColorToHex(category.color);
+                    category.color = convertColorToHex(category.color);
+                    filterColorFromList(filteredColorList, category.color);
                 });
                 sessionStorage.putObject('categories', resp.event_categories);
+                sessionStorage.putObject('colorList', filteredColorList);
                 // Updating selected category if there is one.
                 if (sessionStorage.getObject('selectedCategory')) {
                     for (var i = 0; i < resp.event_categories.length; i++) {
@@ -217,7 +230,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 var returnedCategoryID = resp.event_category.id;
                 newCategory.id = returnedCategoryID;
                 resp.event_category.color = categoryManagement.convertColorToHex(resp.event_category.color);
-                // Save category objects in cookie.
+                // Save category objects in session storage.
                 var currentCats = sessionStorage.getObject('categories');
                 if (currentCats) {
                     currentCats.push(resp.event_category);
@@ -225,7 +238,6 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 } else {
                     sessionStorage.putObject('categories', resp.event_category);
                 }
-
                 $scope.closeCategoryModal();
                 $log.log("New category created: " + JSON.stringify(newCategory));
                 $log.log("Category list updated: " + sessionStorage.getObject('categories').length);
@@ -321,7 +333,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             return parseInt(hexColor, 16);
         }
 
-        categoryManagement.convertColorToHex = function(decimalColor) {
+        var convertColorToHex = function(decimalColor) {
             var hexColor = decimalColor.toString(16);
             var lengthDiff = 6 - hexColor.length;
             var prefix = '#';
@@ -329,6 +341,14 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 prefix += Array(lengthDiff + 1).join('0');
             }
             return (hexColor.indexOf('#') === -1) ? prefix + hexColor : hexColor;
+        }
+
+        var filterColorFromList = function(list, color) {
+            color = color.toUpperCase();
+            if (color.indexOf('#') !== -1)
+                color = color.slice(color.indexOf('#') + 1);
+            if (list.indexOf(color) !== -1)
+                list.splice(list.indexOf(color), 1);
         }
 
         var validateForm = function(isEdit) {
@@ -463,7 +483,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 								scope.itemType = droppedItem.attr('item-type').trim();
                 if ($(this).hasClass('destroy-special-category')) {
                     var confirm = window.confirm('Are you sure you want to destroy this ' + scope.itemType + '?\n' +
-																								 'The ' + scope.itemType + ' will be deleted and removed from all categories.');
+												 'The ' + scope.itemType + ' will be deleted and removed from all categories.');
                     if (confirm) 
                         scope.deleteItem(scope.itemId);
 										else 
@@ -471,11 +491,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 }
                 else if ($(this).hasClass('remove-special-category')) {
                     var confirm = window.confirm('Are you sure you want to remove this ' 
-																								 + scope.itemType + ' from current category?');
+												 + scope.itemType + ' from current category?');
                     if (confirm) 
-											scope.removeItemFromCategory(scope.itemId);
-									 	else 
-											droppedItem.goBack();
+						scope.removeItemFromCategory(scope.itemId);
+					else 
+						droppedItem.goBack();
                 }
             }
         });
@@ -485,5 +505,35 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         restrict: 'A',
         link: link
     }
+
+})
+
+.directive('cngColorPicker', function() {
+
+    var link = function(scope, elem, attrs) {
+
+        // When colors array changes, update color palette 
+        scope.$watch(function() {
+            return scope.colorList;
+        }, function(newValue) {
+            $('.colorPicker-picker').remove(); // Delete the old palette
+            elem.colorPicker({colors: JSON.parse(newValue)}); // Create a new palette
+        });
+
+        scope.$watch('color', function(value) {
+            elem.val(value);
+            elem.change();
+        });
+    }
+
+    return {
+        restrict: 'A',
+        require: '^ngModel',
+        scope: {
+            color: '@color',
+            colorList: '@colorList'
+        },
+        link: link
+    };
 
 });
