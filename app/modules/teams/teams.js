@@ -351,15 +351,9 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 		teamManagement.removeTeamFromCategory = function(teamId, categoryId) {
 			var connection = TeamRESTService(authHeader);
-			var wasRemoved = false;
-			var deferred = $q.defer();
 			connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
 				categoryManagementService.getCategories();
-				wasRemoved = true;
-			}).finally(function() {
-				deferred.resolve(wasRemoved);
 			});
-			return deferred.promise;
 		}
 
 		teamManagement.updateStoredCategory = function(category) {

@@ -48,7 +48,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.removeTeamFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-            return teamManagementService.removeTeamFromCategory(itemId, categoryId);
+            teamManagementService.removeTeamFromCategory(itemId, categoryId);
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -460,14 +460,9 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 else if ($(this).hasClass('remove-special-category')) {
                     var confirm = window.confirm('Are you sure you want to remove this team?');
                     if (confirm) {
-												scope.removeTeamFromCategory(scope.itemId).then(function(wasRemoved) {
-												if (wasRemoved) 
-													droppedItem.remove();
-												else
-													droppedItem.goBack();
-												});
+											scope.removeTeamFromCategory(scope.itemId);
 										} else {
-                        droppedItem.goBack();
+											droppedItem.goBack();
 										}
                 }
             }
