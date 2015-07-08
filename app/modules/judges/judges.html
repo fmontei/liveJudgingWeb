@@ -152,8 +152,8 @@
 					</button>
 					<h4 class="modal-title"
 						id="notification-modal-label">
-						<span ng-show="judgeModalView == 'create'">Add new Judge: {{judgeFirstName}} {{judgeLastName}}</span>
-						<span ng-show="judgeModalView == 'edit'">Edit Judge '{{judgeFirstName}} {{judgeLastName}}'</span>
+						<span ng-show="judgeModalView == 'create'">Add new Judge: {{judgeInfoForm.judgeFirstName}} {{judgeInfoForm.judgeLastName}}</span>
+						<span ng-show="judgeModalView == 'edit'">Edit Judge '{{judgeInfoForm.judgeFirstName}} {{judgeInfoForm.judgeLastName}}'</span>
 					</h4>
 				</div>
 
@@ -171,7 +171,7 @@
 									<div class="col col-sm-5 col-md-5 col-lg-5">
 										<input class="form-control"
 													 type="text"
-													 ng-model="createJudgeForm.judgeFirstName"
+													 ng-model="judgeInfoForm.judgeFirstName"
 													 required />
 									</div>
 								</div> <!-- ./row -->
@@ -186,7 +186,7 @@
 									<div class="col col-sm-5 col-md-5 col-lg-5">
 										<input class="form-control"
 													 type="text"
-													 ng-model="createJudgeForm.judgeLastName"
+													 ng-model="judgeInfoForm.judgeLastName"
 													 required	/>
 									</div>
 								</div> <!-- ./row -->
@@ -201,7 +201,7 @@
 									<div class="col col-sm-5 col-md-5 col-lg-5">
 										<input class="form-control"
 													 type="email"
-													 ng-model="createJudgeForm.judgeEmail"
+													 ng-model="judgeInfoForm.judgeEmail"
 													 required />
 									</div>
 								</div> <!-- ./row -->
@@ -216,7 +216,7 @@
 									<div class="col col-sm-5 col-md-5 col-lg-5">
 										<input class="form-control"
 													 type="text"
-													 ng-model="createJudgeForm.judgeAffiliation" />
+													 ng-model="judgeInfoForm.judgeAffiliation" />
 									</div>
 								</div> <!-- ./row -->
 							</div>

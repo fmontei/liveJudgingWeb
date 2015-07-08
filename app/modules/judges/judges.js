@@ -23,7 +23,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	$scope.selectedTeams = [];
 	$scope.modalSortType = '+name';
 	$scope.teamFilterText = '';
-	$scope.createJudgeForm = {};
+	$scope.judgeInfoForm = {};
 
 	$scope.tabs = [
 		{ title: 'Judge Information', active: true, view: 'judgeInfo' },
@@ -55,12 +55,12 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			$scope.judgeModalView = 'create';
 			$scope.tabs[0].active = true;
 		} else if (action === 'edit') {
-			$scope.judgeId = judge.id;
 			$scope.judgeModalView = 'edit';
-			$scope.judgeFirstName = judge.first_name;
-			$scope.judgeLastName = judge.last_name;
-			$scope.judgeEmail = judge.email;
-			$scope.judgeAffliation = judge.affiliation;
+			$scope.judgeInfoForm.judgeId = judge.id;
+			$scope.judgeInfoForm.judgeFirstName = judge.first_name;
+			$scope.judgeInfoForm.judgeLastName = judge.last_name;
+			$scope.judgeInfoForm.judgeEmail = judge.email;
+			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
 			$scope.selectedTeams = teams;
 
 			sessionStorage.putObject('originalTeams', teams);
@@ -68,11 +68,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 
 	$scope.closeJudgeModal = function() {
-		$scope.judgeFirstName = '';
-		$scope.judgeLastName = '';
-		$scope.judgeEmail = '';
-		$scope.judgeAffliation = '';
-		$scope.judgeErrorMessage = undefined;
+		$scope.judgeInfoForm = {};
 		$('#judge-modal').modal('hide');
 	}
 
@@ -163,9 +159,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 	$scope.addJudge = function() {
 		var judgeFormData = {
-			email: $scope.createJudgeForm.judgeEmail.trim(),
-			first_name: $scope.createJudgeForm.judgeFirstName.trim(),
-			last_name: $scope.createJudgeForm.judgeLastName.trim()
+			email: $scope.judgeInfoForm.judgeEmail.trim(),
+			first_name: $scope.judgeInfoForm.judgeFirstName.trim(),
+			last_name: $scope.judgeInfoForm.judgeLastName.trim()
 		};
 		judgeManagementService.addJudge(judgeFormData).then(function() {
 			// Refresh judge objects
