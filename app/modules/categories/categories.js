@@ -227,7 +227,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             connection.new_category.create({event_id: eventId}, categoryReq).$promise.then(function(resp) {
                 var returnedCategoryID = resp.event_category.id;
                 newCategory.id = returnedCategoryID;
-                resp.event_category.color = categoryManagement.convertColorToHex(resp.event_category.color);
+                resp.event_category.color = convertColorToHex(resp.event_category.color);
                 // Save category objects in session storage.
                 var currentCats = sessionStorage.getObject('categories');
                 if (currentCats) {
