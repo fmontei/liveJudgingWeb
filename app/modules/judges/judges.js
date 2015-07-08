@@ -9,8 +9,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
   });
 }])
 
-.controller('JudgesCtrl', ['$scope', 'sessionStorage', '$log', 'filterFilter', 'JudgeManagementService', 'JudgeWatchService',
-	function($scope, sessionStorage, $log, filterFilter, JudgeManagementService, JudgeWatchService) {
+.controller('JudgesCtrl', ['$q', '$scope', 'sessionStorage', '$log', 'filterFilter', 'JudgeManagementService', 'JudgeWatchService',
+	function($q, $scope, sessionStorage, $log, filterFilter, JudgeManagementService, JudgeWatchService) {
 	
 	var judgeWatchService = JudgeWatchService($scope, sessionStorage);
 	judgeWatchService.init();
@@ -78,13 +78,26 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 	$scope.closeAssignByCatModal = function() {
 		$('#judge-cat-assignment-modal').modal('hide');
+		sessionStorage.remove('teamsInDropCat');
 	}
 
 	$scope.openAssignByCatModal = function() {
-		for (var i = 0; i < $scope.teamsInDropCat.length; i++) {
-			$scope.teamsInDropCat[i].checked = true;
+		setUpTeams().then(function() {
+			$('#judge-cat-assignment-modal').modal();
+		});
+
+		function setUpTeams() {
+			var defer = $q.defer();
+
+			var teams = sessionStorage.getObject('teamsInDropCat');
+			for (var i = 0; i < teams.length; i++) {
+				teams[i].checked = true;
+			}
+			sessionStorage.putObject('teamsInDropCat', teams);
+			defer.resolve();
+
+			return defer.promise;
 		}
-		$('#judge-cat-assignment-modal').modal();
 	}
 	
 	$scope.filterTeams = function(filterText) {
