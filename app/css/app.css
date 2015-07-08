@@ -37,3 +37,7 @@
   content: "";
   padding: 0;
 }
+
+.lj-tab-content {
+  margin-top: 10px;
+}

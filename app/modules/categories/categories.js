@@ -126,7 +126,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         service.init = function() {
             var defaultColorList = ["FF0000", "FFFF00", "00FF00", "00FFFF", "FF00FF", "FF6347", "C0C0C0", "A0522D", "FA8072", 
-                                    "FFA500", "FFE4C4", "F0E68C", "B00000", "A0522D", "DDA0DD", "EEDD82", "8470FF"];
+                                    "FFA500", "FFE4C4", "F0E68C", "B00000", "DDA0DD", "EEDD82", "8470FF"];
             sessionStorage.putObject('colorList', defaultColorList);
             sessionStorage.putObject('defaultColorList', defaultColorList);
 
