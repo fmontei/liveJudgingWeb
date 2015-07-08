@@ -3,10 +3,19 @@
 		<div class="col col-sm-8 col-md-8 col-lg-8">		
 			<div ng-switch on="teamView">
 				<div ng-switch-default>
-					<div class="row">
-						<h1>Teams <span class="label label-default">{{teams.length}}</span></h1>
-						<hr>
+					<div class="row general-error-message-row">
+						<div class="col col-sm-6 col-md-6 col-lg-6">
+							<h1>Teams <span class="label label-default">{{teams.length}}</span></h1>
+						</div>
+						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">	
+							<h4 general-error-message
+									 float="right"
+									 animate="true"
+									 color="red">
+							</h4>
+						</div>
 					</div>
+					<br />
 				</div>
 				<div ng-switch-when="selectedCategory">
 					<div class="row">

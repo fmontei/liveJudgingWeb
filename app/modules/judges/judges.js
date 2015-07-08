@@ -205,9 +205,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		judgeManagement.getJudges = function() {
 			judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
 				sessionStorage.putObject('judges', resp.event_judges);
-			}).then(function() {
-				var judges = sessionStorage.getObject('judges');
-				judgeManagement.getJudgeTeams(judges);
 			});
 		}
 			
@@ -219,7 +216,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			function getJudgeTeam(judge) {
 				var judgeId = judge.judge.id;
 				judgeRESTService.judgeTeams.get({judge_id: judgeId}).$promise.then(function(resp) {
-					//judge.teams = resp;
+					
 					console.log(JSON.stringify(resp));
 				});
 			}
@@ -248,13 +245,16 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 						judgeRESTService.judgeTeams.assign({judge_id: judgeId}, req).$promise.then(function(resp) {
 							console.log('Judge assigned to team.');
 						}).catch(function(error) {
+							sessionStorage.put('generalErrorMessage', 'Error adding judge to team.');
 							console.log('Error adding judge to team.');
 						});
 					});
 				}).catch(function() {
+					sessionStorage.put('generalErrorMessage', 'Error adding judge to event');
 					console.log('Error adding judge to event');
 				});
 			}).catch(function(error) {
+				sessionStorage.put('generalErrorMessage', 'Error registering judge user');
 				console.log('Error registering judge user');
 				if (error.data.email !== undefined) {
 					var error = 'Email already exists. Please use another.';
@@ -326,8 +326,10 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		
 		judgeManagement.deleteJudge = function(judgeId) {
 			judgeRESTService.judge.delete({event_id: eventId, judge_id: judgeId}).$promise.then(function() {
+				//judgeManagement.getJudges();
 				console.log('Successfully deleted judge.');
 			}).catch(function(error) {
+				sessionStorage.put('generalErrorMessage', 'Error deleting judge.');
 				console.log('Error deleting judge.');
 			});
 		}
@@ -336,7 +338,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 }])
 
-.factory('JudgeWatchService', ['sessionStorage', function (sessionStorage) {
+.factory('JudgeWatchService', ['sessionStorage', '$timeout', function (sessionStorage, $timeout) {
 	return function($scope, sessionStorage) {
 		var service = {};
 		

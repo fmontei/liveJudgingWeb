@@ -118,9 +118,9 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				sessionStorage.putObject('teams', filledTeams);
 				defer.resolve('Successfully got teams.');
 			}).catch(function() {
-				var errorMessage = 'Error getting teams from server.';
+				sessionStorage.put('generalErrorMessage', 'Error getting teams from server.');
 				defer.reject('Error getting teams.');
-				$log.log(errorMessage);
+				$log.log('Error getting teams from server.');
 			});
 
 			return defer.promise;
@@ -253,8 +253,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				}
 				// Todo: Update uncategorized to reflect changes.
 			}).catch(function() {
-				$scope.errorMessage = 'Error creating new team.';
-				$log.log($scope.errorMessage);
+				sessionStorage.put('generalErrorMessage', 'Error creating new team.');
+				$log.log('Error creating new team.');
 			});
 		}
 
@@ -282,8 +282,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				$scope.closeTeamModal();
 				$log.log("Team edited: " + resp.event_team.name);
 			}).catch(function() {
-				$scope.errorMessage = 'Error editing team.';
-				$log.log($scope.errorMessage);
+				sessionStorage.put('generalErrorMessage', 'Error editing team.');
+				$log.log('Error editing team.');
 			});
 		}
 		
@@ -317,8 +317,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				console.log('Successfully deleted team.');
 				// Todo: update categories' team lists to reflect changes.
 			}).catch(function() {
-				$scope.errorMessage = 'Error deleting team.';
-				$log.log($scope.errorMessage);
+				sessionStorage.put('generalErrorMessage', 'Error deleting team.');
+				$log.log('Error deleting team.');
 			});
 		}
 
@@ -342,7 +342,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				}
 				$log.log("Added team# " + teamId + " to category " + resp.team_category.category.label + ".");
 			}).catch(function() {
-				$scope.error = 'Error transferring team to category.'
+				sessionStorage.put('generalErrorMessage', 'Error transferring team to category.');
+				$scope.error = 'Error transferring team to category.';
 			});
 		}
 
@@ -411,6 +412,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				}
 				defer.resolve(false);
 			}).catch(function() {
+				sessionStorage.put('generalErrorMessage', 'Error getting teams in category.');
 				defer.reject('Error getting teams in category');
 			});
 

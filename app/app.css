@@ -1,0 +1,10 @@
+.general-error-message-row {
+	border-bottom: solid #ccc 1px; 
+	display: flex; 
+	height: 100%;
+}
+
+.general-error-message-col {
+	display: inline-block; 
+	align-self: flex-end;
+}

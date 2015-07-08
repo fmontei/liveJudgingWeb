@@ -149,14 +149,14 @@ angular.module('liveJudgingAdmin', [
             elem.draggable({
                 cursor: 'grab',
                 start: function(event, ui) {
-                    $(this).css('zIndex', '100');
-                    if (undefined === elem.data('originalPosition')) {
-                        elem.data('originalPosition', elem.offset());
-                    }
-                  $(this).draggable('option', 'cursorAt', {
-                    left: Math.floor(ui.helper.width() / 2),
-                    top: Math.floor(ui.helper.height() / 2)
-                  }); 
+										$(this).css('zIndex', '100');
+										if (undefined === elem.data('originalPosition')) {
+												elem.data('originalPosition', elem.offset());
+										}
+										$(this).draggable('option', 'cursorAt', {
+											left: Math.floor(ui.helper.width() / 2),
+											top: Math.floor(ui.helper.height() / 2)
+										}); 
                 },
                 stop: function(event, ui) {
                     $('[cng-draggable-item]').each(function() {
@@ -205,4 +205,29 @@ angular.module('liveJudgingAdmin', [
             });
         }
     }
-});
+})
+
+.directive('generalErrorMessage', ['$timeout', 'sessionStorage', function($timeout, sessionStorage) {
+	return {
+		restrict: 'A',
+		scope: {
+			float: '@float',
+			animate: '@animate',
+			color: '@color'
+		},
+		link: function(scope, elem, attrs) {
+			elem.css('float', 'right');
+			elem.css('color', scope.color);
+			scope.$watch(function() {
+				return sessionStorage.get('generalErrorMessage');
+			}, function(newValue) {
+				if (scope.animate === 'true') {
+					elem.html(newValue);
+					$timeout(function() { sessionStorage.put('generalErrorMessage', ''); }, 5000);
+				} else {
+					elem.html(newValue);	
+				}
+			}, true);
+		}
+	}
+}]);

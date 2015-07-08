@@ -18,3 +18,5 @@ that a judge was dropped into
 sessionStorage.get('teamView')
     Originally 'currentView' -- I changed this since we have rubrics and judges tabs,
     but now that I'm thinking about it, maybe it's good to leave it as one view?
+		
+sessionStorage.put('generalErrorMessage') -- used for temporarily displaying error message to user.

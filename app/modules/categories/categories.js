@@ -48,11 +48,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.removeItemFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-				if ($location.path().includes('teams')) {
-            	   teamManagementService.removeTeamFromCategory(itemId, categoryId);
-				} else if ($location.path().includes('judges')) {
-                //
-            }
+						if ($location.path().includes('teams')) {
+					  		teamManagementService.removeTeamFromCategory(itemId, categoryId);
+						} else if ($location.path().includes('judges')) {
+								//
+						}
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -85,7 +85,6 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             $scope.categoryColor = 'FFFFFF'; 
             $scope.categoryModalError = null;
             $('#category-modal').modal('hide');
-            $scope.updateStoredCategory(null);
         }
 
         $scope.updateStoredCategory = function(category) {
@@ -94,7 +93,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }
 
             if (category) {
-				sessionStorage.putObject('selectedCategory', category);   
+							sessionStorage.putObject('selectedCategory', category);  
             } else {
             	sessionStorage.remove('selectedCategory');
             }
@@ -113,10 +112,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             if ($location.path().includes('teams')) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().includes('judges')) {
-				judgeManagementService.changeView('selectedCategory');
-			} else if ($location.path().includes('rubrics')) {
-				rubricManagementService.changeView('selectedCategory');
-		    }
+								judgeManagementService.changeView('selectedCategory');
+						} else if ($location.path().includes('rubrics')) {
+								rubricManagementService.changeView('selectedCategory');
+		    		}
         }
     }
 ])
@@ -198,7 +197,6 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     }
                 }
                 defer.resolve();
-
             }).catch(function() {
                 console.log('Error getting categories.');
                 defer.reject();
@@ -274,8 +272,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 $log.log('Category successfully edited: ' + JSON.stringify(updatedCategory));
             }).catch(function() {
                 $scope.closeCategoryModal();
-                $scope.errorMessage = 'Error editing category on server.';
-                $log.log($scope.errorMessage);
+                sessionStorage.put('generalErrorMessage', 'Error editing category on server.');
+                $log.log('Error editing category on server.');
             });
         }
 
