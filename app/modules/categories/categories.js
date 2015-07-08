@@ -120,13 +120,13 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 ])
 
-.factory('CatWatchService', ['$location', function($location) {
+.factory('CatWatchService', ['$location', 'CategoryManagementService', function($location, CategoryManagementService) {
     return function(sessionStorage, $scope) {
+        var categoryManagementService = CategoryManagementService($scope);
         var service = {};
 
         service.init = function() {
-            var defaultColorList = ["FF0000", "FFFF00", "00FF00", "00FFFF", "FF00FF", "FF6347", "C0C0C0", "A0522D", "FA8072", 
-                                    "FFA500", "FFE4C4", "F0E68C", "B00000", "DDA0DD", "EEDD82", "8470FF"];
+            var defaultColorList = categoryManagementService.getDefaultColors();
             sessionStorage.putObject('colorList', defaultColorList);
             sessionStorage.putObject('defaultColorList', defaultColorList);
 
@@ -373,6 +373,12 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 }
             });
             return retVal;
+        }
+
+        categoryManagement.getDefaultColors = function() {
+            var defaultColorList = ['EB9F9F', 'D82F32', 'E97F02', 'F8CA00', 'AEE239', '60B99A', '83E874', '4DEBAE',
+                'F5634A', 'B38184', 'CCFC8E', 'BB9CF8', 'D2A6E0', '85D7F2', '91A0DB', 'C65DE3', 'E3CCE6', 'FAF7A2', 'CCB397'];
+            return defaultColorList;
         }
 
         return categoryManagement;
