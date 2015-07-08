@@ -1,1 +1,57 @@
-Settings
+<div class="container-fluid">
+	<div class="row">
+		<div class="col col-sm-12 col-md-12 col-lg-12">
+			<h1>Settings</h1>
+			<hr />
+			
+			<div tabset id="setting-tabs">
+				<div tab 
+						 ng-repeat="tab in tabs"
+						 ng-click="changeActiveTab(tab.view)"
+						 heading="{{tab.title}}"
+						 active="tab.active">
+				</div>
+			</div>
+			
+			<div class="row" id="settings-tab-wrapper">
+				<div class="col col-sm-12 col-md-12 col-lg-12">
+					
+					<div ng-switch on="activeTab">
+						<div ng-switch-when="eventDashboard" class="settings-tab-content">
+							<div class="row">
+								<h2 class="settings-separator">This event is scheduled to end at: 00:00:00</h2>
+								<h2 class="settings-separator">Time remaining: 00:00:00</h2>
+								<div class="btn-grp" style="display: inline-block" role="group">
+									<button type="button" class="btn btn-success">
+										Start <span class="glyphicon glyphicon-play"></span> 
+									</button>
+									<button type="button" class="btn btn-danger">
+										Stop <span class="glyphicon glyphicon-stop"></span> 
+									</button>
+								</div> <!-- ./btn-grp -->
+							</div> <!-- ./row -->
+						</div> <!-- ng-switch-when="eventDashboard" -->
+						
+						<div ng-switch-when="eventDelete" class="settings-tab-content">
+							<div class="row">
+								<div class="col col-sm-12 col-md-12 col-lg-12">
+									<div class="alert alert-danger" id="settings-delete-alert">
+										<p>
+											Deleting this event will permanently delete all associated teams, judges and rubrics.<br />
+											Note: the event must first be stopped before it can be deleted.<br /><br />
+										</p>
+										<button class="btn btn-lg btn-danger">
+											Delete Event
+										</button>
+									</div>
+								</div>
+							</div>
+						</div> <!-- ng-switch-when="eventDelete" -->
+						
+					</div> <!-- ng-switch on="activeTab" -->
+				</div> <!-- ./col col-sm-12 col-md-12 col-lg-12 -->
+			</div> <!-- #/settings-tab-wrapper -->
+			
+		</div> <!-- ./col col-sm-12 col-md-12 col-lg-12 -->
+	</div> <!-- ./row -->
+</div> <!-- ./container-fluid -->

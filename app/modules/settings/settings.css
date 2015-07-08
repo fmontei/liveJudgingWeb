@@ -1,0 +1,27 @@
+#setting-tabs  .nav-tabs {
+	margin-bottom: 0;
+	border: none;
+}
+
+#settings-tab-wrapper {
+	border: solid #dddddd 1px; 
+	border-radius: 0px 0px 5px 5px;
+	padding: 10px;
+}
+
+.settings-tab-content {
+	margin-left: 2px;
+	margin-right: 2px;
+	margin-top: 5px;
+}
+
+.settings-separator {
+	border-right: 1px black solid; 
+	display: inline-block; 
+	padding-right: 20px;
+	margin-right: 20px;
+}
+
+#settings-delete-alert {
+	margin-bottom: 5px;
+}
