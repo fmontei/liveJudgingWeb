@@ -555,70 +555,18 @@
 								</ul>
 							</div>
 							
-							<div class="row">
+							<div class="row" ng-init="filterType=''">
 								<div ng-switch on="filterRanking">
 									<div ng-switch-default>
-										<div ng-repeat="category in categories">
-											<div class="row" ng-if="$index !== 0 && $index % 3 == 0"></div>
-											<div class="col col-sm-4 col-md-4 col-lg-4">
-												<div class="category-standing" style="background-color: {{category.color}}">
-													{{category.label}}
-												</div>
-												<div ng-repeat="team in category.teams">
-													<div class="row">
-														<div class="col col-sm-12 col-md-12 col-lg-12">
-															<div class="media media-standing">
-																<div class="media-left">
-																	<a href="javascript:void(0)">
-																		<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-																	</a>
-																</div>
-																<div class="media-body">
-																	<h4 class="media-heading">
-																		{{team.id}}
-																	</h4>
-																	<div class="media-text" cng-wrap-word word="{{team.name}}"
-																			 line-width="18"
-																			 total-width="36">
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
+										<div ng-repeat="category in categories" 
+												 ng-include="'/app/modules/event/teamStandingTemplate.html'">
+											<!-- HTML provided by template -->
 										</div>
 									</div> <!-- ng-switch-default -->
 									<div ng-switch-when="custom">
-										<div ng-repeat="category in categories | filter3Categories">
-											<div class="row" ng-if="$index !== 0 && $index % 3 == 0"></div>
-											<div class="col col-sm-4 col-md-4 col-lg-4">
-												<div class="category-standing" style="background-color: {{category.color}}">
-													{{category.label}}
-												</div>
-												<div ng-repeat="team in category.teams">
-													<div class="row">
-														<div class="col col-sm-12 col-md-12 col-lg-12">
-															<div class="media media-standing">
-																<div class="media-left">
-																	<a href="javascript:void(0)">
-																		<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-																	</a>
-																</div>
-																<div class="media-body">
-																	<h4 class="media-heading">
-																		{{team.id}}
-																	</h4>
-																	<div class="media-text" cng-wrap-word word="{{team.name}}"
-																			 line-width="18"
-																			 total-width="36">
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
+										<div ng-repeat="category in categories | filter3Categories" 
+												 ng-include="'/app/modules/event/teamStandingTemplate.html'">
+											<!-- HTML provided by template -->
 										</div>
 									</div> <!-- ng-switch-when="custom" -->
 								</div> <!-- ng-switch on="filterRanking" -->
