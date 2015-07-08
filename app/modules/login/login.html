@@ -3,20 +3,20 @@
 
     <tabset>
         <tab heading="Login" class="login-tab" active="tabs[0].active">
-			<div ng-switch on="error">
-				<div ng-switch-default>
-					<p class="alert alert-danger" ng-bind="error"></p>
-				</div>
-				<div ng-switch-when="undefined">
-				</div>
-			</div>
-			<div ng-switch on="success">
-				<div ng-switch-default>
-					<p class="alert alert-success" ng-bind="success"></p>
-				</div>
-				<div ng-switch-when="undefined">
-				</div>
-			</div>
+            <div ng-switch on="error">
+              <div ng-switch-default>
+                <p class="alert alert-danger" ng-bind="error"></p>
+              </div>
+              <div ng-switch-when="undefined">
+              </div>
+            </div>
+            <div ng-switch on="success">
+              <div ng-switch-default>
+                <p class="alert alert-success" ng-bind="success"></p>
+              </div>
+              <div ng-switch-when="undefined">
+              </div>
+            </div>
             <form class="login-form" ng-submit="login(returningUser)">
                 <label>Email</label>
                 <input type="email"
@@ -35,13 +35,13 @@
         </tab>
 
         <tab heading="Register" class="login-tab" active="tabs[1].active">
-		  	<div ng-switch on="registerError">
-				<div ng-switch-default>
-				  <p class="alert alert-danger" ng-bind="registerError"></p>
-				</div>
-				<div ng-switch-when="undefined">
-				</div>
-			</div>
+        <div ng-switch on="registerError">
+        <div ng-switch-default>
+          <p class="alert alert-danger" ng-bind="registerError"></p>
+        </div>
+        <div ng-switch-when="undefined">
+        </div>
+      </div>
             <form class="login-form" ng-submit="register(newUser)">
                 <label>Email</label>
                 <input type="email"
@@ -61,8 +61,8 @@
                        ng-model="newUser.password_confirmation"
                        class="form-control login-input"
                        required
-					   login-validation
-					   compare-to="newUser.password">
+             login-validation
+             compare-to="newUser.password">
 
                 <label>First Name</label>
                 <input type="text"

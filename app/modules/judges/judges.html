@@ -56,13 +56,13 @@
 							<button class="btn btn-lg btn-success add-entity-btn"
 											data-toggle="modal"
 											data-target="#judge-modal"
-											ng-click="changeJudgeModalView('create', null)">
+											ng-click="changeJudgeModalView('create', null, null)">
 								<span class="glyphicon glyphicon-plus"></span> 
 								Add Judge
 							</button>
 						</div>
 					</div>
-					
+
 					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
 						<div class="media draggable-item"
 								 cng-draggable-item
@@ -76,7 +76,7 @@
 									<span class="glyphicon glyphicon-cog" 
 												data-toggle="modal"
 												data-target="#judge-modal"
-												ng-click="changeJudgeModalView('edit', judgeObj.judge)">
+												ng-click="changeJudgeModalView('edit', judgeObj.judge, judgeObj.teams)">
 									</span>
 								</h4>
 								<div class="media-text judge-media-text" 
@@ -86,7 +86,7 @@
 								</div> {{judgeObj.judge.id}}
 							</div>
 						</div>
-					</div>			
+					</div>
 				</div> <!-- ng-switch-default -->
 				
 				<div ng-switch-when="selectedCategory">
@@ -103,7 +103,7 @@
 									<div class="media-body">
 										<h4 class="media-heading">
 											<span class="glyphicon glyphicon-cog" 
-														ng-click="changeJudgeModalView('edit', judge)">
+													ng-click="changeJudgeModalView('edit', judge)">
 											</span>
 										</h4>
 										<div class="media-text judge-media-text" 
@@ -121,19 +121,18 @@
 				<div ng-switch-when="team">
 					teams
 				</div> <!-- ng-switch-when="team" -->
-				
 			</div> <!-- ng-switch on -->
-					
-		</div> <!-- ./col col-sm-8 col-md-8 col-lg-8 -->
-		
-		<div class="col-sm-4 col-md-4 col-lg-4">
-			<div class="text-center" id="category-container" ng-include="'modules/categories/categories.html'"></div> <!--Text-Center-->
-		</div> <!-- ./col -->
+		</div> <!-- ./col col-sm-8 col-md-8 col-lg-8 (Judges Container) -->
 
-	</div> <!-- ./col-sm-4 col-md-4 col-lg-4 -->
+		<div class="col-sm-4 col-md-4 col-lg-4">
+			<div class="text-center" id="category-container" ng-include="'modules/categories/categories.html'">
+			</div> <!--Text-Center-->
+		</div> <!-- ./col (Categories Container) -->
+
+	</div> <!-- ./row -->
 </div> <!-- ./container-fluid -->
 
-<form name="judgeForm">
+<form name="judgeForm" novalidate>
 	<div class="modal fade" id="judge-modal" tabindex="-1" role="dialog" aria-labelledby="judge-modal" aria-hidden="true">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content panel-success">
@@ -142,180 +141,172 @@
 						<span aria-hidden="true">&times;
 						</span>
 					</button>
-					<h4 class="modal-title" id="notification-modal-label">Add new Judge: {{judgeFirstName}} {{judgeLastName}}</h4>
+					<h4 class="modal-title"
+						id="notification-modal-label">
+						<span ng-show="judgeModalView == 'create'">Add new Judge: {{judgeFirstName}} {{judgeLastName}}</span>
+						<span ng-show="judgeModalView == 'edit'">Edit Judge '{{judgeFirstName}} {{judgeLastName}}'</span>
+					</h4>
 				</div>
-				<div class="modal-body">
-				
-					<div class="row">
-						<div class="col col-sm-2 col-md-2 col-lg-2">
-						</div>
-						<div class="col col-sm-3 col-md-3 col-lg-3">
-							<label>*First Name:</label>
-						</div>
-						<div class="col col-sm-5 col-md-5 col-lg-5">
-							<input class="form-control"
-										 type="text"
-										 ng-model="judgeFirstName"
-										 required />
-						</div>
-					</div> <!-- ./row -->
-					<br />
 
-					<div class="row">
-						<div class="col col-sm-2 col-md-2 col-lg-2">
-						</div>
-						<div class="col col-sm-3 col-md-3 col-lg-3">
-							<label>*Last Name:</label>
-						</div>
-						<div class="col col-sm-5 col-md-5 col-lg-5">
-							<input class="form-control"
-										 type="text"
-										 ng-model="judgeLastName"
-										 required	/>
-						</div>
-					</div> <!-- ./row -->
-					<br />
-					
-					<div class="row">
-						<div class="col col-sm-2 col-md-2 col-lg-2">
-						</div>
-						<div class="col col-sm-3 col-md-3 col-lg-3">
-							<label>*E-mail:</label>
-						</div>
-						<div class="col col-sm-5 col-md-5 col-lg-5">
-							<input class="form-control"
-										 type="email"
-										 ng-model="judgeEmail"
-										 required />
-						</div>
-					</div> <!-- ./row -->
-					<br />
-					
-					<div class="row">
-						<div class="col col-sm-2 col-md-2 col-lg-2">
-						</div>
-						<div class="col col-sm-3 col-md-3 col-lg-3">
-							<label>Affiliation:</label>
-						</div>
-						<div class="col col-sm-5 col-md-5 col-lg-5">
-							<input class="form-control"
-										 type="text"
-										 ng-model="judgeAffiliation" />
-						</div>
-					</div> <!-- ./row -->
-					
-					<div class="row">
-						<div class="col col-sm-2 col-md-2 col-lg-2">
-						</div>
-						<div class="col col-sm-8 col-md-8 col-lg-8">
-							<div tabset id="judge-modal-tabs">
-								<div tab 
-										 ng-repeat="tab in tabs"
-										 ng-click="changeModalTab(tab.view)"
-										 heading="{{tab.title}}"
-										 active="tab.active">
+				<div class="modal-body">
+					<tabset style="margin-left: 10px; margin-right: 10px;">
+						<tab heading="Judge Information"
+								active="tabs[0].active">
+							<div class="lj-tab-content">
+								<div class="row">
+									<div class="col col-sm-2 col-md-2 col-lg-2">
+									</div>
+									<div class="col col-sm-3 col-md-3 col-lg-3">
+										<label>*First Name:</label>
+									</div>
+									<div class="col col-sm-5 col-md-5 col-lg-5">
+										<input class="form-control"
+													 type="text"
+													 ng-model="judgeFirstName"
+													 required />
+									</div>
+								</div> <!-- ./row -->
+								<br />
+
+								<div class="row">
+									<div class="col col-sm-2 col-md-2 col-lg-2">
+									</div>
+									<div class="col col-sm-3 col-md-3 col-lg-3">
+										<label>*Last Name:</label>
+									</div>
+									<div class="col col-sm-5 col-md-5 col-lg-5">
+										<input class="form-control"
+													 type="text"
+													 ng-model="judgeLastName"
+													 required	/>
+									</div>
+								</div> <!-- ./row -->
+								<br />
+
+								<div class="row">
+									<div class="col col-sm-2 col-md-2 col-lg-2">
+									</div>
+									<div class="col col-sm-3 col-md-3 col-lg-3">
+										<label>*E-mail:</label>
+									</div>
+									<div class="col col-sm-5 col-md-5 col-lg-5">
+										<input class="form-control"
+													 type="email"
+													 ng-model="judgeEmail"
+													 required />
+									</div>
+								</div> <!-- ./row -->
+								<br />
+
+								<div class="row">
+									<div class="col col-sm-2 col-md-2 col-lg-2">
+									</div>
+									<div class="col col-sm-3 col-md-3 col-lg-3">
+										<label>Affiliation:</label>
+									</div>
+									<div class="col col-sm-5 col-md-5 col-lg-5">
+										<input class="form-control"
+													 type="text"
+													 ng-model="judgeAffiliation" />
+									</div>
+								</div> <!-- ./row -->
+							</div>
+						</tab>
+
+						<tab heading="Assigned Teams"
+								active="tabs[1].active"
+								ng-show="judgeModalView == 'edit'">
+							<div class="lj-tab-content">
+								<label>Currently Assigned Teams: ({{selectedTeams.length}})</label>
+								<div class="row">
+									<div class="col col-sm-12 col-md-12 col-lg-12">
+										<span ng-if="selectedTeams.length == 0">
+											No teams assigned to this judge.
+										</span>
+										<span ng-if="selectedTeams.length > 0">
+											{{selectedTeams | printAllTeams}}
+										</span>
+									</div>
+								</div>
+								<br />
+
+								<div class="row">
+									<div class="col col-sm-1 col-md-1 col-lg-1">
+										<div class="btn-group" role="group">
+											<button class="btn btn-default dropdown-toggle"
+													type="button"
+													data-toggle="dropdown"
+													aria-haspopup="true"
+													aria-expanded="true">
+												Sort by
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu">
+												<li><a href="javascript:void(0)" ng-click="changeModalSortType('name')">Name</a></li>
+												<li><a href="javascript:void(0)" ng-click="changeModalSortType('id')">Number</a></li>
+											</ul>
+										</div>
+									</div>
+									<div class="col col-sm-6 col-md-6 col-lg-6">
+										<input type="text"
+												placeholder="Type to filter by team, category, or number"
+												ng-model="teamFilterText"
+												class="form-control">
+									</div>
+									<div class="col col-sm-5 col-md-5 col-lg-5 pull-left btn-group">
+										<button class="btn btn-info"
+												ng-click="selectAllFilteredTeams()">
+											Select All
+										</button>
+										<button class="btn btn-warning"
+												ng-click="deselectAllFilteredTeams()">
+											Clear All
+										</button>
+										<button class="btn btn-success"
+												type="button"
+												ng-click="addSelectedTeamsToJudgeModal(filteredTeams)">
+											Assign Selected
+										</button>
+									</div>
+								</div>
+								<br />
+								
+								<div class="row">
+									<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
+										<table class="table table-striped" id="judge-modal-table">
+											<thead>
+												<th>Team #</th>
+												<th>Team Name</th>
+												<th>Category</th>
+												<th>Add</th>
+											</thead>
+											<tbody>
+												<!-- For modalSortType === 'name' or 'id', default to grey background color -->
+												<tr ng-repeat="team in teams | filter:teamFilterText as filteredTeams">
+													<td>{{team.id}}</td>
+													<td>{{team.name}}</td>
+													<td>{{team | printAllCategories}}</td>
+													<td><input type="checkbox"
+																ng-model="team.selected" />
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
 								</div>
 							</div>
-							
-							<div class="row" id="judge-modal-teams-view">
-								<div class="col col-sm-12 col-md-12 col-lg-12">
-									<div ng-switch on="judgeModalTab">
-										<div ng-switch-when="teams" class="judge-modal-tab-content">
-										
-											<div class="row">
-												<div class="col col-sm-2 col-md-2 col-lg-2">
-													<div class="btn-group" role="group">
-														<button class="btn btn-default dropdown-toggle" type="button" 
-															data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-															Sort by
-															<span class="caret"></span>
-														</button>
-														<ul class="dropdown-menu">
-															<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('name')">Name</a></li>
-															<li><a href="javascript:void(0)" ng-click="$parent.changeModalSortType('id')">Number</a></li>
-														</ul>
-													</div>
-												</div>
-												<div class="col col-sm-7 col-md-7 col-lg-7">
-													<input type="text" 
-																 placeholder="Type to filter results..."
-																 ng-model="$parent.typeAheadFilter" 
-																 typeahead-focus-first="false"
-																 typeahead="team.name for team in $parent.teams | filter:$viewValue | limitTo:8" 
-																 class="form-control">
-												</div>
-												<div class="col col-sm-3 col-md-3 col-lg-3 pull-right">
-													<div class="btn-group" role="group">
-														<div ng-switch on="$parent.areAllTeamsSelected()">
-															<div ng-switch-when="true">
-																<button class="btn btn-warning" 
-																				id="judge-modal-add-btn" 
-																				ng-click="$parent.selectAllFilteredTeams()">
-																				De-select Shown
-																</button>
-															</div>
-															<div ng-switch-when="false">
-																<button class="btn btn-info" 
-																				id="judge-modal-add-btn" 
-																				ng-click="$parent.selectAllFilteredTeams()">
-																				Select Shown
-																</button>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-											<br />
-											
-											<div class="row">
-												<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
-													<table class="table table-striped" id="judge-modal-table">
-														<thead>
-															<th>Team #</th>
-															<th>Team Name</th>
-															<th>Category</th>
-															<th>Add</th>
-														</thead>
-														<tbody>
-															<!-- For modalSortType === 'name' or 'id', default to grey background color -->
-															<tr ng-repeat="filteredTeam in $parent.filteredTeams | orderBy: $parent.modalSortType">
-																<td>{{filteredTeam.id}}</td>
-																<td>{{filteredTeam.name}}</td>
-																<td>{{filteredTeam | printAllCategories}}</td>
-																<td><input type="checkbox" 
-																					 ng-click="$parent.selectSingleFilteredTeam(filteredTeam)" 
-																					 ng-checked="$parent.isTeamSelected(filteredTeam)" />
-															</tr>
-														</tbody>
-													</table>
-												</div>
-											</div>
-											<br />
-											
-											<div class="row">
-												<div class="col col-sm-4 col-md-4 col-lg-4" >
-													<label>Selected teams ({{$parent.selectedTeams.length}}):</label>
-												</div>
-											</div>
-											<div class="row">
-												<div class="col col-sm-12 col-md-12 col-lg-12">
-													<textarea class="form-control" 
-																		id="judge-modal-textarea"
-																		readonly>{{$parent.selectedTeams | printAllTeams}}</textarea>
-												</div>
-											</div>
-								
-										</div> <!-- ng-switch-when="teams" -->
-									</div> <!-- ng-switch on -->
-								</div> <!-- ./col -->
-							</div> <!-- ./row -->
-						</div>
-						
-						<div class="col col-sm-2 col-md-2 col-lg-2">
-						</div>		
-					</div> <!-- ./row -->
+						</tab>
+
+						<tab heading="Rubric Options"
+								active="tabs[2].active"
+								ng-if="judgeModalView == 'edit'">
+							<div class="lj-tab-content">
+								...
+							</div>
+						</tab>
+					</tabset>
 					<br />
-					
+
 					<div ng-switch on="judgeErrorMessage">
 						<div ng-switch-when="undefined"></div>
 						<div ng-switch-default>
@@ -331,28 +322,34 @@
 						</div> <!-- ng-switch-when="undefined" -->
 					</div> <!-- ng-switch on="judgeErrorMessage" -->
 				</div> <!-- ./modal-body -->
-				
+
 				<div class="modal-footer">
 					<div class="row">
-						<span class="col col-sm-5">
-							<input type="submit"
-										 class="btn btn-success pull-right"
-										 value="Create"
-										 ng-click="addJudge()" />
-						</span>
-						<span class="col col-sm-2"></span>
-						<span class="col col-sm-5">
+						<div class="col col-md-5">
+							<input ng-show="judgeModalView == 'create'"
+									type="submit"
+									class="btn btn-success pull-right"
+									value="Create"
+									ng-click="addJudge()" />
+							<input ng-show="judgeModalView == 'edit'"
+									type="submit"
+									class="btn btn-success pull-right"
+									value="Update"
+									ng-click="editJudge()" />
+						</div>
+						<div class="col col-md-1"></div>
+						<div class="col col-md-5">
 							<button type="button" 
-							        class="btn btn-default pull-left" 
-											data-dismiss="modal"
-											ng-click="closeJudgeModal()">
-											Close
+									class="btn btn-failure pull-left"
+									data-dismiss="modal"
+									ng-click="closeJudgeModal()">
+								Cancel
 							</button>
-						</span>
+						</div>
 					</div>
-				</div> <!-- ./modal-footer -->
-			</div>
-		</div>
+				</div>
+			</div><!-- ./modal-content-->
+		</div><!-- ./modal-dialog-->
 	</div>
 </form>
 
@@ -366,9 +363,9 @@
 			<div class="modal-body">
 				<div ng-repeat="team in teamsInDropCat" class="teams-in-cat-list">
 					<label>
-    					<input type="checkbox" ng-model="team.checked" />
-    						{{team.name}}
-  					</label>
+						<input type="checkbox" ng-model="team.checked" />
+							{{team.name}}
+					</label>
 				</div>
 			</div>
 

@@ -117,17 +117,17 @@
 				<div ng-switch-when="category">
 					<div ng-repeat="category in categories | orderBy: '+name'">
 						<div class="accordion team-accordion">
-							<div class="panel panel-default accordion-group" 
-							     cng-category-accordion color="{{category.color}}" 
-									 category-name="{{category.label}}" 
+							<div class="panel panel-default accordion-group"
+								 cng-category-accordion color="{{category.color}}"
+									 category-name="{{category.label}}"
 									 change-category="updateSelectedCategory(category)">
 								<div class="panel-heading">
 									<div class="accordion-heading">
 										<a class="accordion-toggle"
-											 data-toggle="collapse" 
-											 href="#category{{$index}}" 
-										 	 onclick="return false;"
-										 	 ng-click="categoryChevron = (categoryChevron === 'glyphicon glyphicon-chevron-right') 
+											 data-toggle="collapse"
+											 href="#category{{$index}}"
+											 onclick="return false;"
+											 ng-click="categoryChevron = (categoryChevron === 'glyphicon glyphicon-chevron-right')
 															   ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-right'"> 
 												<span ng-class="categoryChevron" 
 															ng-init="categoryChevron='glyphicon glyphicon-chevron-right'">
@@ -226,30 +226,31 @@
 
 <!-- Team Modal -->
 <div class="modal fade" id="team-modal" tabindex="-1" role="dialog" aria-labelledby="team-modal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content panel-success">
-      <div class="modal-header panel-heading">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	<div class="modal-dialog">
+		<div class="modal-content panel-success">
+	  		<div class="modal-header panel-heading">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
-   			<div ng-switch on="teamModalView">
-   				<div ng-switch-when="create">
-		        <div ng-switch on="teamView">
-		        	<div ng-switch-when="default">
-		        		<h4 class="modal-title">Add New Team</h4>
-	        		</div>
-	        		<div ng-switch-when="selectedCategory">
-	        			<h4 class="modal-title">Add New Team to {{selectedCategory.name}}</h4>
-	        		</div>
-	      		</div>
-      		</div> <!-- ng-switch-when="create" -->
-      		<div ng-switch-when="edit">
-      			<h4 class="modal-title">Edit Team: {{teamName}}</h4>
-      		</div> <!-- ng-switch-when="edit" -->
-    		</div> <!-- ng-switch on="teamModalView" -->
-      </div> <!-- ./modal-header panel-heading -->
+				<div ng-switch on="teamModalView">
+					<div ng-switch-when="create">
+						<div ng-switch on="teamView">
+							<div ng-switch-when="default">
+								<h4 class="modal-title">Add New Team</h4>
+							</div>
+							<div ng-switch-when="selectedCategory">
+								<h4 class="modal-title">Add New Team to {{selectedCategory.name}}</h4>
+							</div>
+						</div>
+					</div> <!-- ng-switch-when="create" -->
 
-      <div class="modal-body">
-      	<div class="row">
+					<div ng-switch-when="edit">
+						<h4 class="modal-title">Edit Team: {{teamName}}</h4>
+					</div> <!-- ng-switch-when="edit" -->
+				</div> <!-- ng-switch on="teamModalView" -->
+			</div> <!-- ./modal-header panel-heading -->
+
+			<div class="modal-body">
+				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 						<label>*Team Name:</label>
 					</div>
@@ -272,7 +273,7 @@
 						</select>
 					</div>
 				</div><br />
-				
+
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 						<label>Logo:</label>
@@ -285,14 +286,14 @@
 							<div class="col col-lg-12 col-md-12 col-sm-12">
 								<div class="input-group">
 									<span class="input-group-btn">
-						        <button class="btn btn-sm btn-default" 
-						                type="button">Select file...</button>
-						      </span>
+								<button class="btn btn-sm btn-default" 
+										type="button">Select file...</button>
+							  </span>
 								  <input type="text" 
-								         class="form-control input-sm" 
-								         placeholder="File" 
-								         style="width: 115%"
-								         ng-model="teamLogo">
+										 class="form-control input-sm" 
+										 placeholder="File" 
+										 style="width: 115%"
+										 ng-model="teamLogo">
 								</div>
 							</div>
 						</div>
@@ -310,12 +311,13 @@
 					</div>
 					<div class="col col-lg-7 col-md-7 col-sm-7">
 						<textarea class="form-control" 
-						          rows="3" 
-						          ng-model="teamDesc"
-						          required>
-	          </textarea>
+								  rows="3" 
+								  ng-model="teamDesc"
+								  required>
+						</textarea>
 					</div>
 				</div><br />
+
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 					</div>
@@ -331,24 +333,25 @@
 						</div>
 					</div>
 				</div>
-      </div> <!-- ./modal-body -->
+			</div> <!-- ./modal-body -->
 
-      <div ng-switch on="teamModalView">
+			<div ng-switch on="teamModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
-      			<button type="button" class="btn btn-success" ng-click="createNewTeam()">Save changes</button>
-      			<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
+						<button type="button" class="btn btn-success" ng-click="createNewTeam()">Save changes</button>
+						<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
 					</div> <!-- ./modal-footer -->
-				</div> <!-- ng-switch-when-"ceate" -->
+				</div> <!-- ng-switch-when-"create" -->
+
 				<div ng-switch-when="edit">
 					<div class="modal-footer">
 						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteTeam()">Delete</button>
-      			<button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Save changes</button>
-      			<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
+						<button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Save changes</button>
+						<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
 					</div> <!-- /.modal-footer-->
 				</div> <!-- ng-switch-when-"edit" -->
 			</div> <!-- ng-switch on="categoryModalView" -->
 
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal-content -->
+  	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
