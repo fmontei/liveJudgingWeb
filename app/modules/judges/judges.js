@@ -16,15 +16,14 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	judgeWatchService.init();
 
 	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-	judgeManagementService.getJudges().then(function() {
-		console.log(sessionStorage.getObject('judges'));
-	});
+	judgeManagementService.getJudges();
 
 	$scope.judgeModalView = 'create';
 	$scope.judgeModalTab = 'judgeInfo';
 	$scope.selectedTeams = [];
 	$scope.modalSortType = '+name';
 	$scope.teamFilterText = '';
+	$scope.createJudgeForm = {};
 
 	$scope.tabs = [
 		{ title: 'Judge Information', active: true, view: 'judgeInfo' },
@@ -151,9 +150,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 	$scope.addJudge = function() {
 		var judgeFormData = {
-			email: $scope.judgeEmail.trim(),
-			first_name: $scope.judgeFirstName.trim(),
-			last_name: $scope.judgeLastName.trim()
+			email: $scope.createJudgeForm.judgeEmail.trim(),
+			first_name: $scope.createJudgeForm.judgeFirstName.trim(),
+			last_name: $scope.createJudgeForm.judgeLastName.trim()
 		};
 		judgeManagementService.addJudge(judgeFormData).then(function() {
 			// Refresh judge objects
