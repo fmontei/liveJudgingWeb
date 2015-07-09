@@ -9,10 +9,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
   });
 }])
 
-.controller('CategoriesCtrl', ['sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService', 
-                                                             'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
-    function(sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService, 
-                         TeamManagementService, RubricManagementService) {
+.controller('CategoriesCtrl', ['sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService',
+                               'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
+    function(sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService,
+             TeamManagementService, RubricManagementService) {
 
         var catWatchService = CatWatchService(sessionStorage, $scope);
         catWatchService.init();
@@ -29,7 +29,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.editSelectedCategory = function() {
-            categoryManagementService.editCategory();       
+            categoryManagementService.editCategory();
         }
 
         $scope.deleteCategory = function() {
@@ -82,7 +82,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             $scope.categoryName = '';
             $scope.categoryDesc = '';
             $scope.categoryTime = '';
-            $scope.categoryColor = 'FFFFFF'; 
+            $scope.categoryColor = 'FFFFFF';
             $scope.categoryModalError = null;
             $('#category-modal').modal('hide');
         }
@@ -126,7 +126,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             sessionStorage.putObject('colorList', defaultColorList);
             sessionStorage.putObject('defaultColorList', defaultColorList);
 
-            $scope.$watch(function() { 
+            $scope.$watch(function() {
                 return sessionStorage.getObject('categories');
             }, function(newValue) {
                 $scope.categories = newValue;
@@ -168,7 +168,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         var eventId = sessionStorage.getObject('selected_event').id;
 
         var categoryManagement = {};
-            
+
         categoryManagement.getCategories = function() {
             var defer = $q.defer();
 
@@ -212,7 +212,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 color: $scope.categoryColor,
                 teams: [],
                 judges: []
-            };      
+            };
             var categoryReq = {
                 label: newCategory.name,
                 description: newCategory.desc,
@@ -430,7 +430,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         var isEmpty = function(str) {
-        return (!str || 0 === str.length);
+            return (!str || 0 === str.length);
         }
 
         var convertColorToDecimal = function(hexColor) {
@@ -595,17 +595,17 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 if ($(this).hasClass('destroy-special-category')) {
                     var confirm = window.confirm('Are you sure you want to destroy this ' + scope.itemType + '?\n' +
                                                  'The ' + scope.itemType + ' will be deleted and removed from all categories.');
-                    if (confirm) 
+                    if (confirm)
                         scope.deleteItem(scope.itemId);
-                                        else 
+                                        else
                         droppedItem.goBack();
                 }
                 else if ($(this).hasClass('remove-special-category')) {
-                    var confirm = window.confirm('Are you sure you want to remove this ' 
+                    var confirm = window.confirm('Are you sure you want to remove this '
                                                  + scope.itemType + ' from current category?');
-                    if (confirm) 
+                    if (confirm)
                         scope.removeItemFromCategory(scope.itemId);
-                    else 
+                    else
                         droppedItem.goBack();
                 }
             }
@@ -623,7 +623,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
     var link = function(scope, elem, attrs) {
 
-        // When colors array changes, update color palette 
+        // When colors array changes, update color palette
         scope.$watch(function() {
             return scope.colorList;
         }, function(newValue) {

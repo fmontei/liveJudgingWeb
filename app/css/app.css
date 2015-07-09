@@ -41,3 +41,7 @@
 .lj-tab-content {
   margin-top: 10px;
 }
+
+.clickable {
+  cursor: pointer;
+}

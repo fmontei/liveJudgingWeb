@@ -11,7 +11,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 .controller('TeamsCtrl', ['$scope', 'sessionStorage', 'TeamInitService', 'CategoryManagementService', 'ScopeInitService', 'TeamManagementService',
 	function($scope, sessionStorage, TeamInitService, CategoryManagementService, ScopeInitService, TeamManagementService) {
-		
+
 		sessionStorage.remove('selectedCategory');
 
 		/*
@@ -24,15 +24,15 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		var teamInitService = TeamInitService($scope, sessionStorage);
 		teamInitService.initDefaultCookies();
 
-		var categoryManagementService = CategoryManagementService($scope, sessionStorage);		
+		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 
 		var teamManagementService = TeamManagementService($scope, sessionStorage);
 		teamManagementService.getTeams();
-		$scope.teamNumberOptions = teamManagementService.getTeamNumberOptions();		
+		$scope.teamNumberOptions = teamManagementService.getTeamNumberOptions();
 
 		/*
 		 * Team Management Functionality
-		 */ 
+		 */
 
 		$scope.createNewTeam = function() {
 			teamManagementService.createNewTeam();
@@ -96,14 +96,14 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 }])
 
-.factory('TeamInitService', ['$q', '$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService', 
+.factory('TeamInitService', ['$q', '$log', '$rootScope', 'CategoryRESTService', 'TeamRESTService',
 		'CategoryManagementService', 'CurrentUserService', 'sessionStorage',
-	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService, 
+	function($q, $log, $rootScope, CategoryRESTService, TeamRESTService,
 		CategoryManagementService, CurrentUserService, sessionStorage) {
 	return function($scope, sessionStorage) {
 		var teamInitService = {};
 		var selectedEvent = sessionStorage.getObject('selected_event');
-		var categoryManagementService = CategoryManagementService($scope, sessionStorage);	
+		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 
 		teamInitService.initDefaultCookies = function() {
 			sessionStorage.put('teamView', 'default');
@@ -142,7 +142,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			}, function(newValue) {
 				$scope.teams = newValue;
 			}, true);
-				
+
 			$scope.$watch(function() {
 				return sessionStorage.getObject('categories');
 			}, function(newValue) {
@@ -216,8 +216,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			return deferred.promise;
 		}
 
-		teamManagement.createNewTeam = function() {	
-			if (!validateForm(false)) 
+		teamManagement.createNewTeam = function() {
+			if (!validateForm(false))
 				return;
 			var newTeam = {
 				name: $scope.teamName,
@@ -251,7 +251,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				if (teams) {
 					teams.push(resp.event_team);
 					sessionStorage.putObject('teams', teams);
-				} else { 
+				} else {
 					sessionStorage.putObject('teams', resp.event_team);
 				}
 				// Todo: Update uncategorized to reflect changes.
@@ -261,8 +261,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			});
 		}
 
-		teamManagement.editTeam = function() { 
-			if (!validateForm(true)) 
+		teamManagement.editTeam = function() {
+			if (!validateForm(true))
 				return;
 			var updatedTeam = {
 				id: $scope.teamID,
@@ -289,7 +289,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				$log.log('Error editing team.');
 			});
 		}
-		
+
 		var updateTeam = function(newTeam) {
 			var teams = sessionStorage.getObject('teams');
 			var teamToUpdate = null;
