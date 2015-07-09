@@ -88,12 +88,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.updateStoredCategory = function(category) {
-            if ($location.path().includes('teams')) {
-                teamManagementService.updateStoredCategory(category);
-            }
-
             if (category) {
-                            sessionStorage.putObject('selectedCategory', category);
+                sessionStorage.putObject('selectedCategory', category);
             } else {
                 sessionStorage.remove('selectedCategory');
             }
@@ -112,10 +108,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             if ($location.path().includes('teams')) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().includes('judges')) {
-                                judgeManagementService.changeView('selectedCategory');
-                        } else if ($location.path().includes('rubrics')) {
-                                rubricManagementService.changeView('selectedCategory');
-                    }
+                judgeManagementService.changeView('selectedCategory');
+            } else if ($location.path().includes('rubrics')) {
+                rubricManagementService.changeView('selectedCategory');
+            }
         }
     }
 ])
@@ -300,7 +296,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     sessionStorage.putObject('categories', cats);
                     $scope.closeCategoryModal();
                     $log.log('Successfully deleted category.');
-                    categoryManagement.checkForUncategorizedTeams([teamsInCat]);
+                    categoryManagement.checkForUncategorizedTeams(teamsInCat);
                     defer.resolve();
                 }).catch(function() {
                     $scope.errorMessage = 'Error deleting category.';
@@ -312,6 +308,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 console.log($scope.errorMessage);
 
                 defer.reject();
+            }).finally(function() {
+                sessionStorage.remove('selectedCategory');
             });
 
             return defer.promise;
@@ -407,14 +405,9 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             });
         }
 
-        categoryManagement.checkForUncategorizedTeams = function() {
-            var teams = sessionStorage.getObject('teams');
-            var currentTeamId;
+        categoryManagement.checkForUncategorizedTeams = function(teams) {
             for (var i = 0; i < teams.length; i++) {
-                currentTeamId = teams[i].id;
-                categoryManagement.getCategoriesInTeam(teams[i].id).then(function(resp) {
-                    categoryManagement.addTeamToUncategorized(currentTeamId);
-                });
+                categoryManagement.checkForUncategorizedTeam(teams[i].id);
             }
         }
 
