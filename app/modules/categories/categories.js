@@ -10,9 +10,9 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 }])
 
 .controller('CategoriesCtrl', ['sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService', 
-															 'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
+                                                             'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
     function(sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService, 
-						 TeamManagementService, RubricManagementService) {
+                         TeamManagementService, RubricManagementService) {
 
         var catWatchService = CatWatchService(sessionStorage, $scope);
         catWatchService.init();
@@ -22,7 +22,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         var teamManagementService = TeamManagementService($scope, sessionStorage);
         var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-			  var rubricManagementService = RubricManagementService($scope, sessionStorage);
+              var rubricManagementService = RubricManagementService($scope, sessionStorage);
 
         $scope.createNewCategory = function() {
             categoryManagementService.createNewCategory();
@@ -48,11 +48,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.removeItemFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-						if ($location.path().includes('teams')) {
-					  		teamManagementService.removeTeamFromCategory(itemId, categoryId);
-						} else if ($location.path().includes('judges')) {
-								//
-						}
+                        if ($location.path().includes('teams')) {
+                            categoryManagementService.removeTeamFromCategory(itemId, categoryId);
+                        } else if ($location.path().includes('judges')) {
+                                //
+                        }
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -93,15 +93,15 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }
 
             if (category) {
-							sessionStorage.putObject('selectedCategory', category);  
+                            sessionStorage.putObject('selectedCategory', category);
             } else {
-            	sessionStorage.remove('selectedCategory');
+                sessionStorage.remove('selectedCategory');
             }
         }
 
         $scope.transferItemToCategory = function(categoryId, itemId) {
             if ($location.path().includes('teams')) {
-                teamManagementService.transferTeamToCategory(categoryId, itemId);
+                categoryManagementService.transferTeamToCategory(categoryId, itemId);
             } else if ($location.path().includes('judges')) {
                 judgeManagementService.openAssignByCatModal(categoryId, itemId);
             }
@@ -112,10 +112,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             if ($location.path().includes('teams')) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().includes('judges')) {
-								judgeManagementService.changeView('selectedCategory');
-						} else if ($location.path().includes('rubrics')) {
-								rubricManagementService.changeView('selectedCategory');
-		    		}
+                                judgeManagementService.changeView('selectedCategory');
+                        } else if ($location.path().includes('rubrics')) {
+                                rubricManagementService.changeView('selectedCategory');
+                    }
         }
     }
 ])
@@ -143,15 +143,15 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }, true);
 
             $scope.$watch(function() {
-    			if ($location.path().includes('teams')) {
-    				return sessionStorage.get('teamView');
-    			} else if ($location.path().includes('judges')) {
-    				return sessionStorage.get('judgeView');
-    			} else if ($location.path().includes('rubrics')) {
-    				return sessionStorage.get('rubricView');
-    			}
+                if ($location.path().includes('teams')) {
+                    return sessionStorage.get('teamView');
+                } else if ($location.path().includes('judges')) {
+                    return sessionStorage.get('judgeView');
+                } else if ($location.path().includes('rubrics')) {
+                    return sessionStorage.get('rubricView');
+                }
             }, function(newValue) {
-				$scope.currentView = newValue;
+                $scope.currentView = newValue;
             }, true);
 
             $scope.$watch(function() {
@@ -165,8 +165,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 }])
 
-.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService',
-    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService) {
+.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService', 'TeamRESTService',
+    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService, TeamRESTService) {
     return function($scope) {
         var authHeader = CurrentUserService.getAuthHeader();
         var eventId = sessionStorage.getObject('selected_event').id;
@@ -278,23 +278,43 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         categoryManagement.deleteCategory = function() {
+            var defer = $q.defer();
+
             var catId = sessionStorage.getObject('selectedCategory').id;
             var connection = CategoryRESTService(authHeader);
-            connection.category.delete({id: catId}).$promise.then(function(resp) {
-                var cats = sessionStorage.getObject('categories');
-                for (var i = 0; i < cats.length; i++) {
-                    if (cats[i].id == catId) {
-                        cats.splice(i, 1);
-                        break;
+
+            // Get teams currently in category (used to check if any should be
+            // put into uncategorized).
+            categoryManagement.getTeamsInCategory(catId).then(function(resp) {
+                var teamsInCat = resp;
+
+                // THEN delete the category.
+                connection.category.delete({id: catId}).$promise.then(function(resp) {
+                    var cats = sessionStorage.getObject('categories');
+                    for (var i = 0; i < cats.length; i++) {
+                        if (cats[i].id == catId) {
+                            cats.splice(i, 1);
+                            break;
+                        }
                     }
-                }
-                sessionStorage.putObject('categories', cats);
-                $scope.closeCategoryModal();
-                $log.log('Successfully deleted category.');
+                    sessionStorage.putObject('categories', cats);
+                    $scope.closeCategoryModal();
+                    $log.log('Successfully deleted category.');
+                    categoryManagement.checkForUncategorizedTeams([teamsInCat]);
+                    defer.resolve();
+                }).catch(function() {
+                    $scope.errorMessage = 'Error deleting category.';
+                    $log.log($scope.errorMessage);
+                    defer.reject();
+                });
             }).catch(function() {
-                $scope.errorMessage = 'Error deleting catgory.';
-                $log.log($scope.errorMessage);
+                $scope.errorMessage = 'Error deleting category.';
+                console.log($scope.errorMessage);
+
+                defer.reject();
             });
+
+            return defer.promise;
         }
 
         categoryManagement.getTeamsInCategory = function(categoryId) {
@@ -312,6 +332,19 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             return defer.promise;
         }
 
+        categoryManagement.getCategoriesInTeam = function(teamId) {
+            var defer = $q.defer();
+
+            var teamRESTService = TeamRESTService(authHeader);
+            teamRESTService.team_categories.get({team_id: teamId}).$promise.then(function(resp) {
+                defer.resolve(resp.team_categories);
+            }).catch(function() {
+                defer.reject('Error getting categories in team.');
+            });
+
+            return defer.promise;
+        }
+
         categoryManagement.getCategoryById = function(categoryId) {
             var cats = sessionStorage.getObject('categories');
             for (var i = 0; i < cats.length; i++) {
@@ -320,6 +353,87 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 }
             }
             return null;
+        }
+
+        categoryManagement.transferTeamToCategory = function(categoryId, teamId, isDragNDrop) {
+            // If isDrapNDrop is false, that means we don't have to
+            // worry about closing a modal.
+            var connection = TeamRESTService(authHeader);
+            var req = {category_id: categoryId};
+            connection.team_categories.add_team({team_id: teamId}, req).$promise.then(function(resp) {
+                if (sessionStorage.getObject('uncategorized').id != categoryId) {
+                    categoryManagement.isTeamAlreadyInCategory(teamId, sessionStorage.getObject('uncategorized').id).then(function(resp) {
+                        if (resp) {
+                            categoryManagement.removeTeamFromUncategorized(teamId);
+                        }
+                    });
+                }
+                // Update the category view
+                categoryManagement.getCategories();
+                if (!isDragNDrop) {
+                    $scope.closeTeamModal();
+                }
+                $log.log("Added team# " + teamId + " to category " + resp.team_category.category.label + ".");
+            }).catch(function() {
+                sessionStorage.put('generalErrorMessage', 'Error transferring team to category.');
+                $scope.error = 'Error transferring team to category.';
+            });
+        }
+
+        categoryManagement.removeTeamFromUncategorized = function(teamId) {
+            var uncatId = sessionStorage.getObject('uncategorized').id;
+            categoryManagement.removeTeamFromCategory(teamId, uncatId);
+        }
+
+        categoryManagement.addTeamToUncategorized = function(teamId) {
+            var uncatId = sessionStorage.getObject('uncategorized').id;
+            categoryManagement.transferTeamToCategory(uncatId, teamId, false);
+        }
+
+        categoryManagement.removeTeamFromCategory = function(teamId, categoryId) {
+            var connection = TeamRESTService(authHeader);
+            connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
+                categoryManagement.getCategories().then(function() {
+                    categoryManagement.checkForUncategorizedTeam(teamId);
+                });
+            });
+        }
+
+        categoryManagement.checkForUncategorizedTeam = function(teamId) {
+            categoryManagement.getCategoriesInTeam(teamId).then(function(resp) {
+                if (resp.length == 0) {
+                    categoryManagement.addTeamToUncategorized(teamId);
+                }
+            });
+        }
+
+        categoryManagement.checkForUncategorizedTeams = function() {
+            var teams = sessionStorage.getObject('teams');
+            var currentTeamId;
+            for (var i = 0; i < teams.length; i++) {
+                currentTeamId = teams[i].id;
+                categoryManagement.getCategoriesInTeam(teams[i].id).then(function(resp) {
+                    categoryManagement.addTeamToUncategorized(currentTeamId);
+                });
+            }
+        }
+
+        categoryManagement.isTeamAlreadyInCategory = function(teamId, categoryId) {
+            var defer = $q.defer();
+
+            categoryManagement.getTeamsInCategory(categoryId).then(function(teamsInCat) {
+                for (var i = 0; i < teamsInCat.length; i++) {
+                    if (teamId == teamsInCat[i].id) {
+                        defer.resolve(true);
+                    }
+                }
+                defer.resolve(false);
+            }).catch(function() {
+                sessionStorage.put('generalErrorMessage', 'Error getting teams in category.');
+                defer.reject('Error getting teams in category');
+            });
+
+            return defer.promise;
         }
 
         var isEmpty = function(str) {
@@ -484,22 +598,22 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             drop: function(event, ui) {
                 var droppedItem = ui.draggable;
                 scope.itemId = droppedItem.attr('item-id').trim();
-								scope.itemType = droppedItem.attr('item-type').trim();
+                                scope.itemType = droppedItem.attr('item-type').trim();
                 if ($(this).hasClass('destroy-special-category')) {
                     var confirm = window.confirm('Are you sure you want to destroy this ' + scope.itemType + '?\n' +
-												 'The ' + scope.itemType + ' will be deleted and removed from all categories.');
+                                                 'The ' + scope.itemType + ' will be deleted and removed from all categories.');
                     if (confirm) 
                         scope.deleteItem(scope.itemId);
-										else 
+                                        else 
                         droppedItem.goBack();
                 }
                 else if ($(this).hasClass('remove-special-category')) {
                     var confirm = window.confirm('Are you sure you want to remove this ' 
-												 + scope.itemType + ' from current category?');
+                                                 + scope.itemType + ' from current category?');
                     if (confirm) 
-						scope.removeItemFromCategory(scope.itemId);
-					else 
-						droppedItem.goBack();
+                        scope.removeItemFromCategory(scope.itemId);
+                    else 
+                        droppedItem.goBack();
                 }
             }
         });

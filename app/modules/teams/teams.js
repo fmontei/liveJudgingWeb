@@ -23,11 +23,11 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 		var teamInitService = TeamInitService($scope, sessionStorage);
 		teamInitService.initDefaultCookies();
-		teamInitService.initTeams();
 
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);		
 
 		var teamManagementService = TeamManagementService($scope, sessionStorage);
+		teamManagementService.getTeams();
 		$scope.teamNumberOptions = teamManagementService.getTeamNumberOptions();		
 
 		/*
@@ -108,56 +108,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		teamInitService.initDefaultCookies = function() {
 			sessionStorage.put('teamView', 'default');
 			sessionStorage.categoryTime = Date();
-		}	
-
-		teamInitService.initTeams = function() {
-			var defer = $q.defer();
-
-			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
-			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
-				return getCategoriesForEachTeam(resp.event_teams);
-			}).then(function(filledTeams) {
-				sessionStorage.putObject('teams', filledTeams);
-				defer.resolve('Successfully got teams.');
-			}).catch(function() {
-				sessionStorage.put('generalErrorMessage', 'Error getting teams from server.');
-				defer.reject('Error getting teams.');
-				$log.log('Error getting teams from server.');
-			});
-
-			return defer.promise;
-		}
-		
-		var getCategoriesForEachTeam = function(eventTeams) {
-			var deferred = $q.defer();
-			var filledTeams = [], promises = [];
-			var connection = TeamRESTService(CurrentUserService.getAuthHeader());
-			
-			function promiseCategories(team) {
-				var innerDeferred = $q.defer();
-				team.categories = [];
-				connection.team_categories.get({team_id: team.id}).$promise.then(function(resp) {
-					angular.forEach(resp.team_categories, function(team_category) {
-						team.categories.push(team_category.category);
-					});
-					$q.all(team.categories).then(function() {
-						innerDeferred.resolve(team);
-					});
-				});
-				return innerDeferred.promise;
-			}
-			
-			angular.forEach(eventTeams, function(team) {
-				var promise = promiseCategories(team).then(function(filledTeam) {
-					filledTeams.push(filledTeam);
-				});
-				promises.push(promise);
-			});
-			
-			$q.all(promises).then(function() {
-				deferred.resolve(filledTeams);
-			});
-			return deferred.promise;
 		}
 
 		return teamInitService;
@@ -212,8 +162,59 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 	return function($scope, sessionStorage) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
+		var selectedEvent = sessionStorage.getObject('selected_event');
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 		var teamInitService = TeamInitService($scope, sessionStorage);
+
+		teamManagement.getTeams = function() {
+			var defer = $q.defer();
+
+			var connection = TeamRESTService(authHeader);
+			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
+				return getCategoriesForEachTeam(resp.event_teams);
+			}).then(function(filledTeams) {
+				sessionStorage.putObject('teams', filledTeams);
+				defer.resolve('Successfully got teams.');
+			}).catch(function() {
+				sessionStorage.put('generalErrorMessage', 'Error getting teams from server.');
+				defer.reject('Error getting teams.');
+				$log.log('Error getting teams from server.');
+			});
+
+			return defer.promise;
+		}
+
+		var getCategoriesForEachTeam = function(eventTeams) {
+			var deferred = $q.defer();
+			var filledTeams = [], promises = [];
+			var connection = TeamRESTService(authHeader);
+
+			function promiseCategories(team) {
+				var innerDeferred = $q.defer();
+				team.categories = [];
+				connection.team_categories.get({team_id: team.id}).$promise.then(function(resp) {
+					angular.forEach(resp.team_categories, function(team_category) {
+						team.categories.push(team_category.category);
+					});
+					$q.all(team.categories).then(function() {
+						innerDeferred.resolve(team);
+					});
+				});
+				return innerDeferred.promise;
+			}
+
+			angular.forEach(eventTeams, function(team) {
+				var promise = promiseCategories(team).then(function(filledTeam) {
+					filledTeams.push(filledTeam);
+				});
+				promises.push(promise);
+			});
+
+			$q.all(promises).then(function() {
+				deferred.resolve(filledTeams);
+			});
+			return deferred.promise;
+		}
 
 		teamManagement.createNewTeam = function() {	
 			if (!validateForm(false)) 
@@ -244,7 +245,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				} else {
 					catId = sessionStorage.getObject('uncategorized').id;
 				}
-				teamManagement.transferTeamToCategory(catId, returnedTeamID, false);
+				categoryManagementService.transferTeamToCategory(catId, returnedTeamID, false);
 
 				var teams = sessionStorage.getObject('teams');
 				if (teams) {
@@ -321,54 +322,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			}).catch(function() {
 				sessionStorage.put('generalErrorMessage', 'Error deleting team.');
 				$log.log('Error deleting team.');
-			});
-		}
-
-		teamManagement.transferTeamToCategory = function(categoryId, teamId, isDragNDrop) {
-			// If isDrapNDrop is false, that means we don't have to
-			// worry about closing a modal.
-			var connection = TeamRESTService(authHeader);
-			var req = {category_id: categoryId};
-			connection.team_categories.add_team({team_id: teamId}, req).$promise.then(function(resp) {
-				if (sessionStorage.getObject('uncategorized').id != categoryId) {
-					teamManagement.isTeamAlreadyInCategory(teamId, sessionStorage.getObject('uncategorized').id).then(function(resp) {
-						if (resp) {
-							teamManagement.removeTeamFromUncategorized(teamId);
-						}
-					});
-				}
-				// Update the category view
-				categoryManagementService.getCategories();
-				if (!isDragNDrop) {
-					$scope.closeTeamModal();
-				}
-				$log.log("Added team# " + teamId + " to category " + resp.team_category.category.label + ".");
-			}).catch(function() {
-				sessionStorage.put('generalErrorMessage', 'Error transferring team to category.');
-				$scope.error = 'Error transferring team to category.';
-			});
-		}
-
-		teamManagement.removeTeamFromUncategorized = function(teamId) {
-			var uncatId = sessionStorage.getObject('uncategorized').id;
-			teamManagement.removeTeamFromCategory(teamId, uncatId);
-		}
-
-		teamManagement.addTeamToUncategorized = function(teamId) {
-			var uncatId = sessionStorage.getObject('uncategorized').id;
-			teamManagement.transferTeamToCategory(uncatId, teamId, false);
-		}
-
-		teamManagement.removeTeamFromCategory = function(teamId, categoryId) {
-			var connection = TeamRESTService(authHeader);
-			connection.team_categories.remove_team({team_id: teamId, category_id: categoryId}).$promise.then(function(resp) {
-				categoryManagementService.getCategories();
-				teamInitService.initTeams().then(function() {
-					var removedTeam = teamManagement.getTeamByID(teamId);
-					if (removedTeam.categories.length == 0) {
-						teamManagement.addTeamToUncategorized(teamId);
-					}
-				});
 			});
 		}
 
