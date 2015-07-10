@@ -535,7 +535,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				console.log('Successfully deleted judge.');
 			}).catch(function(error) {
 				sessionStorage.put('generalErrorMessage', 'Error deleting judge.');
-				console.log('Error deleting judge.');
+				console.log('Error deleting judge: ' + JSON.stringify(error));
 			});
 		}
 

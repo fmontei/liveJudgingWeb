@@ -37,22 +37,22 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.deleteItem = function(itemId, itemType) {
-            if ($location.path().contains('teams')) {
+            if ($location.path().indexOf('teams') !== -1) {
                 var team = teamManagementService.getTeamByID(parseInt(itemId));
                 sessionStorage.putObject('selectedTeam', team);
                 teamManagementService.deleteTeam();
-            } else if ($location.path().contains('judges')) {
+            } else if ($location.path().indexOf('judges') !== -1) {
                 judgeManagementService.deleteJudge(itemId);
             }
         }
 
         $scope.removeItemFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-                        if ($location.path().contains('teams')) {
-                            categoryManagementService.removeTeamFromCategory(itemId, categoryId);
-                        } else if ($location.path().contains('judges')) {
-                                //
-                        }
+								if ($location.path().indexOf('teams') !== -1) {
+										categoryManagementService.removeTeamFromCategory(itemId, categoryId);
+								} else if ($location.path().indexOf('judges') !== -1) {
+												//
+								}
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -96,20 +96,20 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.transferItemToCategory = function(categoryId, itemId) {
-            if ($location.path().contains('teams')) {
+            if ($location.path().indexOf('teams') !== -1) {
                 categoryManagementService.transferTeamToCategory(categoryId, itemId);
-            } else if ($location.path().contains('judges')) {
+            } else if ($location.path().indexOf('judges') !== -1) {
                 judgeManagementService.openAssignByCatModal(categoryId, itemId);
             }
         }
 
         $scope.viewCategoryDetails = function(cat) {
             $scope.updateStoredCategory(cat);
-            if ($location.path().contains('teams')) {
+            if ($location.path().indexOf('teams') !== -1) {
                 teamManagementService.changeView('selectedCategory');
-            } else if ($location.path().contains('judges')) {
+            } else if ($location.path().indexOf('judges') !== -1) {
                 judgeManagementService.changeView('selectedCategory');
-            } else if ($location.path().contains('rubrics')) {
+            } else if ($location.path().indexOf('rubrics') !== -1) {
                 rubricManagementService.changeView('selectedCategory');
             }
         }
@@ -140,11 +140,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }, true);
 
             $scope.$watch(function() {
-                if ($location.path().contains('teams')) {
+                if ($location.path().indexOf('teams') !== -1) {
                     return sessionStorage.get('teamView');
-                } else if ($location.path().contains('judges')) {
+                } else if ($location.path().indexOf('judges') !== -1) {
                     return sessionStorage.get('judgeView');
-                } else if ($location.path().contains('rubrics')) {
+                } else if ($location.path().indexOf('rubrics') !== -1) {
                     return sessionStorage.get('rubricView');
                 }
             }, function(newValue) {
