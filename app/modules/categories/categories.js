@@ -37,20 +37,20 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.deleteItem = function(itemId, itemType) {
-            if ($location.path().includes('teams')) {
+            if ($location.path().contains('teams')) {
                 var team = teamManagementService.getTeamByID(parseInt(itemId));
                 sessionStorage.putObject('selectedTeam', team);
                 teamManagementService.deleteTeam();
-            } else if ($location.path().includes('judges')) {
+            } else if ($location.path().contains('judges')) {
                 judgeManagementService.deleteJudge(itemId);
             }
         }
 
         $scope.removeItemFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-                        if ($location.path().includes('teams')) {
+                        if ($location.path().contains('teams')) {
                             categoryManagementService.removeTeamFromCategory(itemId, categoryId);
-                        } else if ($location.path().includes('judges')) {
+                        } else if ($location.path().contains('judges')) {
                                 //
                         }
         }
@@ -96,27 +96,28 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         $scope.transferItemToCategory = function(categoryId, itemId) {
-            if ($location.path().includes('teams')) {
+            if ($location.path().contains('teams')) {
                 categoryManagementService.transferTeamToCategory(categoryId, itemId);
-            } else if ($location.path().includes('judges')) {
+            } else if ($location.path().contains('judges')) {
                 judgeManagementService.openAssignByCatModal(categoryId, itemId);
             }
         }
 
         $scope.viewCategoryDetails = function(cat) {
             $scope.updateStoredCategory(cat);
-            if ($location.path().includes('teams')) {
+            if ($location.path().contains('teams')) {
                 teamManagementService.changeView('selectedCategory');
-            } else if ($location.path().includes('judges')) {
+            } else if ($location.path().contains('judges')) {
                 judgeManagementService.changeView('selectedCategory');
-            } else if ($location.path().includes('rubrics')) {
+            } else if ($location.path().contains('rubrics')) {
                 rubricManagementService.changeView('selectedCategory');
             }
         }
     }
 ])
 
-.factory('CatWatchService', ['$location', 'CategoryManagementService', function($location, CategoryManagementService) {
+.factory('CatWatchService', ['$location', 'CategoryManagementService', 
+				 function($location, CategoryManagementService) {
     return function(sessionStorage, $scope) {
         var categoryManagementService = CategoryManagementService($scope);
         var service = {};
@@ -139,11 +140,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }, true);
 
             $scope.$watch(function() {
-                if ($location.path().includes('teams')) {
+                if ($location.path().contains('teams')) {
                     return sessionStorage.get('teamView');
-                } else if ($location.path().includes('judges')) {
+                } else if ($location.path().contains('judges')) {
                     return sessionStorage.get('judgeView');
-                } else if ($location.path().includes('rubrics')) {
+                } else if ($location.path().contains('rubrics')) {
                     return sessionStorage.get('rubricView');
                 }
             }, function(newValue) {

@@ -192,6 +192,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 
 	$scope.assignTeamsToJudge = function() {
+		console.log('hello!');
 		var teamsToAdd = [];
 		for (var i = 0; i < $scope.teamsInDropCat.length; i++) {
 			if ($scope.teamsInDropCat[i].checked) {
@@ -304,6 +305,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 			judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
 				sessionStorage.putObject('judges', resp.event_judges);
+				console.log('Judges successfully retrieved from server.');
 			}).then(function() {
 				var judges = sessionStorage.getObject('judges');
 				judgeManagement.getJudgeTeams(judges).then(function() {
@@ -365,19 +367,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			UserRESTService.register(judgeReq).$promise.then(function(resp) {
 				judgeId = resp.user.id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId}).$promise.then(function(resp) {
-					console.log('ID from first resp: ' + judgeId + '; Second resp: ' + JSON.stringify(resp));
 					console.log('Judge successfully registered & added to event');
-
-					/* Assign judge to every team selected in modal */
-					angular.forEach(judgeFormData.teams, function(team) {
-						var req = {team_id: team.id};
-						judgeRESTService.judgeTeams.assign({judge_id: judgeId}, req).$promise.then(function(resp) {
-							console.log('Judge assigned to team.');
-						}).catch(function(error) {
-							sessionStorage.put('generalErrorMessage', 'Error adding judge to team.');
-							console.log('Error adding judge to team.');
-						});
-					});
+					defer.resolve('Finished addJudge()');
 				}).catch(function() {
 					sessionStorage.put('generalErrorMessage', 'Error adding judge to event');
 					console.log('Error adding judge to event');
@@ -389,8 +380,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 					var error = 'Email already exists. Please use another.';
 					defer.reject(error);
 				}
-			}).finally(function() {
-				defer.resolve('Finished addJudge()');
 			});
 
 			return defer.promise;
@@ -509,6 +498,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				console.log(resp);
 				console.log('Successfully assigned team ' + teamName + ' to judge.');
 			}).catch(function() {
+				sessionStorage.put('Error assigning team ' + teamName + ' to judge.');
 				console.log('Error assigning team ' + teamName + ' to judge.');
 			});
 		}
