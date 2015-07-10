@@ -173,7 +173,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var defer = $q.defer();
 
             CategoryRESTService(authHeader).categories.get({event_id: eventId}).$promise.then(function(resp) {
-                var filteredColorList = sessionStorage.getObject('defaultColorList');
+                var filteredColorList = categoryManagement.getDefaultColors();
+                sessionStorage.putObject('defaultColorList', filteredColorList);
                 angular.forEach(resp.event_categories, function(category) {
                     if (category.label === 'Uncategorized') {
                         category.color = '#BBBBBB';

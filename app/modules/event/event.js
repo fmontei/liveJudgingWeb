@@ -11,7 +11,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         controller: 'EventSelectCtrl'
     }).when('/eventEdit', {
         templateUrl: 'modules/event/eventEdit.html',
-        controller: 'EventEditCtrl'  
+        controller: 'EventEditCtrl'
     });
 }])
 
@@ -58,7 +58,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.eventForm = {
             startTime: new Date(0, 0, 0, 12, 0),
             endTime: new Date(0, 0, 0, 12, 0)
-        };        
+        };
 
         $scope.saveEvent = function(eventForm) {
             addDateTimesToEvent(eventForm);
@@ -175,13 +175,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 				var teamStandingService = TeamStandingService($scope);
 				teamStandingService.init();
-			
+
         $scope.event = {
             EVENT_READY_VIEW: EventUtilService.views.EVENT_READY_VIEW,
             EVENT_IN_PROGRESS_VIEW: EventUtilService.views.EVENT_IN_PROGRESS_VIEW,
             current_view: sessionStorage.get('event_view')
         };
-				
+
 				$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
 														{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
 														{name: 'Category Progress', id: 'category-progress-tab', sectionId: 'category-progress-section'},
@@ -205,7 +205,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.reveal_event_desc = function(desc) {
             $('#event-selection-desc').html('<strong>Event Description:</strong><br />' + desc).show();
         };
-			
+
 				$scope.rankNext3Categories = function() {
 					var categoryInc = parseInt(sessionStorage.get('categoryInc')) + 3;
 					var numCategories = $scope.categories.length;
@@ -218,7 +218,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
         $scope.recipient_list = []; // Contains list of judges to be notified
         $scope.project_list = ["Sample Project 1", "Sample Project 2"];
-        
+
         $scope.times = [];
         for (var i = 1; i <= 12; i++) {
             for (var j = 0; j <= 45; j += 15) {
@@ -238,21 +238,21 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.factory('TeamStandingService', ['sessionStorage', 'CategoryManagementService', 
-				 function(sessionStorage, CategoryManagementService) {
+.factory('TeamStandingService', ['sessionStorage', 'CategoryManagementService',
+	function(sessionStorage, CategoryManagementService) {
 	return function($scope) {
 		var service = {};
-		
+
 		service.init =  function() {
 			var categoryManagementService = CategoryManagementService($scope);
 			categoryManagementService.getCategories();
-			
+
 			$scope.$watch(function() {
 				return sessionStorage.getObject('categories');
 			}, function(newValue) {
 				$scope.categories = newValue;
 			}, true);
-			
+
 			sessionStorage.put('categoryInc', '0');
 		}
 
@@ -352,7 +352,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		});
 	}
 	return {
-		restrict: 'A', 
+		restrict: 'A',
 		scope: {
 			eventSection: '@'
 	  },
@@ -397,7 +397,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         link: function(scope, elem, attrs) {
             $(".accordion-toggle").unbind().click(function(event) {
                 var span = $(this).find("span");
-                if (span.hasClass("glyphicon-chevron-right")) 
+                if (span.hasClass("glyphicon-chevron-right"))
                     span.removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
                 else
                     span.removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
@@ -407,7 +407,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 })
 
 .directive('notificationWidget', function() {
-    
+
     var link = function(scope, elem, attrs) {
         /*
          * Initialize the Autocomplete Object for the Notification Modal
@@ -428,7 +428,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
          */
         function create_new_judge_notification_object(name) {
             var recipient_div = $("#recipients-div");
-            recipient_div.append("<div class='recipient'>" + name + 
+            recipient_div.append("<div class='recipient'>" + name +
                 "&nbsp;&nbsp;<span class='glyphicon glyphicon-remove'></span></div>");
             scope.recipient_list.push(name);
             clear_all_checkbox.attr("checked", false);
@@ -437,7 +437,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 if ($(this).parent().html().indexOf(name) >= 0) {
                     /* Remove recipient from list if 'x' is clicked */
                     scope.recipient_list = scope.recipient_list.filter(function(elem) {
-                         return elem != name; 
+                         return elem != name;
                     });
                     /* Destroy HTML element */
                     $(this).parent().remove();
@@ -447,8 +447,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         }
 
         /*
-         * Send to all judges Checkbox 
-         */ 
+         * Send to all judges Checkbox
+         */
         var send_all_checkbox = $("#send-all-checkbox");
         send_all_checkbox.click(function() {
             if (!this.checked) return;
@@ -462,17 +462,17 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
         /*
          * Clear all judges from receiving notification Checkbox
-         */ 
+         */
         var clear_all_checkbox = $("#clear-all-checkbox");
         clear_all_checkbox.click(function() {
             if (!this.checked) return;
             /* Use listener defined in create_new_judge_notification_object() to destroy */
-            $(".recipient .glyphicon.glyphicon-remove").click(); 
+            $(".recipient .glyphicon.glyphicon-remove").click();
             scope.recipient_list.length = 0; // Clear recipient list
             send_all_checkbox.attr("checked", false);
         });
     }
-    
+
   return {
         link: link
   };
