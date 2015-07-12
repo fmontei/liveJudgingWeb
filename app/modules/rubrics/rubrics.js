@@ -34,19 +34,19 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	$scope.updateRatingType = function(index, type) {
 		$scope.modalCriteria[index].ratingType = type;
 	}
-	
+
 	$scope.changeView = function(view) {
 		rubricManagementService.changeView(view);
 	}
-	
+
 	sessionStorage.put('rubricView', 'default');
-	
+
 	$scope.$watch(function() {
 		return sessionStorage.get('rubricView');
 	}, function(newValue) {
 		$scope.rubricView = newValue;
 	});
-							
+
 	$scope.$watch(function() {
 		return sessionStorage.getObject('selectedCategory');
 	}, function(newValue) {
@@ -54,7 +54,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	}, true);
 }])
 
-.factory('RubricManagementService', function() {
+.factory('RubricManagementService', function(CurrentUserService, RubricRESTService) {
 	return function($scope, sessionStorage) {
 		var rubricManagement = {};
 
@@ -62,6 +62,35 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			sessionStorage.put('rubricView', view);
 		}
 
+		rubricManagement.getRubrics = function() {
+			var eventId = sessionStorage.getObject('selected_event').id;
+			RubricRESTService(CurrentUserService.getAuthHeader()).rubrics.get({event_id: eventId}).$promise.then(function(resp) {
+				sessionStorage.put('rubrics', resp.event_rubrics);
+				console.log(resp.event_rubrics);
+			}).catch(function() {
+				console.log('Error getting rubrics');
+			});
+		}
+
 		return rubricManagement;
+	}
+})
+
+.factory('RubricRESTService', function($resource, CurrentUserService) {
+	return function(authHeader) {
+		return {
+			rubrics: $resource('http://api.stevedolan.me/events/:event_id/rubrics', {
+				event_id: '@id'
+			}, {
+				get: {
+					method: 'GET',
+					headers: authHeader
+				},
+				create: {
+					method: 'POST',
+					headers: authHeader
+				}
+			})
+		}
 	}
 });
