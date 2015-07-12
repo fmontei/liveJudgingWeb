@@ -10,15 +10,16 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 }])
 
 .controller('RubricsCtrl', ['$scope', 'sessionStorage', 'RubricManagementService',
-						function($scope, sessionStorage, RubricManagementSerive) {
-							
-	var rubricManagementService = RubricManagementSerive($scope, sessionStorage);
-							
+						function($scope, sessionStorage, RubricManagementService) {
+
+	var rubricManagementService = RubricManagementService($scope, sessionStorage);
+
+	$scope.rubricForm = {};
 	$scope.modalCriteria = [{name: 'Flavor'}, {name: 'Texture'}, {name: 'Size'}];
-	
+
 	$scope.createNewAccordionCriterion = function() {
 		var numberOfNewCriteria = 0;
-		for (var i = 0; i < $scope.modalCriteria.length; i++) 
+		for (var i = 0; i < $scope.modalCriteria.length; i++)
 			if ($scope.modalCriteria[i].name.indexOf('New Criterion') !== -1)
 				numberOfNewCriteria++;
 		if (numberOfNewCriteria > 0)
@@ -26,13 +27,18 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		else
 			$scope.modalCriteria.push({name: 'New Criterion'});
 	}
-	
+
 	$scope.removeAccordionCriterion = function(index) {
 		$scope.modalCriteria.splice(index, 1);
 	}
 
 	$scope.updateRatingType = function(index, type) {
 		$scope.modalCriteria[index].ratingType = type;
+	}
+
+	$scope.createRubric = function() {
+		var rubricReq = {name: $scope.rubricForm.name};
+		rubricManagementService.createRubric(rubricReq);
 	}
 
 	$scope.changeView = function(view) {
@@ -69,6 +75,16 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 				console.log(resp.event_rubrics);
 			}).catch(function() {
 				console.log('Error getting rubrics');
+			});
+		}
+
+		rubricManagement.createRubric = function(rubricReq) {
+			var eventId = sessionStorage.getObject('selected_event').id;
+			RubricRESTService(CurrentUserService.getAuthHeader()).rubrics.create({event_id: eventId}, rubricReq).$promise.then(function(resp) {
+				console.log(resp);
+				console.log('Successfully created rubric');
+			}).catch(function() {
+				console.log('Error creating rubric');
 			});
 		}
 

@@ -11,14 +11,14 @@
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
 						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Rubrics</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}} 
+							<a ng-click="changeView('default')">Rubrics</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
 							<span class="label label-default">TODO</span>
 						</h1>
 						<hr>
 					</div>
 				</div>
 			</div>
-			
+
 			<div class="row">
 				<div class="col-sm-8 col-md-8 col-lg-8">
 					<em>Drag-'n-drop rubrics into categories.</em>
@@ -32,7 +32,7 @@
 									<span class="glyphicon glyphicon-th-large"></span>
 								</button>
 								<div class="btn-group" role="group">
-									<button class="btn btn-default dropdown-toggle" type="button" 
+									<button class="btn btn-default dropdown-toggle" type="button"
 										data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 										Sort by
 										<span class="caret"></span>
@@ -47,7 +47,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div ng-switch on="rubricView">
 				<div ng-switch-default>
 					<div class="row">
@@ -66,9 +66,9 @@
 					</div>
 				</div> <!-- ng-switch-when="selectedCategory" -->
 			</div>
-			
+
 		</div> <!-- ./col col-sm-8 col-md-8 col-lg-8 -->
-		
+
 		<div class="col-sm-4 col-md-4 col-lg-4">
 			<div class="text-center" id="category-container" ng-include="'modules/categories/categories.html'"></div> <!--Text-Center-->
 		</div> <!-- ./col -->
@@ -84,7 +84,7 @@
 				<h4 class="modal-title" id="notification-modal-label">Add New Rubric</h4>
 			</div>
 			<div class="modal-body">
-			
+
 				<div class="row">
 					<div class="col col-sm-1 col-md-1 col-lg-1">
 					</div>
@@ -92,11 +92,13 @@
 						<label>*Name:</label>
 					</div>
 					<div class="col col-sm-7 col-md-7 col-lg-7">
-						<input class="form-control" type="text" />
+						<input class="form-control"
+								type="text"
+								ng-model="rubricForm.name" />
 					</div>
 				</div> <!-- ./row -->
 				<br />
-				
+
 				<div class="row">
 					<div class="col col-sm-1 col-md-1 col-lg-1">
 					</div>
@@ -105,10 +107,10 @@
 					</div>
 					<div class="col col-sm-7 col-md-7 col-lg-7">
 						<div ng-init="rubricRating = 5"><rating ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
-					</div>			
+					</div>
 				</div> <!-- ./row -->
 				<br />
-				
+
 				<div class="row">
 					<div class="col col-sm-1 col-md-1 col-lg-1">
 					</div>
@@ -116,11 +118,11 @@
 						<label>*Criteria:</label>
 					</div>
 					<div class="col col-sm-7 col-md-7 col-lg-7">
-				
+
 						<div accordion close-others="true">
-							<button class="btn btn-success" 
-							        id="rubric-accordion-add-btn" 
-											ng-click="createNewAccordionCriterion()">
+							<button class="btn btn-success"
+							        id="rubric-accordion-add-btn"
+									ng-click="createNewAccordionCriterion()">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add New Criterion
 							</button>
@@ -129,14 +131,14 @@
 									<div accordion-heading class="panel-heading rubric-accordion-heading">
 										<div class="rubric-accordion-heading-content">
 											{{criteria.name}}
-											<i class="pull-right glyphicon" 
+											<i class="pull-right glyphicon"
 												 ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}">
 											</i>
 										</div>
 									</div accordion-heading>
 									<div class="row">
 										<div class="col-sm-12 col-md-12 col-lg-12">
-											<i class="pull-right glyphicon glyphicon-remove criterion-remove-icon" 
+											<i class="pull-right glyphicon glyphicon-remove criterion-remove-icon"
 												 ng-click="removeAccordionCriterion($index)">
 											</i>
 										</div>
@@ -168,16 +170,16 @@
 									<br />
 									<div class="row rubric-accordion-row">
 										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default" 
-											     ng-style="inheritedActive" 
+											<div class="panel panel-default"
+											     ng-style="inheritedActive"
 											     ng-click="updateRatingType($index, 'Inherited'); inheritedActive={'background-color':'#d6e9c6'}; customActive={'background-color':'white'}">
 												<label>Inherited</label>
 												<div><rating ng-model="rubricRating" readonly="true" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
 											</div>
 										</div>
 										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default" 
-											     ng-style="customActive" 
+											<div class="panel panel-default"
+											     ng-style="customActive"
 											     ng-click="updateRatingType($index, 'Custom'); customActive={'background-color':'#d6e9c6'}; inheritedActive={'background-color':'white'}">
 												<label>Custom</label>
 												<div ng-init="modalCriteria[$index].rating = 0">
@@ -189,15 +191,21 @@
 								</div accordion-group>
 							</div>
 						</div accordion>
-						
+
 					</div>
 				</div>
-				
+
 			</div> <!-- ./modal-body -->
-			
+
 			<div class="modal-footer">
 				<div class="row">
-					<span class="col col-sm-5"><button type="button" class="btn btn-success pull-right">Create</button></span>
+					<span class="col col-sm-5">
+						<button type="button"
+								class="btn btn-success pull-right"
+								ng-click="createRubric()">
+							Create
+						</button>
+					</span>
 					<span class="col col-sm-2"></span>
 					<span class="col col-sm-5"><button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button></span>
 				</div>
