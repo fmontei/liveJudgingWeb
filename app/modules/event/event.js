@@ -158,7 +158,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             } else if (picker === 'end') {
                 $scope.datePicker.endOpened = !$scope.datePicker.endOpened;
             }
-            console.log($scope.eventForm);
         }
 
         if ($scope.isCreation) {
@@ -238,14 +237,20 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.factory('TeamStandingService', ['sessionStorage', 'CategoryManagementService',
-	function(sessionStorage, CategoryManagementService) {
+.factory('TeamStandingService', ['sessionStorage', 'CategoryManagementService', 'JudgeManagementService', 'TeamManagementService',
+	function(sessionStorage, CategoryManagementService, JudgeManagementService, TeamManagmentService) {
 	return function($scope) {
 		var service = {};
 
 		service.init =  function() {
 			var categoryManagementService = CategoryManagementService($scope);
 			categoryManagementService.getCategories();
+
+            var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+            teamManagmentService.getTeams();
+
+            var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+            judgeManagementService.getJudges();
 
 			$scope.$watch(function() {
 				return sessionStorage.getObject('categories');
@@ -263,6 +268,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 return sessionStorage.getObject('judges');
             }, function(newValue) {
                 $scope.judges = newValue;
+            }, true);
+
+            $scope.$watch(function() {
+                return sessionStorage.getObject('selected_event');
+            }, function(newValue) {
+                $scope.selectedEvent = newValue;
             }, true);
 
 			sessionStorage.put('categoryInc', '0');
