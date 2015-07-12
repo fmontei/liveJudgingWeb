@@ -253,6 +253,18 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				$scope.categories = newValue;
 			}, true);
 
+            $scope.$watch(function() {
+                return sessionStorage.getObject('teams');
+            }, function(newValue) {
+                $scope.teams = newValue;
+            }, true);
+
+            $scope.$watch(function() {
+                return sessionStorage.getObject('judges');
+            }, function(newValue) {
+                $scope.judges = newValue;
+            }, true);
+
 			sessionStorage.put('categoryInc', '0');
 		}
 
