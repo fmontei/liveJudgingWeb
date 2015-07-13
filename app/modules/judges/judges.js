@@ -490,16 +490,15 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		}
 
 		judgeManagement.assignTeamToJudge = function(teamId, judgeId) {
-			var teamName = teamManagementService.getTeamByID(teamId).name;
 			if (!judgeId) {
 				var judgeId = sessionStorage.getObject('draggedJudge').judge.id;
 			}
 			judgeRESTService.judgeTeams.assign({judge_id: judgeId}, {team_id: teamId}).$promise.then(function(resp) {
 				console.log(resp);
-				console.log('Successfully assigned team ' + teamName + ' to judge.');
+				console.log('Successfully assigned team #' + teamId + ' to judge.');
 			}).catch(function() {
-				sessionStorage.put('Error assigning team ' + teamName + ' to judge.');
-				console.log('Error assigning team ' + teamName + ' to judge.');
+				sessionStorage.put('Error assigning team #' + teamId + ' to judge.');
+				console.log('Error assigning team #' + teamId + ' to judge.');
 			});
 		}
 
