@@ -223,14 +223,14 @@
 								active="tabs[1].active"
 								ng-show="judgeModalView == 'edit'">
 							<div class="lj-tab-content">
-								<label>Currently Assigned Teams: ({{judgeInfoForm.assignedTeams.length}})</label>
+								<label>Currently Assigned Teams: ({{assignedTeams.length}})</label>
 								<div class="row">
 									<div class="col col-sm-12 col-md-12 col-lg-12">
-										<span ng-if="judgeInfoForm.assignedTeams.length == 0">
+										<span ng-if="assignedTeams.length == 0">
 											No teams assigned to this judge.
 										</span>
-										<span ng-if="judgeInfoForm.assignedTeams.length > 0">
-											<span ng-repeat="team in judgeInfoForm.assignedTeams"
+										<span ng-if="assignedTeams.length > 0">
+											<span ng-repeat="team in assignedTeams"
 												 class="assigned-team">
 												<span ng-show="!team.toRemove">
 												 	#{{team.id}} {{team.name}} [<!-- comment prevents space

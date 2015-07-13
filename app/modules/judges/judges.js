@@ -30,7 +30,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	$scope.teamsToAdd = []; // Teams added in the form (not yet saved)
 	$scope.teamsToRemove = []; // Teams removed in the form (not yet saved)
 	$scope.assignedTeams = []; // Teams actually assigned
-	$scope.selectedTeams = []; // Teams that are checked in the form
 	/* end */
 
 	$scope.tabs = [
@@ -141,20 +140,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		team.selected = false;
 	}
 
-	$scope.isTeamSelected = function(team) {
-		return $scope.selectedTeams.indexOf(team) !== -1;
-	}
-
-	$scope.areAllTeamsSelected = function() {
-		for (var i = 0; i < $scope.filteredTeams.length; i++) {
-			var team = $scope.filteredTeams[i];
-			if (!team.selected) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	$scope.addJudge = function() {
 		var judgeFormData = {
       email: $scope.judgeInfoForm.judgeEmail.trim(),
@@ -213,9 +198,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	// Used for modal display.
 	$scope.removeTeamFromJudge = function(team) {
 		$scope.teamsToRemove.push(team);
-    var index = $scope.judgeInfoForm.assignedTeams.indexOf(team);
+    var index = $scope.assignedTeams.indexOf(team);
     if (index > -1)
-      $scope.judgeInfoForm.assignedTeams[index].toRemove = true;
+      $scope.assignedTeams[index].toRemove = true;
 	}
 
 	// Also used for modal display.
@@ -224,9 +209,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		if (index > -1) {
 			$scope.teamsToRemove.splice(index, 1);
 		}
-    index = $scope.judgeInfoForm.assignedTeams.indexOf(team);
+    index = $scope.assignedTeams.indexOf(team);
     if (index > -1)
-      $scope.judgeInfoForm.assignedTeams[index].toRemove = false;
+      $scope.assignedTeams[index].toRemove = false;
 	}
 
 	// For modal display
@@ -284,6 +269,10 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
     var userRESTService = UserRESTService(CurrentUserService.getAuthHeader());
     
 		var eventId = sessionStorage.getObject('selected_event').id;
+    
+    judgeManagement.changeView = function(view) {
+			sessionStorage.put('judgeView', view);
+		}
 
 		judgeManagement.getJudges = function() {
 			var defer = $q.defer();
@@ -385,14 +374,17 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		judgeManagement.editJudge = function(judgeId, judgeFormData, teamsToAdd, teamsToRemove, assignedTeams) {
 			var defer = $q.defer();
       
-      console.log(judgeFormData);
       userRESTService.edit({id: judgeId}, judgeFormData).$promise.then(function(resp) {
         alert('woot!');
       });
       
+      /* Within the modal, it is possible to remove an already-assigned team
+         and, at the same time, assign the same team from the table. This means
+         removing then adding teams will work for this edge case (but the 
+         opposite will not, since duplicates are not added). */
       for (var i = 0; i < teamsToRemove.length; i++) {
         var index = assignedTeams.indexOf(teamsToRemove[i]);
-        if (index !== -1)
+        if (index > -1)
           assignedTeams.splice(index, 1);
       }
       
@@ -456,10 +448,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			});
       
       return defer.promise;
-		}
-
-		judgeManagement.changeView = function(view) {
-			sessionStorage.put('judgeView', view);
 		}
 
 		judgeManagement.removeTeamsFromJudge = function(teams, judgeId) {
