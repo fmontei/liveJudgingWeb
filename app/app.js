@@ -150,8 +150,8 @@ angular.module('liveJudgingAdmin', [
                 cursor: 'grab',
                 start: function(event, ui) {
 										$(this).css('zIndex', '100');
-										if (undefined === elem.data('originalPosition')) {
-												elem.data('originalPosition', elem.offset());
+										if (elem.data('originalPosition') === undefined) {
+											elem.data('originalPosition', elem.offset());
 										}
 										$(this).draggable('option', 'cursorAt', {
 											left: Math.floor(ui.helper.width() / 2),
@@ -159,35 +159,39 @@ angular.module('liveJudgingAdmin', [
 										}); 
                 },
                 stop: function(event, ui) {
-                    $('[cng-draggable-item]').each(function() {
-                        $(this).css('zIndex', '1');
-                    });
-                    $(this).css('zIndex', '2');
+                  $('[cng-draggable-item]').each(function() {
+                    $(this).css('zIndex', '1');
+                  });
+                  $(this).css('zIndex', '2');
                 }
             });
 
             var cog = elem.find(scope.cog);
             elem.bind('mouseenter', function() {
-                cog.show();
+              cog.show();
             });
 
             elem.bind('mouseleave', function() {
-                cog.hide();
+              cog.hide();
             });
 
             $.fn.goBack = function() {
-                if ($(this).is('[cng-draggable-item]')) {
-                    var originalPosition = $(this).data('originalPosition');
-                    var leftDifference = $(this).offset().left - originalPosition.left;
-                    var leftDecrement = '-=' + leftDifference;
-                    var topDifference = $(this).offset().top - originalPosition.top;
-                    var topDecrement = '-=' + topDifference;
-                    $(this).animate({
-                        'left': leftDecrement,
-                        'top': topDecrement
-                    }, 500);
-                }
+              if ($(this).is('[cng-draggable-item]')) {
+                var originalPosition = $(this).data('originalPosition');
+                var leftDifference = $(this).offset().left - originalPosition.left;
+                var leftDecrement = '-=' + leftDifference;
+                var topDifference = $(this).offset().top - originalPosition.top;
+                var topDecrement = '-=' + topDifference;
+                $(this).animate({
+                    'left': leftDecrement,
+                    'top': topDecrement
+                }, 500);
+              }
             }
+
+            $(window).resize(function() {
+              location.reload(); // Kludgey way to reset the position of draggable elements
+            });
         }
     }
 
@@ -211,7 +215,6 @@ angular.module('liveJudgingAdmin', [
 	return {
 		restrict: 'A',
 		scope: {
-			float: '@float',
 			animate: '@animate',
 			color: '@color'
 		},
@@ -221,12 +224,17 @@ angular.module('liveJudgingAdmin', [
 			scope.$watch(function() {
 				return sessionStorage.get('generalErrorMessage');
 			}, function(newValue) {
-				if (scope.animate === 'true') {
-					elem.html(newValue);
-					$timeout(function() { sessionStorage.put('generalErrorMessage', ''); }, 5000);
+				if (scope.animate == 'true') {
+          if (newValue !== '') {
+            elem.html(newValue);  
+            $timeout(function() {
+              elem.html('');
+              sessionStorage.put('generalErrorMessage', '');
+            }, 5000);
+          }
 				} else {
 					elem.html(newValue);	
-				}
+        }
 			}, true);
 		}
 	}

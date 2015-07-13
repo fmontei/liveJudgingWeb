@@ -192,7 +192,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 
 	$scope.assignTeamsToJudge = function() {
-		console.log('hello!');
 		var teamsToAdd = [];
 		for (var i = 0; i < $scope.teamsInDropCat.length; i++) {
 			if ($scope.teamsInDropCat[i].checked) {

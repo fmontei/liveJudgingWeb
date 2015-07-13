@@ -202,6 +202,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 }
                 defer.resolve();
             }).catch(function() {
+                sessionStorage.put('generalErrorMessage', 'Error getting categories.');
                 console.log('Error getting categories.');
                 defer.reject();
             });

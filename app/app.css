@@ -8,3 +8,7 @@
 	display: inline-block; 
 	align-self: flex-end;
 }
+
+.general-error-message-col h4 {
+	float: right;
+}
