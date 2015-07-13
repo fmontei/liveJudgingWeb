@@ -287,8 +287,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 })
 
 .factory('JudgeManagementService', ['$q', 'CategoryManagementService', 'CurrentUserService', 'JudgeRESTService',
-									'sessionStorage', 'TeamManagementService', 'UserRESTService',
-	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService,
+									'sessionStorage', 'TeamManagementService', 'UserRESTService', '$window',
+	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService, $window,
 				sessionStorage, TeamManagementService, UserRESTService) {
 	return function($scope, sessionStorage) {
 
@@ -529,14 +529,18 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			});
 		}
 
-		judgeManagement.deleteJudge = function(judgeId) {
-			judgeRESTService.judge.delete({event_id: eventId, judge_id: judgeId}).$promise.then(function() {
-				//judgeManagement.getJudges();
+		judgeManagement.deleteJudge = function(judgeId, judge) {
+			var defer = $q.defer();
+			judgeRESTService.judge.delete({id: judgeId}).$promise.then(function() {
+				judgeManagement.getJudges();
 				console.log('Successfully deleted judge.');
+				defer.resolve(true);
 			}).catch(function(error) {
 				sessionStorage.put('generalErrorMessage', 'Error deleting judge.');
 				console.log('Error deleting judge: ' + JSON.stringify(error));
+				defer.resolve(false);
 			});
+			return defer.promise;
 		}
 
 		return judgeManagement;
@@ -607,8 +611,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			judge: $resource('http://api.stevedolan.me/events/:event_id/judges/:judge_id', {
-				event_id: '@event_id', judge_id: '@judge_id'
+			judge: $resource('http://api.stevedolan.me/judges/:id', {
+				id: '@id'
 			}, {
 				delete: {
 					method: 'DELETE',

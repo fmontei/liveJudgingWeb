@@ -273,27 +273,29 @@
 								<br />
 
 								<div class="row">
-									<div class="col col-sm-1 col-md-1 col-lg-1">
-										<div class="btn-group" role="group">
-											<button class="btn btn-default dropdown-toggle"
-													type="button"
-													data-toggle="dropdown"
-													aria-haspopup="true"
-													aria-expanded="true">
-												Sort by
-												<span class="caret"></span>
-											</button>
-											<ul class="dropdown-menu">
-												<li><a href="javascript:void(0)" ng-click="changeModalSortType('name')">Name</a></li>
-												<li><a href="javascript:void(0)" ng-click="changeModalSortType('id')">Number</a></li>
-											</ul>
+									<div class="col col-sm-7 col-md-7 col-lg-7">
+										<div class="input-group">
+   									 	<span class="input-group-btn">
+   									 		<div class="btn-group" role="group">
+													<button class="btn btn-default dropdown-toggle"
+															type="button"
+															data-toggle="dropdown"
+															aria-haspopup="true"
+															aria-expanded="true">
+														Sort by
+														<span class="caret"></span>
+													</button>
+													<ul class="dropdown-menu">
+														<li><a href="javascript:void(0)" ng-click="changeModalSortType('name')">Name</a></li>
+														<li><a href="javascript:void(0)" ng-click="changeModalSortType('id')">Number</a></li>
+													</ul>
+												</div>
+     									</span>
+											<input type="text"
+													placeholder="Type to filter by team, category, or number"
+													ng-model="teamFilterText"
+													class="form-control" />
 										</div>
-									</div>
-									<div class="col col-sm-6 col-md-6 col-lg-6">
-										<input type="text"
-												placeholder="Type to filter by team, category, or number"
-												ng-model="teamFilterText"
-												class="form-control">
 									</div>
 									<div class="col col-sm-5 col-md-5 col-lg-5 pull-left btn-group">
 										<button class="btn btn-info"
@@ -314,17 +316,17 @@
 								<br />
 
 								<div class="row">
-									<div class="col col-sm-12 col-md-12 col-lg-12" id="judge-modal-table">
+									<div class="col col-sm-12 col-md-12 col-lg-12">
 										<table class="table table-striped" id="judge-modal-table">
 											<thead>
-												<th>Team #</th>
+												<th>Team # {{modalSortType}}</th>
 												<th>Team Name</th>
 												<th>Category</th>
 												<th>Add</th>
 											</thead>
 											<tbody>
 												<!-- For modalSortType === 'name' or 'id', default to grey background color -->
-												<tr ng-repeat="team in teams | filter:teamFilterText as filteredTeams">
+												<tr ng-repeat="team in teams | filter:teamFilterText | orderBy: modalSortType">
 													<td>{{team.id}}</td>
 													<td>{{team.name}}</td>
 													<td>{{team | printAllCategories}}</td>

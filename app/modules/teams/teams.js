@@ -305,6 +305,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		}
 
 		teamManagement.deleteTeam = function() {
+			var defer = $q.defer();
 			var connection = TeamRESTService(authHeader);
 			connection.team.delete({id: sessionStorage.getObject('selectedTeam').id}).$promise.then(function(resp) {
 				categoryManagementService.getCategories();
@@ -317,12 +318,15 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				}
 				sessionStorage.putObject('teams', teams);
 				$scope.closeTeamModal();
-				console.log('Successfully deleted team.');
+				$log.log('Successfully deleted team.');
+				defer.resolve(true);
 				// Todo: update categories' team lists to reflect changes.
 			}).catch(function() {
 				sessionStorage.put('generalErrorMessage', 'Error deleting team.');
 				$log.log('Error deleting team.');
+				defer.resolve(false);
 			});
+			return defer.promise;
 		}
 
 		teamManagement.updateStoredCategory = function(category) {
