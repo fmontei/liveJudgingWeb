@@ -67,11 +67,19 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 ])
 
 .factory('UserRESTService', ['$resource', function($resource) {
-    return $resource('http://api.stevedolan.me/users', {}, {
-        register: {
-            method: 'POST'
-        }
-    }); 
+    return function(authHeader) {
+        return $resource('http://api.stevedolan.me/users', {}, {
+            register: {
+                method: 'POST'
+            },
+            edit: {
+                url: 'http://api.stevedolan.me/users/:id',
+                params: {id: '@id'},
+                method: 'PUT',
+                headers: authHeader
+            }
+        }); 
+    }
 }])
 
 .factory('LoginService', function($resource) {

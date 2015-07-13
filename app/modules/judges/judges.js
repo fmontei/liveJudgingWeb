@@ -28,7 +28,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	$scope.judgeInfoForm = {};
 
 	$scope.teamsToAdd = []; // Teams added in the form (not yet saved)
-	$scope.teamsToRemove = []; // *Ids* of teams removed in the form (not yet saved)
+	$scope.teamsToRemove = []; // Teams removed in the form (not yet saved)
 	$scope.assignedTeams = []; // Teams actually assigned
 	$scope.selectedTeams = []; // Teams that are checked in the form
 	/* end */
@@ -69,10 +69,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			$scope.judgeInfoForm.judgeLastName = judge.last_name;
 			$scope.judgeInfoForm.judgeEmail = judge.email;
 			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
-			// Hardcoding these for the time being
-			$scope.assignedTeams = [{id: 1, name: 'team1'}, {id: 2, name: 'team2'}, {id: 3, name: 'team3'}];
-
-			sessionStorage.putObject('assignedTeams', teams);
+      $scope.assignedTeams = $scope.teams;
+      sessionStorage.putObject('draggedJudge', judge); // Needed by judgeManagentService.assignedTeamsToJudge()
 		}
 	}
 
@@ -159,7 +157,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 	$scope.addJudge = function() {
 		var judgeFormData = {
-			email: $scope.judgeInfoForm.judgeEmail.trim(),
+      email: $scope.judgeInfoForm.judgeEmail.trim(),
 			first_name: $scope.judgeInfoForm.judgeFirstName.trim(),
 			last_name: $scope.judgeInfoForm.judgeLastName.trim()
 		};
@@ -173,19 +171,17 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 
 	$scope.editJudge = function() {
-		// Todo: needs fix
-		return;
 		var judgeFormData = {
-			email: $scope.judgeEmail.trim(),
-			first_name: $scope.judgeFirstName.trim(),
-			last_name: $scope.judgeLastName.trim()
+      email: $scope.judgeInfoForm.judgeEmail.trim(),
+			first_name: $scope.judgeInfoForm.judgeFirstName.trim(),
+			last_name: $scope.judgeInfoForm.judgeLastName.trim()
 		};
-		var assignedTeams = sessionStorage.getObject('assignedTeams');
-		judgeManagementService.editJudge($scope.judgeId, judgeFormData, $scope.teamsToAdd, $scope.teamsToRemove, assignedTeams).then(function() {
+		judgeManagementService.editJudge($scope.judgeId, judgeFormData, $scope.teamsToAdd, $scope.teamsToRemove, $scope.assignedTeams).then(function() {
 			// Refresh judge objects
 			judgeManagementService.getJudges();
 		}).catch(function(error) {
 			$scope.judgeErrorMessage = error;
+      console.log('Error editing judge.');
 		});
 
 		$scope.closeJudgeModal();
@@ -205,43 +201,32 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 
 	$scope.addSelectedTeamsToJudgeModal = function(teams) {
-		var isDuplicateTeam;
 		for (var i = 0; i < teams.length; i++) {
-			isDuplicateTeam = false;
 			if (teams[i].selected) {
-				for (var j = 0; j < $scope.teamsToAdd.length; j++) {
-					if ($scope.teamsToAdd[j].id == teams[i].id) {
-						isDuplicateTeam = true;
-					}
-				}
-				if (!isDuplicateTeam) {
-					$scope.teamsToAdd.push(teams[i]);
-				}
+				var index = $scope.teamsToAdd.indexOf(teams[i]);
+        if (index === -1)
+          $scope.teamsToAdd.push(teams[i]);
 			}
 		}
 	}
 
 	// Used for modal display.
-	$scope.removeTeamFromJudge = function(teamId) {
-		$scope.teamsToRemove.push(teamId);
-		for (var i = 0; i < $scope.assignedTeams.length; i++) {
-			if ($scope.assignedTeams[i].id == teamId) {
-				$scope.assignedTeams[i].toRemove = true;
-			}
-		}
+	$scope.removeTeamFromJudge = function(team) {
+		$scope.teamsToRemove.push(team);
+    var index = $scope.judgeInfoForm.assignedTeams.indexOf(team);
+    if (index > -1)
+      $scope.judgeInfoForm.assignedTeams[index].toRemove = true;
 	}
 
 	// Also used for modal display.
-	$scope.undoRemoveTeamFromJudge = function(teamId) {
-		var index = $scope.teamsToRemove.indexOf(teamId);
+	$scope.undoRemoveTeamFromJudge = function(team) {
+		var index = $scope.teamsToRemove.indexOf(team);
 		if (index > -1) {
 			$scope.teamsToRemove.splice(index, 1);
 		}
-		for (var i = 0; i < $scope.assignedTeams.length; i++) {
-			if ($scope.assignedTeams[i].id == teamId) {
-				$scope.assignedTeams[i].toRemove = false;
-			}
-		}
+    index = $scope.judgeInfoForm.assignedTeams.indexOf(team);
+    if (index > -1)
+      $scope.judgeInfoForm.assignedTeams[index].toRemove = false;
 	}
 
 	// For modal display
@@ -286,17 +271,18 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 })
 
 .factory('JudgeManagementService', ['$q', 'CategoryManagementService', 'CurrentUserService', 'JudgeRESTService',
-									'sessionStorage', 'TeamManagementService', 'UserRESTService', '$window',
-	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService, $window,
-				sessionStorage, TeamManagementService, UserRESTService) {
+         'sessionStorage', 'TeamManagementService', 'UserRESTService', '$window',
+	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService,
+				sessionStorage, TeamManagementService, UserRESTService, $window) {
 	return function($scope, sessionStorage) {
 
 		var judgeManagement = {};
 
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 		var teamManagementService = TeamManagementService($scope, sessionStorage);
-
 		var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
+    var userRESTService = UserRESTService(CurrentUserService.getAuthHeader());
+    
 		var eventId = sessionStorage.getObject('selected_event').id;
 
 		judgeManagement.getJudges = function() {
@@ -363,7 +349,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			judgeReq.password_confirmation = randomPass;
 
 			// Register judge as a user & adds them to the event.
-			UserRESTService.register(judgeReq).$promise.then(function(resp) {
+			userRESTService.register(judgeReq).$promise.then(function(resp) {
 				judgeId = resp.user.id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId}).$promise.then(function(resp) {
 					console.log('Judge successfully registered & added to event');
@@ -383,77 +369,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 			return defer.promise;
 		}
-
-		judgeManagement.editJudge = function(judgeId, judgeFormData, teamsToAdd, teamsToRemove, assignedTeams) {
-			var defer = $q.defer();
-
-			//todo: UserRESTService PUT to update judge user.
-
-			var haveTeamsChanged = false;
-			if (oldTeams.length == newTeams.length) {
-				for (var i = 0; i < oldTeams.length; i++) {
-					if (oldTeams[i].id != newTeams[i].id) {
-						haveTeamsChanged = true;
-					}
-				}
-			} else {
-				haveTeamsChanged = true;
-			}
-
-			if (haveTeamsChanged) {
-				judgeManagement.updateJudgeTeams(judgeId, newTeams, oldTeams).then(function() {
-					judgeManagement.getJudges();
-					defer.resolve();
-				}).catch(function() {
-					console.log('Error updating judge teams.');
-					defer.reject();
-				});
-			} else {
-				defer.resolve();
-			}
-
-			return defer.promise;
-		}
-
-		judgeManagement.updateJudgeTeams = function(judgeId, newTeams, oldTeams) {
-			var defer = $q.defer();
-
-			var newIds = [];
-			var oldIds = [];
-
-			for (var i = 0; i < oldTeams.length; i++) {
-				oldIds.push(oldTeams[i].id);
-			}
-			for (i = 0; i < newTeams.length; i++) {
-				newIds.push(newTeams[i].id);
-			}
-
-			// Find teams in oldTeams, but not in newTeams (ie, the deleted teams).
-			var teamsToRemove = [];
-			for (i = 0; i < oldIds.length; i++) {
-				if (newIds.indexOf(oldIds[i]) == -1) {
-					teamsToRemove.push(oldIds[i]);
-				}
-			}
-
-			// Find teams in newTeams, but not in oldTeams (ie, the added teams).
-			var teamsToAdd = [];
-			for (i = 0; i < newIds.length; i++) {
-				if (oldIds.indexOf(newIds[i]) == -1) {
-					teamsToAdd.push(newIds[i]);
-				}
-			}
-
-			judgeManagement.assignTeamsToJudge(teamsToAdd, false).then(function() {
-				defer.resolve();
-			}).catch(function() {
-				defer.reject();
-			});
-
-			return defer.promise;
-		}
-
-		judgeManagement.generatePassword = function() {
+    
+    judgeManagement.generatePassword = function() {
 			// Most certainly should be done on the server (would require a call to make a judge user)
 			var pass = "";
 				var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -465,40 +382,84 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				return pass;
 		}
 
-		judgeManagement.changeView = function(view) {
-			sessionStorage.put('judgeView', view);
-		}
-
-		judgeManagement.assignTeamsToJudge = function(teams, areObjects) {
+		judgeManagement.editJudge = function(judgeId, judgeFormData, teamsToAdd, teamsToRemove, assignedTeams) {
 			var defer = $q.defer();
+      
+      console.log(judgeFormData);
+      userRESTService.edit({id: judgeId}, judgeFormData).$promise.then(function(resp) {
+        alert('woot!');
+      });
+      
+      for (var i = 0; i < teamsToRemove.length; i++) {
+        var index = assignedTeams.indexOf(teamsToRemove[i]);
+        if (index !== -1)
+          assignedTeams.splice(index, 1);
+      }
+      
+      for (var i = 0; i < teamsToAdd.length; i++) {
+        if (assignedTeams.indexOf(teamsToAdd[i]) === -1)
+          assignedTeams.push(teamsToAdd[i]);
+      }
+
+			var haveTeamsChanged = true;
+
+			if (haveTeamsChanged) {
+				judgeManagement.assignTeamsToJudge(assignedTeams, true).then(function() {
+					defer.resolve();
+				}).catch(function() {
+					console.log('Error updating judge teams.');
+					defer.reject();
+				});
+			} else {
+				defer.resolve();
+			}
+
+			return defer.promise;
+		}
+    
+    judgeManagement.assignTeamsToJudge = function(teams, areObjects) {
+			var defer = $q.defer();
+      var promises = [];
 
 			var judgeId = sessionStorage.getObject('draggedJudge').id;
 			if (areObjects) {
 				angular.forEach(teams, function(team) {
-					judgeManagement.assignTeamToJudge(team.id, judgeId);
+					promises.push(judgeManagement.assignTeamToJudge(team.id, judgeId));
 				});
 			} else { // Passing in team ids
 				angular.forEach(teams, function(teamId) {
-					judgeManagement.assignTeamToJudge(teamId, judgeId);
+					promises.push(judgeManagement.assignTeamToJudge(teamId, judgeId));
 				});
 			}
 
-			// Todo: actually wait for all team assigns to finish.
-			defer.resolve();
+      $q.all(promises).then(function() {
+        defer.resolve();
+      });
+			
 			return defer.promise;
 		}
 
 		judgeManagement.assignTeamToJudge = function(teamId, judgeId) {
+      var defer = $q.defer();
+      
 			if (!judgeId) {
-				var judgeId = sessionStorage.getObject('draggedJudge').judge.id;
+				var judgeId = sessionStorage.getObject('draggedJudge').judge.id; // !!!!!
 			}
 			judgeRESTService.judgeTeams.assign({judge_id: judgeId}, {team_id: teamId}).$promise.then(function(resp) {
 				console.log(resp);
 				console.log('Successfully assigned team #' + teamId + ' to judge.');
+        defer.resolve();
 			}).catch(function() {
 				sessionStorage.put('Error assigning team #' + teamId + ' to judge.');
 				console.log('Error assigning team #' + teamId + ' to judge.');
+        defer.reject();
 			});
+      
+      return defer.promise;
+		}
+
+		judgeManagement.changeView = function(view) {
+			sessionStorage.put('judgeView', view);
 		}
 
 		judgeManagement.removeTeamsFromJudge = function(teams, judgeId) {
