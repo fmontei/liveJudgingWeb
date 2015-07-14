@@ -66,8 +66,8 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		rubricManagement.getRubrics = function() {
 			var eventId = sessionStorage.getObject('selected_event').id;
 			RubricRESTService(authHeader).rubrics.get({event_id: eventId}).$promise.then(function(resp) {
-				sessionStorage.putObject('rubrics', resp.rubrics);
-				console.log(resp.rubrics);
+				sessionStorage.putObject('rubrics', resp);
+				console.log(resp);
 				console.log(sessionStorage.getObject('rubrics'));
 			}).catch(function() {
 				console.log('Error getting rubrics');
@@ -137,6 +137,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
+					isArray: true,
 					headers: authHeader
 				},
 				create: {
@@ -149,6 +150,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
+					isArray: true,
 					headers: authHeader
 				},
 				create: {

@@ -577,7 +577,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
-          isArray: true,
+          			isArray: true,
 					headers: authHeader
 				},
 				addToEvent: {
@@ -598,7 +598,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
-          isArray: true,
+          			isArray: true,
 					headers: authHeader
 				},
 				assign: {
