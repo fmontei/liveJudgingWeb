@@ -29,7 +29,7 @@
 
 			<div class="row">
 				<div class="col-sm-8 col-md-8 col-lg-8">
-					<em>Drag-'n-drop judges into categories.</em>
+					<em>Drag-'n-drop judges into categories to assign judges to teams.</em>
 				</div>
 				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
 					<div class="row">
@@ -74,7 +74,7 @@
 					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'" class="draggable-item-col">
             <div class="media draggable-item"
                  cng-draggable-item
-                 item-id="{{judgeObj.judge.id}}"
+                 item-id="{{judgeObj.id}}"
                  item-type="judge"
                  cog=".glyphicon-cog"
                  is-transferable="true">
@@ -92,7 +92,7 @@
                      line-width="25"
                      total-width="50">
                 </div> 
-                {{judgeObj.judge.id}}
+                <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
               </div>
             </div>
 					</div>
@@ -103,7 +103,7 @@
 						<div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
               <div class="media draggable-item"
                    cng-draggable-item
-                   itemId="{{judgeObj.judge.id}}"
+                   itemId="{{judgeObj.id}}"
                    cog=".glyphicon-cog"
                    is-transferable="true">
                 <div class="media-left"></div>

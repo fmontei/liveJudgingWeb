@@ -45,7 +45,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     defer.resolve(wasSuccessful);
                 });
             } else if ($location.path().indexOf('judges') !== -1) {
-                judgeManagementService.deleteJudge(itemId, item).then(function(wasSuccessful) {
+                judgeManagementService.deleteJudge(itemId).then(function(wasSuccessful) {
                     defer.resolve(wasSuccessful);
                 });
             }
