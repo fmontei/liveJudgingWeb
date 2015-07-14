@@ -64,7 +64,7 @@
 							<button class="btn btn-lg btn-success add-entity-btn"
 											data-toggle="modal"
 											data-target="#judge-modal"
-											ng-click="changeJudgeModalView('create', null, null)">
+											ng-click="changeJudgeModalView('create', null)">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Judge
 							</button>
@@ -84,7 +84,7 @@
                   <span class="glyphicon glyphicon-cog"
                         data-toggle="modal"
                         data-target="#judge-modal"
-                        ng-click="changeJudgeModalView('edit', judgeObj.judge, judgeObj.teams)">
+                        ng-click="changeJudgeModalView('edit', judgeObj)">
                   </span>
                 </h4>
                 <div class="media-text judge-media-text"
@@ -110,7 +110,7 @@
                 <div class="media-body">
                   <h4 class="media-heading">
                     <span class="glyphicon glyphicon-cog"
-                        ng-click="changeJudgeModalView('edit', judge)">
+                          ng-click="changeJudgeModalView('edit', judgeObj)">
                     </span>
                   </h4>
                   <div class="media-text judge-media-text"
@@ -230,15 +230,15 @@
 											No teams assigned to this judge.
 										</span>
 										<span ng-if="assignedTeams.length > 0">
-											<span ng-repeat="team in assignedTeams"
+											<span ng-repeat="teamObj in assignedTeams"
 												 class="assigned-team">
 												<span ng-show="!team.toRemove">
-												 	#{{team.id}} {{team.name}} [<!-- comment prevents space
+												 	#{{teamObj.team.id}} {{teamObj.team.name}} [<!-- comment prevents space
 											 		--><a ng-click="removeTeamFromJudge(team)"
 											 				class="clickable">x</a>]
 										 		</span>
 										 		<span ng-show="team.toRemove">
-										 			<s><i>#{{team.id}} {{team.name}}</i></s> [<!--
+										 			<s><i>#{{teamObj.team.id}} {{teamObj.team.name}}</i></s> [<!--
 										 			--><a ng-click="undoRemoveTeamFromJudge(team)"
 										 					class="clickable">+</a>]
 										 		</span>
