@@ -71,57 +71,55 @@
 						</div>
 					</div>
 
-					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
-						<div class="media draggable-item"
-								 cng-draggable-item
-								 item-id="{{judgeObj.judge.id}}"
-								 item-type="judge"
-								 cog=".glyphicon-cog"
-								 is-transferable="true">
-							<div class="media-left"></div>
-							<div class="media-body">
-								<h4 class="media-heading">
-									<span class="glyphicon glyphicon-cog"
-												data-toggle="modal"
-												data-target="#judge-modal"
-												ng-click="changeJudgeModalView('edit', judgeObj.judge, judgeObj.teams)">
-									</span>
-								</h4>
-								<div class="media-text judge-media-text"
-										 cng-wrap-word word="{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}"
-										 line-width="25"
-										 total-width="50">
-								</div> {{judgeObj.judge.id}}
-							</div>
-						</div>
+					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'" class="draggable-item-col">
+            <div class="media draggable-item"
+                 cng-draggable-item
+                 item-id="{{judgeObj.judge.id}}"
+                 item-type="judge"
+                 cog=".glyphicon-cog"
+                 is-transferable="true">
+              <div class="media-left"></div>
+              <div class="media-body">
+                <h4 class="media-heading">
+                  <span class="glyphicon glyphicon-cog"
+                        data-toggle="modal"
+                        data-target="#judge-modal"
+                        ng-click="changeJudgeModalView('edit', judgeObj.judge, judgeObj.teams)">
+                  </span>
+                </h4>
+                <div class="media-text judge-media-text"
+                     cng-wrap-word word="{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}"
+                     line-width="25"
+                     total-width="50">
+                </div> 
+                {{judgeObj.judge.id}}
+              </div>
+            </div>
 					</div>
 				</div> <!-- ng-switch-default -->
 
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
 						<div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
-							<div ng-if="$index != 0 && $index % 3 == 0" class="row"></div>
-							<div class="col col-sm-4 col-md-4 col-lg-3 draggable-item-col">
-								<div class="media draggable-item"
-										 cng-draggable-item
-										 itemId="{{judgeObj.judge.id}}"
-										 cog=".glyphicon-cog"
-										 is-transferable="true">
-									<div class="media-left"></div>
-									<div class="media-body">
-										<h4 class="media-heading">
-											<span class="glyphicon glyphicon-cog"
-													ng-click="changeJudgeModalView('edit', judge)">
-											</span>
-										</h4>
-										<div class="media-text judge-media-text"
-												 cng-wrap-word word="{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}"
-												 line-width="25"
-												 total-width="50">
-										</div>
-									</div>
-								</div>
-							</div>
+              <div class="media draggable-item"
+                   cng-draggable-item
+                   itemId="{{judgeObj.judge.id}}"
+                   cog=".glyphicon-cog"
+                   is-transferable="true">
+                <div class="media-left"></div>
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    <span class="glyphicon glyphicon-cog"
+                        ng-click="changeJudgeModalView('edit', judge)">
+                    </span>
+                  </h4>
+                  <div class="media-text judge-media-text"
+                       cng-wrap-word word="{{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}"
+                       line-width="25"
+                       total-width="50">
+                  </div>
+                </div>
+              </div>
 						</div>
 					</div>
 				</div> <!-- ng-switch-when="selectedCategory" -->
@@ -236,12 +234,12 @@
 												 class="assigned-team">
 												<span ng-show="!team.toRemove">
 												 	#{{team.id}} {{team.name}} [<!-- comment prevents space
-											 		--><a ng-click="removeTeamFromJudge(team.id)"
+											 		--><a ng-click="removeTeamFromJudge(team)"
 											 				class="clickable">x</a>]
 										 		</span>
 										 		<span ng-show="team.toRemove">
 										 			<s><i>#{{team.id}} {{team.name}}</i></s> [<!--
-										 			--><a ng-click="undoRemoveTeamFromJudge(team.id)"
+										 			--><a ng-click="undoRemoveTeamFromJudge(team)"
 										 					class="clickable">+</a>]
 										 		</span>
 											</span>
@@ -318,7 +316,7 @@
 									<div class="col col-sm-12 col-md-12 col-lg-12">
 										<table class="table table-striped" id="judge-modal-table">
 											<thead>
-												<th>Team # {{modalSortType}}</th>
+												<th>Team #</th>
 												<th>Team Name</th>
 												<th>Category</th>
 												<th>Add</th>

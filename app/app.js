@@ -190,7 +190,9 @@ angular.module('liveJudgingAdmin', [
             }
 
             $(window).resize(function() {
-              location.reload(); // Kludgey way to reset the position of draggable elements
+              var originalPos = elem.data('originalPosition');
+              if (originalPos !== undefined && originalPos !== elem.offset())
+                elem.goBack();
             });
         }
     }
@@ -225,16 +227,16 @@ angular.module('liveJudgingAdmin', [
 				return sessionStorage.get('generalErrorMessage');
 			}, function(newValue) {
 				if (scope.animate == 'true') {
-          if (newValue !== '') {
-            elem.html(newValue);  
-            $timeout(function() {
-              elem.html('');
-              sessionStorage.put('generalErrorMessage', '');
-            }, 5000);
-          }
-				} else {
-					elem.html(newValue);	
-        }
+                  if (newValue !== '') {
+                    elem.html(newValue);  
+                    $timeout(function() {
+                      elem.html('');
+                      sessionStorage.put('generalErrorMessage', '');
+                    }, 5000);
+                  }
+                } else {
+                    elem.html(newValue);	
+                }
 			}, true);
 		}
 	}

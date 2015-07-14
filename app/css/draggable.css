@@ -17,9 +17,8 @@
 	cursor: move;
 }
 
-.draggable-items-wrapper {
-	width: 100%;
-	margin: 0 auto;
+.draggable-item-col {
+  width: 700px;
 }
 
 .draggable-item .glyphicon-cog, .glyphicon-cog {
