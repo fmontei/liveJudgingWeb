@@ -219,13 +219,24 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 	$scope.assignTeamsToJudge = function() {
 		var teamsToAdd = [];
+    var judge = sessionStorage.getObject('draggedJudge');
 		for (var i = 0; i < $scope.teamsInDropCat.length; i++) {
 			if ($scope.teamsInDropCat[i].checked) {
-				teamsToAdd.push($scope.teamsInDropCat[i]);
+        var alreadyExists = false;
+        for (var j = 0; j < judge.teams.length; j++) {
+          if (judge.teams[j].team.id === $scope.teamsInDropCat[i].id) {
+				    alreadyExists = true;
+            break;
+          }
+        }
+        if (!alreadyExists)
+          teamsToAdd.push($scope.teamsInDropCat[i]);
 			}
 		}
 		if (teamsToAdd.length > 0) {
-			judgeManagementService.assignTeamsToJudge(teamsToAdd);
+			judgeManagementService.assignTeamsToJudge(teamsToAdd).then(function() {
+        judgeManagementService.getJudges();
+      });
 		}
 		$scope.closeAssignByCatModal();
 	}
@@ -465,14 +476,13 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
         
         for (var i = positions.length - 1; i >= 0; i--)
           teamsToAdd.splice(positions[i], 1);
-        
       };
 		}
     
     judgeManagement.assignTeamsToJudge = function(teams) {
 			var defer = $q.defer();
       var promises = [];
-
+      
 			var judgeId = sessionStorage.getObject('draggedJudge').id;
       angular.forEach(teams, function(team) {
         promises.push(judgeManagement.assignTeamToJudge(team.id, judgeId));

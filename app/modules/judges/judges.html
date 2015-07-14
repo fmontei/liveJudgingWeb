@@ -425,6 +425,9 @@
 						<input type="checkbox" ng-model="team.checked" />
 							{{team.name}}
 					</label>
+					<label ng-if="teamsInDropCat.length === 0">
+            There are currently no teams in this category.
+          </label>
 				</div>
 			</div>
 
