@@ -287,8 +287,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 .factory('JudgeManagementService', ['$q', 'CategoryManagementService', 'CurrentUserService', 'JudgeRESTService',
 									'sessionStorage', 'TeamManagementService', 'UserRESTService', '$window',
-	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService, $window,
-				sessionStorage, TeamManagementService, UserRESTService) {
+	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService,
+				sessionStorage, TeamManagementService, UserRESTService, $window) {
 	return function($scope, sessionStorage) {
 
 		var judgeManagement = {};
