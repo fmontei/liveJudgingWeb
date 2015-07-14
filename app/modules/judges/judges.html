@@ -423,12 +423,12 @@
 				<div ng-repeat="team in teamsInDropCat" class="teams-in-cat-list">
 					<label>
 						<input type="checkbox" ng-model="team.checked" />
-							{{team.name}}
+            {{team.name}}
 					</label>
-					<label ng-if="teamsInDropCat.length === 0">
-            There are currently no teams in this category.
-          </label>
 				</div>
+				<label ng-if="teamsInDropCat.length === 0">
+          There are currently no teams in this category.
+        </label>
 			</div>
 
 			<div class="modal-footer">
