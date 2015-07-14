@@ -182,7 +182,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             CategoryRESTService(authHeader).categories.get({event_id: eventId}).$promise.then(function(resp) {
                 var filteredColorList = categoryManagement.getDefaultColors();
                 sessionStorage.putObject('defaultColorList', filteredColorList);
-                angular.forEach(resp.event_categories, function(category) {
+                angular.forEach(resp, function(category) {
                     if (category.label === 'Uncategorized') {
                         category.color = '#BBBBBB';
                         sessionStorage.putObject('uncategorized', category);
@@ -190,13 +190,13 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     category.color = convertColorToHex(category.color);
                     filterColorFromList(filteredColorList, category.color);
                 });
-                sessionStorage.putObject('categories', resp.event_categories);
+                sessionStorage.putObject('categories', resp);
                 sessionStorage.putObject('colorList', filteredColorList);
                 // Updating selected category if there is one.
                 if (sessionStorage.getObject('selectedCategory')) {
-                    for (var i = 0; i < resp.event_categories.length; i++) {
-                        if (sessionStorage.getObject('selectedCategory').id == resp.event_categories[i].id) {
-                            sessionStorage.putObject('selectedCategory', resp.event_categories[i]);
+                    for (var i = 0; i < resp.length; i++) {
+                        if (sessionStorage.getObject('selectedCategory').id == resp[i].id) {
+                            sessionStorage.putObject('selectedCategory', resp[i]);
                         }
                     }
                 }
@@ -230,16 +230,16 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             };
             var connection = CategoryRESTService(authHeader);
             connection.new_category.create({event_id: eventId}, categoryReq).$promise.then(function(resp) {
-                var returnedCategoryID = resp.event_category.id;
+                var returnedCategoryID = resp.id;
                 newCategory.id = returnedCategoryID;
-                resp.event_category.color = convertColorToHex(resp.event_category.color);
+                resp.color = convertColorToHex(resp.color);
                 // Save category objects in session storage.
                 var currentCats = sessionStorage.getObject('categories');
                 if (currentCats) {
-                    currentCats.push(resp.event_category);
+                    currentCats.push(resp);
                     sessionStorage.putObject('categories', currentCats);
                 } else {
-                    sessionStorage.putObject('categories', resp.event_category);
+                    sessionStorage.putObject('categories', resp);
                 }
                 $scope.closeCategoryModal();
                 $log.log("New category created: " + JSON.stringify(newCategory));
@@ -330,7 +330,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var catRESTService = CategoryRESTService(authHeader);
             catRESTService.category.get({id: categoryId}).$promise.then(function(resp) {
                 console.log(resp);
-                defer.resolve(resp.event_category.teams);
+                defer.resolve(resp.teams);
             }).catch(function() {
                 console.log('Error getting teams in category ' + categoryId);
                 defer.reject('Error getting teams in category');
@@ -509,6 +509,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }, {
                 get: {
                     method: 'GET',
+										isArray: true,
                     headers: authHeader
                 }
             }),

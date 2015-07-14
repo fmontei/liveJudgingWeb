@@ -131,9 +131,9 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 				service.hasLoginError = false;
         LoginService(service.getLoginAuthHeader(user.email, user.password)).login().$promise.then(function(resp) {
             console.log(service);
-            service.currentUser = resp.user;
+            service.currentUser = resp;
             service.isLoggedIn = true;
-            sessionStorage.putObject('current_user', resp.user);
+            sessionStorage.putObject('current_user', service.currentUser);
             $rootScope.isLoggedIn = true;
             $rootScope.$broadcast('loggedIn');
             $location.path('/eventSelect');

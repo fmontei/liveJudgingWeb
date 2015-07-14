@@ -431,6 +431,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			}, {
 				get: {
 					method: 'GET',
+					isArray: true,
 					headers: authHeader
 				},
 				create: {

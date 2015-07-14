@@ -22,10 +22,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 .controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
     function(sessionStorage, $location, $scope, CurrentUserService, EventService, EventUtilService) {
         EventService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
-            console.log(resp);
-            $scope.eventList = resp.events;
+            console.log('Successfully retrieved events from server.');
+            $scope.eventList = resp;
         }).catch(function(error) {
-            console.log(error);
+            sessionStorage.putObject('generalErrorMessage', 'Error getting events from server.');
+            console.log('Error getting events from server.');
         });
 
         $scope.showCreateEventForm = function() {
@@ -72,7 +73,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
             if ($scope.isCreation) {
                 EventService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
-                    sessionStorage.putObject('selected_event', resp.event);
+                    sessionStorage.putObject('selected_event', resp);
                     EventUtilService.setEventView(EventUtilService.views.EVENT_READY_VIEW);
                     $location.path('/event');
                 }).catch(function() {
@@ -82,7 +83,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             } else {
                 var eventId = sessionStorage.getObject('selected_event').id;
                 EventService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq).$promise.then(function(resp) {
-                    sessionStorage.putObject('selected_event', resp.event);
+                    sessionStorage.putObject('selected_event', resp);
                     $location.path('/event');
                 }).catch(function() {
                     $scope.errorMessage = 'Error updating event.';
@@ -320,6 +321,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 },
                 get: {
                     method: 'GET',
+										isArray: true,
                     headers: authHeader
                 }
             }),

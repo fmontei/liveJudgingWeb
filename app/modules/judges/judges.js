@@ -64,8 +64,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		} else if (action === 'edit') {
 			$scope.judgeModalView = 'edit';
 			$scope.judgeId = judge.id;
-			$scope.judgeInfoForm.judgeFirstName = judge.first_name;
-			$scope.judgeInfoForm.judgeLastName = judge.last_name;
+      var seperator = judge.name.lastIndexOf(' ');
+			$scope.judgeInfoForm.judgeFirstName = judge.name.substring(0, seperator);
+			$scope.judgeInfoForm.judgeLastName = judge.name.substring(seperator + 1, judge.name.length);
 			$scope.judgeInfoForm.judgeEmail = judge.email;
 			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
       $scope.assignedTeams = $scope.teams; // TODO: change to teams
@@ -282,7 +283,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			var defer = $q.defer();
 
 			judgeRESTService.judges.get({event_id: eventId}).$promise.then(function(resp) {
-				sessionStorage.putObject('judges', resp.event_judges);
+				sessionStorage.putObject('judges', resp);
 				console.log('Judges successfully retrieved from server.');
 			}).then(function() {
 				var judges = sessionStorage.getObject('judges');
@@ -343,7 +344,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 			// Register judge as a user & adds them to the event.
 			UserRESTService.register(judgeReq).$promise.then(function(resp) {
-				judgeId = resp.user.id;
+				judgeId = resp.id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId}).$promise.then(function(resp) {
 					console.log('Judge successfully registered & added to event');
 					defer.resolve('Finished addJudge()');
@@ -572,6 +573,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
+          isArray: true,
 					headers: authHeader
 				},
 				addToEvent: {
@@ -592,6 +594,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
+          isArray: true,
 					headers: authHeader
 				},
 				assign: {
