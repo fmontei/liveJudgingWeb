@@ -232,14 +232,14 @@
 										<span ng-if="assignedTeams.length > 0">
 											<span ng-repeat="teamObj in assignedTeams"
 												 class="assigned-team">
-												<span ng-show="!team.toRemove">
+												<span ng-show="!teamObj.toRemove">
 												 	#{{teamObj.team.id}} {{teamObj.team.name}} [<!-- comment prevents space
-											 		--><a ng-click="removeTeamFromJudge(team)"
+											 		--><a ng-click="removeTeamFromJudge(teamObj)"
 											 				class="clickable">x</a>]
 										 		</span>
-										 		<span ng-show="team.toRemove">
+										 		<span ng-show="teamObj.toRemove">
 										 			<s><i>#{{teamObj.team.id}} {{teamObj.team.name}}</i></s> [<!--
-										 			--><a ng-click="undoRemoveTeamFromJudge(team)"
+										 			--><a ng-click="undoRemoveTeamFromJudge(teamObj)"
 										 					class="clickable">+</a>]
 										 		</span>
 											</span>
