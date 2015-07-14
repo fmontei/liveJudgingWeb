@@ -54,7 +54,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	}
 }])
 
-.factory('RubricManagementService', function(CurrentUserService, RubricRESTService) {
+.factory('RubricManagementService', function($q, CurrentUserService, RubricRESTService) {
 	return function($scope, sessionStorage) {
 		var authHeader = CurrentUserService.getAuthHeader();
 		var rubricManagement = {};
@@ -101,7 +101,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 			var criteriaPromises = [];
 			for (var i = 0; i < criteria.length; i++) {
-				criteriaPromise.push(createRubricCriterion(criteria[i], rubricRESTService));
+				criteriaPromises.push(createRubricCriterion(criteria[i], rubricRESTService));
 			}
 
 			$q.all(criteriaPromises).then(function() {
@@ -113,7 +113,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 			return defer.promise;
 
-			function createRubricCriterion(criteron, rubricRESTService) {
+			function createRubricCriterion(criterion, rubricRESTService) {
 				var defer = $q.defer();
 				rubricRESTService.criteria.create(criterion).$promise.then(function(resp) {
 					defer.resolve(resp.criterion);
