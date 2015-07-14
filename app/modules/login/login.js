@@ -66,20 +66,12 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     }
 ])
 
-.factory('UserRESTService', ['$resource', function($resource) {
-    return function(authHeader) {
-        return $resource('http://api.stevedolan.me/users', {}, {
-            register: {
-                method: 'POST'
-            },
-            edit: {
-                url: 'http://api.stevedolan.me/users/:id',
-                params: {id: '@id'},
-                method: 'PUT',
-                headers: authHeader
-            }
-        }); 
-    }
+.factory('UserRESTService', ['$resource', 'CurrentUserService', function($resource, CurrentUserService) {
+    return $resource('http://api.stevedolan.me/users', {}, {
+        register: {
+            method: 'POST'
+        }
+    }); 
 }])
 
 .factory('LoginService', function($resource) {
@@ -105,7 +97,8 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     }
 })
 
-.factory('CurrentUserService', function($base64,
+.factory('CurrentUserService', function($resource,
+                                        $base64,
                                         sessionStorage,
                                         $location,
                                         $rootScope,
@@ -116,6 +109,17 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
         isLoggedIn: false,
         hasLoginError: false
     };
+  
+    service.editUser = function(authHeader) {
+        return $resource('http://api.stevedolan.me/users/:id', {
+          id: '@id' 
+        }, {
+            edit: {
+                method: 'PUT',
+                headers: authHeader
+            }
+        });
+    }
 
     service.isLoggedIn = function() {
         var hasUser = service.currentUser || sessionStorage.getObject('current_user') ? true : false;
@@ -184,23 +188,23 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 
 .directive('loginValidation', function() {
   	return {
-		require: "ngModel",
-		scope: {
-			otherModelValue: "=compareTo"
-		},
-		link: function(scope, element, attributes, ngModel) {
+      require: "ngModel",
+      scope: {
+        otherModelValue: "=compareTo"
+      },
+      link: function(scope, element, attributes, ngModel) {
 
-			ngModel.$validators.compareTo = function(modelValue) {
-			  	if (modelValue !== scope.otherModelValue)
-				  	element.addClass('invalid-password');
-				else
-				  	element.removeClass('invalid-password');
-				return modelValue === scope.otherModelValue;
-			};
+        ngModel.$validators.compareTo = function(modelValue) {
+            if (modelValue !== scope.otherModelValue)
+              element.addClass('invalid-password');
+          else
+              element.removeClass('invalid-password');
+          return modelValue === scope.otherModelValue;
+        };
 
-			scope.$watch("otherModelValue", function() {
-				ngModel.$validate();
-			});
-		}
+        scope.$watch("otherModelValue", function() {
+          ngModel.$validate();
+        });
+      }
   	};
 });

@@ -54,11 +54,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.removeItemFromCategory = function(itemId) {
             var categoryId = $scope.selectedCategory.id;
-			if ($location.path().indexOf('teams') !== -1) {
-				categoryManagementService.removeTeamFromCategory(itemId, categoryId);
-			} else if ($location.path().indexOf('judges') !== -1) {
-				//
-			}
+            if ($location.path().indexOf('teams') !== -1) {
+              categoryManagementService.removeTeamFromCategory(itemId, categoryId);
+            } else if ($location.path().indexOf('judges') !== -1) {
+              //
+            }
         }
 
         $scope.changeCategoryModalView = function(view, event, category) {
@@ -612,7 +612,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     var confirm = window.confirm('Are you sure you want to remove this '
                                                  + scope.itemType + ' from current category?');
                     if (confirm)
-                        scope.removeItemFromCategory(scope.itemId);
+                        scope.removeItem({itemId: scope.itemId});
                     else
                         droppedItem.goBack();
                 }
@@ -623,7 +623,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     return {
         restrict: 'A',
         scope: {
-            deleteItem: '&'
+            deleteItem: '&',
+            removeItem: '&'
         },
         link: link
     }

@@ -27,7 +27,8 @@
                 ng-style="specialCategoryShow">
                 <li class="droppable-category destroy-special-category" 
                     cng-special-droppable-category
-                    delete-item="$parent.deleteItem(itemId)">
+                    delete-item="$parent.deleteItem(itemId)"
+                    remove-item="$parent.removeItemFromCategory(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
                             <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
@@ -43,7 +44,8 @@
                  ng-style="specialCategoryShow">
                 <li class="droppable-category destroy-special-category"
                     cng-special-droppable-category
-                    delete-item="$parent.deleteItem(itemId)">
+                    delete-item="$parent.deleteItem(itemId)"
+                    remove-item="$parent.removeItemFromCategory(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
                             <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
@@ -59,7 +61,8 @@
                  ng-style="specialCategoryShow">
                 <li class="droppable-category destroy-special-category"
                     cng-special-droppable-category
-                    delete-item="$parent.deleteItem(itemId)">
+                    delete-item="$parent.deleteItem(itemId)"
+                    remove-item="$parent.removeItemFromCategory(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
                             <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
@@ -69,7 +72,8 @@
                 </li>
                 <li class="droppable-category remove-special-category"
                     cng-special-droppable-category
-                    remove-team-from-category="$parent.removeTeamFromCategory(itemId)">
+                    delete-item="$parent.deleteItem(itemId)"
+                    remove-item="$parent.removeItemFromCategory(itemId)">
                     <a class="btn" href="javascript:void(0)">
                         <div>
                             <div><u>Remove</u> <i class="glyphicon glyphicon-scissors"></i></div>

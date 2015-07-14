@@ -161,7 +161,12 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			first_name: $scope.judgeInfoForm.judgeFirstName.trim(),
 			last_name: $scope.judgeInfoForm.judgeLastName.trim()
 		};
-		judgeManagementService.editJudge($scope.judgeId, judgeFormData, $scope.teamsToAdd, $scope.teamsToRemove, $scope.assignedTeams).then(function() {
+		judgeManagementService.editJudge($scope.judgeId, 
+                                     judgeFormData, 
+                                     $scope.teamsToAdd, 
+                                     $scope.teamsToRemove, 
+                                     $scope.assignedTeams)
+      .then(function() {
 			// Refresh judge objects
 			judgeManagementService.getJudges();
 		}).catch(function(error) {
@@ -266,7 +271,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 		var teamManagementService = TeamManagementService($scope, sessionStorage);
 		var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
-    var userRESTService = UserRESTService(CurrentUserService.getAuthHeader());
     
 		var eventId = sessionStorage.getObject('selected_event').id;
     
@@ -338,7 +342,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			judgeReq.password_confirmation = randomPass;
 
 			// Register judge as a user & adds them to the event.
-			userRESTService.register(judgeReq).$promise.then(function(resp) {
+			UserRESTService.register(judgeReq).$promise.then(function(resp) {
 				judgeId = resp.user.id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId}).$promise.then(function(resp) {
 					console.log('Judge successfully registered & added to event');
@@ -374,37 +378,53 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		judgeManagement.editJudge = function(judgeId, judgeFormData, teamsToAdd, teamsToRemove, assignedTeams) {
 			var defer = $q.defer();
       
-      userRESTService.edit({id: judgeId}, judgeFormData).$promise.then(function(resp) {
-        alert('woot!');
+      CurrentUserService.editUser(CurrentUserService.getAuthHeader())
+        .edit({id: judgeId}, judgeFormData).$promise.then(function(resp) {
+        console.log('User successfully edited.');
+      }).then(function() {
+        var haveTeamsChanged = editAssignedTeams();
+        if (haveTeamsChanged) {
+          judgeManagement.assignTeamsToJudge(assignedTeams, true).then(function() {
+            defer.resolve();
+          }).catch(function() {
+            console.log('Error updating judge teams.');
+            defer.reject();
+          });
+        } else {
+          defer.resolve();
+        }
+      }).catch(function(error) {
+        console.log(JSON.stringify(error));
+        defer.reject();
       });
       
-      /* Within the modal, it is possible to remove an already-assigned team
-         and, at the same time, assign the same team from the table. This means
-         removing then adding teams will work for this edge case (but the 
-         opposite will not, since duplicates are not added). */
-      for (var i = 0; i < teamsToRemove.length; i++) {
-        var index = assignedTeams.indexOf(teamsToRemove[i]);
-        if (index > -1)
-          assignedTeams.splice(index, 1);
-      }
-      
-      for (var i = 0; i < teamsToAdd.length; i++) {
-        if (assignedTeams.indexOf(teamsToAdd[i]) === -1)
-          assignedTeams.push(teamsToAdd[i]);
-      }
+      function editAssignedTeams() {
+        /* Within the modal, it is possible to remove an already-assigned team
+           and, at the same time, assign the same team from the table. This means
+           removing then adding teams will work for this edge case (but the 
+           opposite will not, since duplicates are not added). */
+        for (var i = 0; i < teamsToRemove.length; i++) {
+          var index = assignedTeams.indexOf(teamsToRemove[i]);
+          if (index > -1)
+            assignedTeams.splice(index, 1);
+        }
 
-			var haveTeamsChanged = true;
-
-			if (haveTeamsChanged) {
-				judgeManagement.assignTeamsToJudge(assignedTeams, true).then(function() {
-					defer.resolve();
-				}).catch(function() {
-					console.log('Error updating judge teams.');
-					defer.reject();
-				});
-			} else {
-				defer.resolve();
-			}
+        for (var i = 0; i < teamsToAdd.length; i++) {
+          if (assignedTeams.indexOf(teamsToAdd[i]) === -1)
+            assignedTeams.push(teamsToAdd[i]);
+        }
+        
+        if (teamsToRemove.length !== teamsToAdd.length)
+          return false;
+        else {
+          for (var i = 0; i < teamsToRemove.length; i++) {
+            if (teamsToRemove[i].id !== teamsToAdd[i].id)
+              return false;
+          }
+        }
+        
+        return true;
+      }
 
 			return defer.promise;
 		}
@@ -435,7 +455,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
       var defer = $q.defer();
       
 			if (!judgeId) {
-				var judgeId = sessionStorage.getObject('draggedJudge').judge.id; // !!!!!
+				var judgeId = sessionStorage.getObject('draggedJudge').judge.id; // Should it really be ('draggedJudge').judge.id; ?
 			}
 			judgeRESTService.judgeTeams.assign({judge_id: judgeId}, {team_id: teamId}).$promise.then(function(resp) {
 				console.log(resp);
