@@ -261,7 +261,28 @@
 											<span ng-repeat="team in teamsToAdd"
 													class="team-to-add">
 												#{{team.id}} {{team.name}} [<!--
-												--><a ng-click="removeTeamToAdd(team.id)"
+												--><a ng-click="removeTeamFromTeamsToAdd(team)"
+														class="clickable">x</a>]
+											</span>
+										</span>
+									</div>
+								</div>
+								<br />
+								
+								<label>Teams to Be Removed: ({{teamsToRemove.length}}) [<!--
+								--><a ng-click="clearTeamsToRemove()" class="clickable">
+									Clear all
+								</a>]</label>
+								<div class="row">
+									<div class="col col-sm-12 col-md-12 col-lg-12">
+										<span ng-if="teamsToRemove.length === 0">
+											No teams to be removed.
+										</span>
+										<span ng-if="teamsToRemove.length > 0">
+											<span ng-repeat="teamObj in teamsToRemove"
+													  class="team-to-add">
+												#{{teamObj.team.id}} {{teamObj.team.name}} [<!--
+												--><a ng-click="undoRemoveTeamFromJudge(teamObj)"
 														class="clickable">x</a>]
 											</span>
 										</span>
@@ -303,11 +324,6 @@
 												ng-click="deselectAllFilteredTeams()">
 											Clear All
 										</button>
-										<button class="btn btn-success"
-												type="button"
-												ng-click="addSelectedTeamsToJudgeModal(filteredTeams)">
-											Assign Selected
-										</button>
 									</div>
 								</div>
 								<br />
@@ -327,8 +343,10 @@
 													<td>{{team.id}}</td>
 													<td>{{team.name}}</td>
 													<td>{{team | printAllCategories}}</td>
-													<td><input type="checkbox"
-																ng-model="team.selected" />
+													<td>
+                              <input type="checkbox"
+                                     ng-checked="team.selected"
+                                     ng-click="(team.selected) ? deselectFilteredTeam(team) : selectFilteredTeam(team)" />
 													</td>
 												</tr>
 											</tbody>
