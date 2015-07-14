@@ -58,6 +58,31 @@
 								<span class="glyphicon glyphicon-plus"></span> Add Rubric
 							</button>
 						</div>
+
+						<div ng-repeat="rubric in rubrics track by $index | orderBy: '+rubric.name'" class="draggable-item-col">
+							<div class="media draggable-item"
+								 cng-draggable-item
+								 item-id="{{rubric.id}}"
+								 item-type="judge"
+								 cog=".glyphicon-cog"
+								 is-transferable="true">
+								<div class="media-left"></div>
+								<div class="media-body">
+									<h4 class="media-heading">
+										<span class="glyphicon glyphicon-cog"
+												data-toggle="modal"
+												data-target="#rubric-modal"
+												ng-click="changeJudgeModalView('edit', judgeObj.judge, judgeObj.teams)">
+										</span>
+									</h4>
+									<div class="media-text rubric-media-text"
+										 cng-wrap-word word="{{rubric.name}}"
+										 line-width="25"
+										 total-width="50">
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div ng-switch-when="selectedCategory">
@@ -121,7 +146,7 @@
 
 						<div accordion close-others="true">
 							<button class="btn btn-success"
-							        id="rubric-accordion-add-btn"
+									id="rubric-accordion-add-btn"
 									ng-click="createNewAccordionCriterion()">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add New Criterion
@@ -171,16 +196,16 @@
 									<div class="row rubric-accordion-row">
 										<div class="col col-sm-6 col-md-6 col-lg-6">
 											<div class="panel panel-default"
-											     ng-style="inheritedActive"
-											     ng-click="updateRatingType($index, 'Inherited'); inheritedActive={'background-color':'#d6e9c6'}; customActive={'background-color':'white'}">
+												 ng-style="inheritedActive"
+												 ng-click="updateRatingType($index, 'Inherited'); inheritedActive={'background-color':'#d6e9c6'}; customActive={'background-color':'white'}">
 												<label>Inherited</label>
 												<div ng-init="$scope.rubricRating"><rating ng-model="rubricRating" readonly="true" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
 											</div>
 										</div>
 										<div class="col col-sm-6 col-md-6 col-lg-6">
 											<div class="panel panel-default"
-											     ng-style="customActive"
-											     ng-click="updateRatingType($index, 'Custom'); customActive={'background-color':'#d6e9c6'}; inheritedActive={'background-color':'white'}">
+												 ng-style="customActive"
+												 ng-click="updateRatingType($index, 'Custom'); customActive={'background-color':'#d6e9c6'}; inheritedActive={'background-color':'white'}">
 												<label>Custom</label>
 												<div ng-init="$scope.rubricRating">
 													<rating ng-model="modalCriteria[$index].rating" max="10"></rating> <b>({{modalCriteria[$index].rating}} / 10)</b>
