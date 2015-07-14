@@ -68,7 +68,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			$scope.judgeInfoForm.judgeLastName = judge.last_name;
 			$scope.judgeInfoForm.judgeEmail = judge.email;
 			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
-      $scope.assignedTeams = $scope.teams;
+      $scope.assignedTeams = $scope.teams; // TODO: change to teams
       sessionStorage.putObject('draggedJudge', judge); // Needed by judgeManagentService.assignedTeamsToJudge()
 		}
 	}
@@ -378,13 +378,14 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		judgeManagement.editJudge = function(judgeId, judgeFormData, teamsToAdd, teamsToRemove, assignedTeams) {
 			var defer = $q.defer();
       
-      CurrentUserService.editUser(CurrentUserService.getAuthHeader())
-        .edit({id: judgeId}, judgeFormData).$promise.then(function(resp) {
-        console.log('User successfully edited.');
-      }).then(function() {
+      //CurrentUserService.editUser(CurrentUserService.getAuthHeader())
+        //.edit({id: judgeId}, judgeFormData).$promise.then(function(resp) {
+        //console.log('User successfully edited.');
+      //}).then(function() {
         var haveTeamsChanged = editAssignedTeams();
         if (haveTeamsChanged) {
           judgeManagement.assignTeamsToJudge(assignedTeams, true).then(function() {
+            console.log('Successfully updated judge teams.');
             defer.resolve();
           }).catch(function() {
             console.log('Error updating judge teams.');
@@ -393,10 +394,10 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
         } else {
           defer.resolve();
         }
-      }).catch(function(error) {
-        console.log(JSON.stringify(error));
-        defer.reject();
-      });
+      //}).catch(function(error) {
+        //console.log(JSON.stringify(error));
+        //defer.reject();
+      //});
       
       function editAssignedTeams() {
         /* Within the modal, it is possible to remove an already-assigned team
@@ -415,15 +416,15 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
         }
         
         if (teamsToRemove.length !== teamsToAdd.length)
-          return false;
+          return true;
         else {
           for (var i = 0; i < teamsToRemove.length; i++) {
             if (teamsToRemove[i].id !== teamsToAdd[i].id)
-              return false;
+              return true;
           }
         }
         
-        return true;
+        return false;
       }
 
 			return defer.promise;
