@@ -344,7 +344,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
             var teamRESTService = TeamRESTService(authHeader);
             teamRESTService.team_categories.get({team_id: teamId}).$promise.then(function(resp) {
-                defer.resolve(resp.team_categories);
+                defer.resolve(resp);
             }).catch(function() {
                 defer.reject('Error getting categories in team.');
             });
@@ -380,7 +380,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 if (!isDragNDrop) {
                     $scope.closeTeamModal();
                 }
-                $log.log("Added team #" + teamId + " to category " + resp.team_category.category.label + ".");
+                $log.log("Added team #" + teamId + " to category " + resp.category.label + ".");
             }).catch(function() {
                 sessionStorage.put('generalErrorMessage', 'Error transferring team to category.');
                 $scope.error = 'Error transferring team to category.';

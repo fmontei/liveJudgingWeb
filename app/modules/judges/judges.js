@@ -472,9 +472,13 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
       return defer.promise;
 		}
 
-		judgeManagement.removeTeamsFromJudge = function(teams, judgeId) {
-			// SOON
-		}
+		/*judgeManagement.removeTeamFromJudge = function(teamId, judgeId) {
+			JudgeRESTService(getAuthHeader()).judgeTeams.remove({judge_id: judgeId, {id: teamId}}).$promise.then(function(resp) {
+				console.log(resp);
+			}).catch(function() {
+				console.log('Error removing team from judge');
+			});
+		}*/
 
 		judgeManagement.getJudgeByID = function(judgeId) {
 			var retVal = null;

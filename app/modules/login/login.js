@@ -128,7 +128,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     },
 
     service.login = function(user) {
-				service.hasLoginError = false;
+		service.hasLoginError = false;
         LoginService(service.getLoginAuthHeader(user.email, user.password)).login().$promise.then(function(resp) {
             console.log(service);
             service.currentUser = resp;

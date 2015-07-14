@@ -171,7 +171,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 			var connection = TeamRESTService(authHeader);
 			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
-				return getCategoriesForEachTeam(resp.event_teams);
+				return getCategoriesForEachTeam(resp);
 			}).then(function(filledTeams) {
 				sessionStorage.putObject('teams', filledTeams);
 				defer.resolve('Successfully got teams.');
@@ -193,7 +193,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				var innerDeferred = $q.defer();
 				team.categories = [];
 				connection.team_categories.get({team_id: team.id}).$promise.then(function(resp) {
-					angular.forEach(resp.team_categories, function(team_category) {
+					angular.forEach(resp, function(team_category) {
 						team.categories.push(team_category.category);
 					});
 					$q.all(team.categories).then(function() {
@@ -238,7 +238,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			connection.teams.create({event_id: eventId}, teamReq).$promise.then(function(resp) {
 
 				// Add new team to uncategorized (or to the selected category if there is one).
-				var returnedTeamID = resp.event_team.id;
+				var returnedTeamID = resp.id;
 				var catId;
 				if (sessionStorage.getObject('selectedCategory')) {
 					catId = sessionStorage.getObject('selectedCategory').id;
@@ -249,10 +249,10 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 				var teams = sessionStorage.getObject('teams');
 				if (teams) {
-					teams.push(resp.event_team);
+					teams.push(resp);
 					sessionStorage.putObject('teams', teams);
 				} else {
-					sessionStorage.putObject('teams', resp.event_team);
+					sessionStorage.putObject('teams', resp);
 				}
 				// Todo: Update uncategorized to reflect changes.
 			}).catch(function() {
@@ -283,7 +283,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				// Todo: call API to update category->team mappings (once that's in the API).
 				updateTeam(updatedTeam);
 				$scope.closeTeamModal();
-				$log.log("Team edited: " + resp.event_team.name);
+				$log.log("Team edited: " + resp.name);
 			}).catch(function() {
 				sessionStorage.put('generalErrorMessage', 'Error editing team.');
 				$log.log('Error editing team.');

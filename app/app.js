@@ -86,6 +86,9 @@ angular.module('liveJudgingAdmin', [
 
     sessionStorage.getObject = function(key) {
       var stringValue = $window.sessionStorage.getItem(key);
+      if (stringValue == "undefined") {
+        return undefined;
+      }
       return JSON.parse(stringValue);
     }
 
