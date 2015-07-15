@@ -52,6 +52,12 @@ angular.module('liveJudgingAdmin', [
     else if ($rootScope.enableButtonText === 'Disable Hints')
       $rootScope.enableButtonText = 'Enable Hints';
   }
+  $rootScope.disableHints = function() {
+    angular.forEach($rootScope.hints, function(hint) {
+      hint.enabled = false;
+    });
+    $rootScope.enableButtonText = 'Enable Hints';
+  }
   $rootScope.disableSingleHint = function(key) {
     $rootScope.hints[key].enabled = false;
   }

@@ -117,7 +117,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.viewCategoryDetails = function(cat) {
             $scope.updateStoredCategory(cat);
-            $rootScope.enableHints();
+            $rootScope.disableHints();
             if ($location.path().indexOf('teams') !== -1) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().indexOf('judges') !== -1) {
