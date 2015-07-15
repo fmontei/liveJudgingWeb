@@ -76,7 +76,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 
 .factory('LoginService', function($resource) {
     return function(authHeader) {
-        return $resource('http://api.stevedolan.me/login', {}, {
+        return $resource('http://api.stevedolan.me/login', {'platform': 'Web'}, {
             login: {
                 method: 'GET',
                 headers: authHeader,
