@@ -14,15 +14,21 @@
 							</h4>
 						</div>
 					</div>
-					<br />
 				</div>
 				<div ng-switch-when="selectedCategory">
-					<div class="row">
-						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
-							<span class="label label-default">{{selectedCategory.teams.length}}</span>
-						</h1>
-						<hr>
+				  <div class="row general-error-message-row">
+						<div class="col col-sm-6 col-md-6 col-lg-6">
+							<h1 id="breadcrumb-symbol">
+							  <a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
+							  <span class="label label-default">{{selectedCategory.teams.length}}</span>
+						  </h1>
+						</div>
+						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
+							<h4 general-error-message
+									 animate="true"
+									 color="red">
+							</h4>
+						</div>
 					</div>
 				</div>
 			</div>

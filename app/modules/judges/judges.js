@@ -282,10 +282,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		var judgeRESTService = JudgeRESTService(CurrentUserService.getAuthHeader());
     
 		var eventId = sessionStorage.getObject('selected_event').id;
-    
-    judgeManagement.changeView = function(view) {
-			sessionStorage.put('judgeView', view);
-		}
 
 		judgeManagement.getJudges = function() {
 			var defer = $q.defer();
@@ -318,7 +314,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 			$q.all(judgePromises).then(function(judgesWithTeams) {
 				sessionStorage.putObject('judges', judgesWithTeams);
-        console.log('Successfully retrieved all judge teams.');
 				defer.resolve();
 			}).catch(function() {
         sessionStorage.putObject('generalErrorMessage', 'Error getting judge teams.');
@@ -394,7 +389,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
       }).then(function() {
         $scope.teamsToAdd.length = 0;
         $scope.teamsToRemove.length = 0;
-        judgeManagement.getJudges();
+        judgeManagement.getJudges().then(function() {
+          updateJudgesInSelectedCategory();
+        });
       });
       
       function removeTeams() {
@@ -535,6 +532,36 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
       
       return defer.promise;
 		}
+    
+    judgeManagement.changeView = function(view) {
+      updateJudgesInSelectedCategory();
+      sessionStorage.put('judgeView', view);
+		}
+    
+    var updateJudgesInSelectedCategory = function() {
+      var judgeTeams = sessionStorage.getObject('judges');
+      var selectedCategory = sessionStorage.getObject('selectedCategory');
+      selectedCategory.judges = [];
+      for (var i = 0; i < judgeTeams.length; i++) {
+        var teams = judgeTeams[i].teams;
+        for (var j = 0; j < teams.length; j++) {
+          if (inSelectedCategory(teams[j].team.id, judgeTeams[i]))
+            break;
+        }
+      }
+      
+      function inSelectedCategory(teamId, judgeTeam) {
+       for (var k = 0; k < selectedCategory.teams.length; k++) {
+          if (selectedCategory.teams[k].id === teamId) {
+            selectedCategory.judges.push(judgeTeam);
+            return true;
+          }
+        }
+        return false;
+      }
+      
+      sessionStorage.putObject('selectedCategory', selectedCategory); 
+    }
 
 		judgeManagement.getJudgeByID = function(judgeId) {
 			var retVal = null;

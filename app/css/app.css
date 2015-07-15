@@ -50,6 +50,7 @@
 	border-bottom: solid #ccc 1px; 
 	display: flex; 
 	height: 100%;
+  margin-bottom: 30px;
 }
 
 .general-error-message-col {
