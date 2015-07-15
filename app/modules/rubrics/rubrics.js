@@ -63,7 +63,9 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 	$scope.editRubric = function() {
 		var rubricReq = {name: $scope.rubricForm.name};
-		rubricManagementService.editRubric($scope.rubricId, rubricReq, $scope.modalCriteria, $scope.criteriaToRemove);
+		rubricManagementService.editRubric($scope.rubricId, rubricReq, $scope.modalCriteria, $scope.criteriaToRemove).then(function() {
+			rubricManagementService.getRubrics();
+		});
 		$scope.closeRubricModal();
 	}
 
@@ -106,7 +108,6 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			var eventId = sessionStorage.getObject('selected_event').id;
 			RubricRESTService(authHeader).rubrics.get({event_id: eventId}).$promise.then(function(resp) {
 				sessionStorage.putObject('rubrics', resp);
-				console.log(resp);
 				console.log(sessionStorage.getObject('rubrics'));
 			}).catch(function() {
 				console.log('Error getting rubrics');
@@ -167,6 +168,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		}
 
 		rubricManagement.editRubric = function(rubricId, rubricReq, criteria, criteriaToRemove) {
+			var defer = $q.defer();
 			var rubricRESTService = RubricRESTService(authHeader);
 			rubricRESTService.rubric.update({id: rubricId}, rubricReq).$promise.then(function(resp) {
 				var criteriaToAdd = [];
@@ -180,16 +182,21 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 				rubricManagement.createRubricCriteria(rubricId, criteriaToAdd).then(function(resp) {
 					// todo: make more efficient, right now this edits everything regardless of whether it changed
 					rubricManagement.editRubricCriteria(criteria, criteriaToRemove).then(function() {
-						rubricManagement.getRubrics();
+						defer.resolve();
 					}).catch(function() {
 						console.log('Error editing rubric criteria');
+						defer.reject();
 					});
 				}).catch(function() {
 					console.log('Error creating rubric criteria');
+					defer.reject();
 				});
 			}).catch(function() {
 				console.log('Error editing rubric');
+				defer.reject();
 			});
+
+			return defer.promise;
 		}
 
 		rubricManagement.editRubricCriteria = function(criteria, criteriaToRemove) {
@@ -239,6 +246,20 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}
 		}
 
+		rubricManagement.deleteRubric = function(rubricId) {
+			var defer = $q.defer();
+			RubricRESTService(authHeader).rubric.remove({id: rubricId}).$promise.then(function() {
+				console.log('Successfully deleted rubric');
+				rubricManagement.getRubrics();
+				defer.resolve();
+			}).catch(function(rubricId) {
+				console.log('Error deleting rubric');
+				defer.reject();
+			});
+
+			return defer.promise;
+		}
+
 		return rubricManagement;
 	}
 })
@@ -264,6 +285,10 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}, {
 				update: {
 					method: 'PUT',
+					headers: authHeader
+				},
+				remove:{
+					method: 'DELETE',
 					headers: authHeader
 				}
 			}),

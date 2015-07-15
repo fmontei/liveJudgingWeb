@@ -22,7 +22,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         var teamManagementService = TeamManagementService($scope, sessionStorage);
         var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-              var rubricManagementService = RubricManagementService($scope, sessionStorage);
+        var rubricManagementService = RubricManagementService($scope, sessionStorage);
 
         $scope.createNewCategory = function() {
             categoryManagementService.createNewCategory();
@@ -48,6 +48,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 judgeManagementService.deleteJudge(itemId).then(function(wasSuccessful) {
                     defer.resolve(wasSuccessful);
                 });
+            } else if ($location.path().indexOf('rubrics') !== -1) {
+                rubricManagementService.deleteRubric(itemId).then(function(wasSuccessful) {
+                    defer.resolve(wasSuccessful);
+                })
             }
             return defer.promise;
         }
