@@ -32,6 +32,10 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	$scope.assignedTeams = []; // Teams actually assigned
 	/* end */
 
+	$scope.addJudgeById = function(judgeId) {
+		judgeManagementService.addJudgeById(judgeId);
+	}
+
 	$scope.tabs = [
 		{ title: 'Judge Information', active: true, view: 'judgeInfo' },
 		{ title: 'Assigned Teams', view: 'teams' },
@@ -352,15 +356,19 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			}
 		}
 
+		judgeManagement.addJudgeById = function(judgeId) {
+			judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId});
+		}
+
 		judgeManagement.addJudge = function(judgeFormData) {
 			var defer = $q.defer();
 
 			// Todo: Check if a user with the email already exists (once that's in the API).
 			var judgeReq = judgeFormData;
 			var judgeId = null;
-			var randomPass = judgeManagement.generatePassword();
-			judgeReq.password = randomPass;
-			judgeReq.password_confirmation = randomPass;
+			//var randomPass = judgeManagement.generatePassword();
+			judgeReq.password = 'password';
+			judgeReq.password_confirmation = 'password';
 
 			// Register judge as a user & adds them to the event.
 			UserRESTService.register(judgeReq).$promise.then(function(resp) {
