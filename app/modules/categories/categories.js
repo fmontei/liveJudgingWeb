@@ -397,6 +397,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var rubricRESTService = RubricRESTService(authHeader);
             var req = {category_id: categoryId};
             CategoryRESTService(authHeader).category.update({id: categoryId}, {rubric_id: rubricId}).$promise.then(function(resp) {
+                categoryManagement.getCategories();
                 console.log(resp);
                 console.log('Successfully transferred rubric to category');
             }).catch(function() {
