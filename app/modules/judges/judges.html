@@ -76,32 +76,34 @@
 							</button>
 						</div>
 					</div>
-
-					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'" class="draggable-item-col">
-            <div class="media draggable-item"
-                 cng-draggable-item
-                 item-id="{{judgeObj.judge.id}}"
-                 item-type="judge"
-                 cog=".glyphicon-cog"
-                 is-transferable="true">
-              <div class="media-left"></div>
-              <div class="media-body">
-                <h4 class="media-heading">
-                  <span class="glyphicon glyphicon-cog"
-                        data-toggle="modal"
-                        data-target="#judge-modal"
-                        ng-click="changeJudgeModalView('edit', judgeObj)">
-                  </span>
-                </h4>
-                <div class="media-text judge-media-text"
-                     cng-wrap-word word="{{judgeObj.judge.name}}"
-                     line-width="25"
-                     total-width="50">
-                </div> 
-                <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
+          
+          <div class="draggable-item-wrapper">
+            <div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
+              <div class="media draggable-item"
+                   cng-draggable-item
+                   item-id="{{judgeObj.judge.id}}"
+                   item-type="judge"
+                   cog=".glyphicon-cog"
+                   is-transferable="true">
+                <div class="media-left"></div>
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    <span class="glyphicon glyphicon-cog"
+                          data-toggle="modal"
+                          data-target="#judge-modal"
+                          ng-click="changeJudgeModalView('edit', judgeObj)">
+                    </span>
+                  </h4>
+                  <div class="media-text judge-media-text"
+                       cng-wrap-word word="{{judgeObj.judge.name}}"
+                       line-width="25"
+                       total-width="50">
+                  </div> 
+                  <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
+                </div>
               </div>
             </div>
-					</div>
+          </div>
 				</div> <!-- ng-switch-default -->
 
 				<div ng-switch-when="selectedCategory">

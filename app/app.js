@@ -12,7 +12,8 @@ angular.module('liveJudgingAdmin', [
   'liveJudgingAdmin.judges',
   'liveJudgingAdmin.rubrics',
   'liveJudgingAdmin.categories',
-  'liveJudgingAdmin.settings'
+  'liveJudgingAdmin.settings',
+  'liveJudgingAdmin.notifications'
 ])
 
 .config(['$routeProvider', function($routeProvider) {
@@ -25,7 +26,20 @@ angular.module('liveJudgingAdmin', [
     if (CurrentUserService.isLoggedIn()) {
       $location.path('/event');
     }
-  })
+  });
+  
+  $rootScope.hints = new Object();
+  $rootScope.hints['addButton'] = {'content': '1) Click here to add a team to this event.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['dragItem'] = {'content': '2) Drag these items over to the right &rarr;', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['destroyItem'] = {'content': '3a) Drop item here to permanently delete it from this event.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.enableHints = function() {
+    angular.forEach($rootScope.hints, function(hint) {
+      hint.enabled = !hint.enabled;
+    });
+  }
+  $rootScope.disableSingleHint = function(key) {
+    $rootScope.hints[key].enabled = false;
+  }
 })
 
 .controller('MainCtrl', ['sessionStorage',
@@ -243,4 +257,39 @@ angular.module('liveJudgingAdmin', [
 			}, true);
 		}
 	}
-}]);
+}])
+
+.directive('customPopover', function() {
+  return {
+    restrict: 'A',
+    scope: {
+      popoverName: '@',
+      popoverContent: '@',
+      popoverPlacement: '@',
+      popoverToggle: '@',
+      popoverDisable: '&'
+    },
+    link: function(scope, elem, attrs) {
+      elem.popover({
+        animation: true,
+        content: scope.popoverContent,
+        html: true,
+        placement: scope.popoverPlacement,
+        trigger: 'manual'
+      });
+      elem.bind('mouseover', function() {
+        scope.popoverDisable({key: scope.popoverName});
+        scope.$apply();
+        elem.popover('hide');
+      });
+      scope.$watch(function() {
+        return scope.popoverToggle;
+      }, function(newValue) {
+        if (newValue == 'true') {
+          elem.popover('show');
+        } else if (newValue == 'false')
+          elem.popover('hide');
+      });
+    }
+  }
+});

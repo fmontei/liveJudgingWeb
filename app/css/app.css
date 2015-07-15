@@ -61,3 +61,20 @@
 .general-error-message-col h4 {
 	float: right;
 }
+
+.popover  {
+  background: tomato;
+  color: white;
+}
+.popover.left .arrow:after {
+  border-left-color:tomato;
+}
+.popover.right .arrow:after {
+  border-right-color:tomato;
+}
+.popover.top .arrow:after {
+  border-top-color:tomato;
+}
+.popover.bottom .arrow:after {
+  border-bottom-color:tomato;
+}

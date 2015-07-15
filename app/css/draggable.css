@@ -17,8 +17,9 @@
 	cursor: move;
 }
 
-.draggable-item-col {
+.draggable-item-wrapper {
   width: 700px;
+  min-height: 50px;
 }
 
 .draggable-item .glyphicon-cog, .glyphicon-cog {

@@ -594,7 +594,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			return retVal;
 		}
 
-		judgeManagement.openAssignByCatModal = function(categoryId, judgeId) {
+		judgeManagement.openAssignByCatModal = function(categoryId, judgeId) {      
 			var judge = judgeManagement.getJudgeByID(judgeId);
 			sessionStorage.putObject('draggedJudge', judge);
 

@@ -58,31 +58,32 @@
 								<span class="glyphicon glyphicon-plus"></span> Add Rubric
 							</button>
 						</div>
+          </div>
 
-						<div ng-repeat="rubric in rubrics track by $index | orderBy: '+rubric.name'" class="draggable-item-col">
-							<div class="media draggable-item"
-								 cng-draggable-item
-								 item-id="{{rubric.id}}"
-								 item-type="rubric"
-								 cog=".glyphicon-cog"
-								 is-transferable="true">
-								<div class="media-left"></div>
-								<div class="media-body">
-									<h4 class="media-heading">
-										<span class="glyphicon glyphicon-cog"
-												data-toggle="modal"
-												ng-click="openRubricModal(true, rubric)">
-										</span>
-									</h4>
-									<div class="media-text rubric-media-text"
-										 cng-wrap-word word="{{rubric.name}}"
-										 line-width="25"
-										 total-width="50">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+          <div ng-repeat="rubric in rubrics track by $index | orderBy: '+rubric.name'" class="draggable-item-col">
+            <div class="media draggable-item"
+               cng-draggable-item
+               item-id="{{rubric.id}}"
+               item-type="rubric"
+               cog=".glyphicon-cog"
+               is-transferable="true">
+              <div class="media-left"></div>
+              <div class="media-body">
+                <h4 class="media-heading">
+                  <span class="glyphicon glyphicon-cog"
+                      data-toggle="modal"
+                      ng-click="openRubricModal(true, rubric)">
+                  </span>
+                </h4>
+                <div class="media-text rubric-media-text"
+                   cng-wrap-word word="{{rubric.name}}"
+                   line-width="25"
+                   total-width="50">
+                </div>
+              </div>
+            </div>
+          </div>
+					
 				</div>
 				<div ng-switch-when="selectedCategory">
 					<div class="row">

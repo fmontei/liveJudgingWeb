@@ -24,7 +24,12 @@
         </div>
         <div ng-switch on="currentView">
             <div ng-switch-default 
-                ng-style="specialCategoryShow">
+                 ng-style="specialCategoryShow"
+                 custom-popover
+                 popover-content="{{hints['destroyItem'].content}}" 
+                 popover-placement="{{hints['destroyItem'].placement}}"
+                 popover-toggle="{{hints['destroyItem'].enabled}}"
+                 popover-disable="disableSignleHint(key)">
                 <li class="droppable-category destroy-special-category" 
                     cng-special-droppable-category
                     delete-item="$parent.deleteItem(itemId)"
