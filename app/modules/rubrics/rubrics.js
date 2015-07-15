@@ -27,12 +27,12 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		console.log($scope.modalCriteria);
 		var numberOfNewCriteria = 0;
 		for (var i = 0; i < $scope.modalCriteria.length; i++)
-			if ($scope.modalCriteria[i].name.indexOf('New Criterion') !== -1)
+			if ($scope.modalCriteria[i].label.indexOf('New Criterion') !== -1)
 				numberOfNewCriteria++;
 		if (numberOfNewCriteria > 0)
-			$scope.modalCriteria.push({name: 'New Criterion (' + numberOfNewCriteria + ')', rating: $scope.rubricRating, ratingType: 'Inherited'});
+			$scope.modalCriteria.push({label: 'New Criterion (' + numberOfNewCriteria + ')', rating: $scope.rubricRating, ratingType: 'Inherited'});
 		else
-			$scope.modalCriteria.push({name: 'New Criterion', rating: $scope.rubricRating, ratingType: 'Inherited'});
+			$scope.modalCriteria.push({label: 'New Criterion', rating: $scope.rubricRating, ratingType: 'Inherited'});
 	}
 
 	$scope.removeAccordionCriterion = function(index) {
@@ -45,8 +45,33 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 	$scope.createRubric = function() {
 		var rubricReq = {name: $scope.rubricForm.name};
-		console.log($scope.modalCriteria);
 		rubricManagementService.createRubric(rubricReq, $scope.modalCriteria);
+		$scope.closeRubricModal();
+	}
+
+	$scope.editRubric = function() {
+		var rubricReq = {name: $scope.rubricForm.name};
+		rubricManagementService.editRubric(rubricReq, $scope.modalCriteria);
+		$scope.closeRubricModal();
+	}
+
+	$scope.openRubricModal = function(isEdit, rubric) {
+		if (isEdit) {
+			$scope.rubricModalView = 'edit';
+			$scope.rubricForm.name = rubric.name;
+			$scope.modalCriteria = rubric.criteria;
+		} else {
+			$scope.rubricModalView = 'create';
+			$scope.rubricForm = {};
+			$scope.modalCriteria = [];
+		}
+		$('#rubric-modal').modal('show');
+	}
+
+	$scope.closeRubricModal = function() {
+		$scope.rubricForm = {};
+		$scope.modalCriteria = [];
+		$('#rubric-modal').modal('hide');
 	}
 
 	$scope.changeView = function(view) {
@@ -86,7 +111,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		rubricManagement.createRubric = function(rubricReq, criteriaReq) {
 			var eventId = sessionStorage.getObject('selected_event').id;
 			RubricRESTService(authHeader).rubrics.create({event_id: eventId}, rubricReq).$promise.then(function(resp) {
-				rubricManagement.createRubricCriteria(criteriaReq).then(function(resp) {
+				rubricManagement.createRubricCriteria(resp.id, criteriaReq).then(function(resp) {
 					rubricManagement.getRubrics();
 				});
 				console.log('Successfully created rubric');
@@ -95,13 +120,13 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			});
 		}
 
-		rubricManagement.createRubricCriteria = function(criteria) {
+		rubricManagement.createRubricCriteria = function(rubricId, criteria) {
 			var defer = $q.defer();
 			var rubricRESTService = RubricRESTService(authHeader);
 
 			var criteriaPromises = [];
 			for (var i = 0; i < criteria.length; i++) {
-				criteriaPromises.push(createRubricCriterion(criteria[i], rubricRESTService));
+				criteriaPromises.push(createRubricCriterion(rubricId, criteria[i], rubricRESTService));
 			}
 
 			$q.all(criteriaPromises).then(function() {
@@ -113,16 +138,20 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 			return defer.promise;
 
-			function createRubricCriterion(criterion, rubricRESTService) {
+			function createRubricCriterion(rubricId, criterion, rubricRESTService) {
 				var defer = $q.defer();
-				rubricRESTService.criteria.create(criterion).$promise.then(function(resp) {
-					defer.resolve(resp.criterion);
+				rubricRESTService.criteria.create({rubric_id: rubricId}, criterion).$promise.then(function(resp) {
+					defer.resolve(resp);
+					console.log(resp);
 				}).catch(function() {
 					defer.reject();
 				});
 
 				return defer.promise;
 			}
+		}
+
+		rubricManagement.editRubric = function(rubricReq, criteriaReq) {
 		}
 
 		return rubricManagement;

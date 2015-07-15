@@ -54,7 +54,7 @@
 						<div class="col col-sm-12 col-md-12 col-lg-12">
 							<button class="btn btn-lg btn-success add-entity-btn"
 											data-toggle="modal"
-											data-target="#rubric-modal">
+											ng-click="openRubricModal(false)">
 								<span class="glyphicon glyphicon-plus"></span> Add Rubric
 							</button>
 						</div>
@@ -71,8 +71,7 @@
 									<h4 class="media-heading">
 										<span class="glyphicon glyphicon-cog"
 												data-toggle="modal"
-												data-target="#rubric-modal"
-												ng-click="changeJudgeModalView('edit', judgeObj.judge, judgeObj.teams)">
+												ng-click="openRubricModal(true, rubric)">
 										</span>
 									</h4>
 									<div class="media-text rubric-media-text"
@@ -109,6 +108,12 @@
 				<h4 class="modal-title" id="notification-modal-label">Add New Rubric</h4>
 			</div>
 			<div class="modal-body">
+
+				<div class="row"
+						ng-if="modalCriteria.length == 0 || !rubricForm.name">
+					<div class="col col-sm-1 col-md-1 col-lg-1"></div>
+						Rubric name and at least one criterion required to save.<br />
+				</div>
 
 				<div class="row">
 					<div class="col col-sm-1 col-md-1 col-lg-1">
@@ -155,7 +160,7 @@
 								<div accordion-group is-open="status.open" class="panel-success">
 									<div accordion-heading class="panel-heading rubric-accordion-heading">
 										<div class="rubric-accordion-heading-content">
-											{{criteria.name}}
+											{{criteria.label}}
 											<i class="pull-right glyphicon"
 												 ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}">
 											</i>
@@ -174,7 +179,7 @@
 											<label>*Name:</label>
 										</div>
 										<div class="col col-sm-7 col-md-7 col-lg-7">
-											<input ng-model="modalCriteria[$index].name" type="text" class="form-control" />
+											<input ng-model="modalCriteria[$index].label" type="text" class="form-control" />
 										</div>
 									</div>
 									<br />
@@ -227,7 +232,8 @@
 					<span class="col col-sm-5">
 						<button type="button"
 								class="btn btn-success pull-right"
-								ng-click="createRubric()">
+								ng-click="createRubric()"
+								ng-disabled="modalCriteria.length == 0">
 							Create
 						</button>
 					</span>
