@@ -20,6 +20,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 	$scope.rubricForm = {};
 	$scope.modalCriteria = [];
+	$scope.criteriaToRemove = [];
 	$scope.rubricId = null; // Used for storing the id of the rubric currently in the modal.
 
 	$scope.rubricRating = 5; // Default
@@ -31,12 +32,22 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			if ($scope.modalCriteria[i].label.indexOf('New Criterion') !== -1)
 				numberOfNewCriteria++;
 		if (numberOfNewCriteria > 0)
-			$scope.modalCriteria.push({label: 'New Criterion (' + numberOfNewCriteria + ')', rating: $scope.rubricRating, ratingType: 'Inherited'});
+			$scope.modalCriteria.push({label: 'New Criterion (' + numberOfNewCriteria + ')',
+										rating: $scope.rubricRating,
+										ratingType: 'Inherited',
+										isAddition: true});
 		else
-			$scope.modalCriteria.push({label: 'New Criterion', rating: $scope.rubricRating, ratingType: 'Inherited'});
+			$scope.modalCriteria.push({label: 'New Criterion',
+										rating: $scope.rubricRating,
+										ratingType: 'Inherited',
+										isAddition: true});
 	}
 
 	$scope.removeAccordionCriterion = function(index) {
+		if (!$scope.modalCriteria[index].isAddition) {
+			// If the criterion has been previously saved, add its id to 'toRemove' list.
+			$scope.criteriaToRemove.push($scope.modalCriteria[index].id);
+		}
 		$scope.modalCriteria.splice(index, 1);
 	}
 
@@ -143,6 +154,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 			function createRubricCriterion(rubricId, criterion, rubricRESTService) {
 				var defer = $q.defer();
+				delete criterion.ratingType;
 				rubricRESTService.criteria.create({rubric_id: rubricId}, criterion).$promise.then(function(resp) {
 					defer.resolve(resp);
 					console.log(resp);
@@ -154,19 +166,62 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}
 		}
 
-		rubricManagement.editRubric = function(rubricId, rubricReq, criteriaReq) {
+		rubricManagement.editRubric = function(rubricId, rubricReq, criteria) {
 			var rubricRESTService = RubricRESTService(authHeader);
 			rubricRESTService.rubric.update({id: rubricId}, rubricReq).$promise.then(function(resp) {
-				// todo: make this more efficient by checking if the criteria have changed
-				rubricManagement.getRubrics();
+				var criteriaToAdd = [];
+				for (var i = 0; i < criteria.length; i++) {
+					if (criteria[i].isAddition) {
+						delete criteria[i].isAddition;
+						delete criteria[i].ratingType;
+						criteriaToAdd.push(criteria[i]);
+					}
+				}
+				rubricManagement.createRubricCriteria(rubricId, criteriaToAdd).then(function(resp) {
+					// todo: make more efficient, right now this edits everything regardless of whether it changed
+					rubricManagement.editRubricCriteria(criteria).then(function() {
+						rubricManagement.getRubrics();
+					}).catch(function() {
+						console.log('Error editing rubric criteria');
+					});
+				}).catch(function() {
+					console.log('Error creating rubric criteria');
+				});
 			}).catch(function() {
 				console.log('Error editing rubric');
 			});
 		}
 
-		rubricManagement.editCriterion = function(id, criterion) {
+		rubricManagement.editRubricCriteria = function(criteria) {
+			var defer = $q.defer();
 			var rubricRESTService = RubricRESTService(authHeader);
-			//
+
+			var criteriaPromises = [];
+			for (var i = 0; i < criteria.length; i++) {
+				criteriaPromises.push(editRubricCriterion(criteria[i], rubricRESTService));
+			}
+
+			$q.all(criteriaPromises).then(function() {
+				defer.resolve();
+			}).catch(function() {
+				defer.reject();
+				console.log('Error updating criteria');
+			});
+
+			return defer.promise;
+
+			function editRubricCriterion(criterion, rubricRESTService) {
+				var defer = $q.defer();
+				delete criterion.ratingType;
+				rubricRESTService.criteria.update({id: criterion.id}, criterion).$promise.then(function(resp) {
+					defer.resolve(resp);
+					console.log(resp);
+				}).catch(function() {
+					defer.reject();
+				});
+
+				return defer.promise;
+			}
 		}
 
 		return rubricManagement;
@@ -207,6 +262,12 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 				},
 				create: {
 					method: 'POST',
+					headers: authHeader
+				},
+				update: {
+					method: 'PUT',
+					url: 'http://api.stevedolan.me/criteria/:id',
+					params: {id: '@id'},
 					headers: authHeader
 				}
 			})

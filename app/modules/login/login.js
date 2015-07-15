@@ -71,7 +71,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
         register: {
             method: 'POST'
         }
-    }); 
+    });
 }])
 
 .factory('LoginService', function($resource) {
