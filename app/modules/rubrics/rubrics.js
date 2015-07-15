@@ -63,7 +63,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 	$scope.editRubric = function() {
 		var rubricReq = {name: $scope.rubricForm.name};
-		rubricManagementService.editRubric($scope.rubricId, rubricReq, $scope.modalCriteria);
+		rubricManagementService.editRubric($scope.rubricId, rubricReq, $scope.modalCriteria, $scope.criteriaToRemove);
 		$scope.closeRubricModal();
 	}
 
@@ -166,7 +166,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}
 		}
 
-		rubricManagement.editRubric = function(rubricId, rubricReq, criteria) {
+		rubricManagement.editRubric = function(rubricId, rubricReq, criteria, criteriaToRemove) {
 			var rubricRESTService = RubricRESTService(authHeader);
 			rubricRESTService.rubric.update({id: rubricId}, rubricReq).$promise.then(function(resp) {
 				var criteriaToAdd = [];
@@ -179,7 +179,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 				}
 				rubricManagement.createRubricCriteria(rubricId, criteriaToAdd).then(function(resp) {
 					// todo: make more efficient, right now this edits everything regardless of whether it changed
-					rubricManagement.editRubricCriteria(criteria).then(function() {
+					rubricManagement.editRubricCriteria(criteria, criteriaToRemove).then(function() {
 						rubricManagement.getRubrics();
 					}).catch(function() {
 						console.log('Error editing rubric criteria');
@@ -192,13 +192,16 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			});
 		}
 
-		rubricManagement.editRubricCriteria = function(criteria) {
+		rubricManagement.editRubricCriteria = function(criteria, criteriaToRemove) {
 			var defer = $q.defer();
 			var rubricRESTService = RubricRESTService(authHeader);
 
 			var criteriaPromises = [];
 			for (var i = 0; i < criteria.length; i++) {
 				criteriaPromises.push(editRubricCriterion(criteria[i], rubricRESTService));
+			}
+			for (i = 0; i < criteriaToRemove.length; i++) {
+				criteriaPromises.push(removeRubricCriterion(criteriaToRemove[i], rubricRESTService));
 			}
 
 			$q.all(criteriaPromises).then(function() {
@@ -213,7 +216,19 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			function editRubricCriterion(criterion, rubricRESTService) {
 				var defer = $q.defer();
 				delete criterion.ratingType;
-				rubricRESTService.criteria.update({id: criterion.id}, criterion).$promise.then(function(resp) {
+				rubricRESTService.criterion.update({id: criterion.id}, criterion).$promise.then(function(resp) {
+					defer.resolve(resp);
+					console.log(resp);
+				}).catch(function() {
+					defer.reject();
+				});
+
+				return defer.promise;
+			}
+
+			function removeRubricCriterion(criterionId, rubricRESTService) {
+				var defer = $q.defer();
+				rubricRESTService.criterion.remove({id: criterionId}).$promise.then(function(resp) {
 					defer.resolve(resp);
 					console.log(resp);
 				}).catch(function() {
@@ -263,11 +278,17 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 				create: {
 					method: 'POST',
 					headers: authHeader
-				},
+				}
+			}),
+			criterion: $resource('http://api.stevedolan.me/criteria/:id', {
+				id: '@id'
+			}, {
 				update: {
 					method: 'PUT',
-					url: 'http://api.stevedolan.me/criteria/:id',
-					params: {id: '@id'},
+					headers: authHeader
+				},
+				remove: {
+					method: 'DELETE',
 					headers: authHeader
 				}
 			})
