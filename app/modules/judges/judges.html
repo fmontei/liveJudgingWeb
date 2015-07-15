@@ -74,7 +74,9 @@
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Judge
 							</button>
-						</div>
+						</div>	
+						<input ng-model="addByJudgeId" />
+						<button ng-click="addJudgeById(addByJudgeId)">magic add judge by id button</button>
 					</div>
 
 					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'" class="draggable-item-col">
