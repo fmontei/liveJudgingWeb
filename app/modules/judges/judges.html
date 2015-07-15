@@ -4,8 +4,13 @@
 			<div ng-switch on="judgeView">
 				<div ng-switch-default>
 					<div class="row general-error-message-row">
-						<div class="col col-sm-6 col-md-6 col-lg-6">
-							<h1>Judges <span class="label label-default">{{judges.length}}</span></h1>
+						<div class="col col-sm-3 col-md-3 col-lg-3">
+							<h1 custom-popover
+                  popover-content="{{hints['heading'].content}}" 
+                  popover-placement="{{hints['heading'].placement}}"
+                  popover-toggle="{{hints['heading'].enabled}}"
+                  popover-disable="disableSignleHint(key)">Judges <span class="label label-default">{{judges.length}}</span>
+              </h1>
 						</div>
 						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
 							<h4 general-error-message
@@ -17,11 +22,16 @@
 				</div>
 				<div ng-switch-when="selectedCategory">
          <div class="row general-error-message-row">
-						<div class="col col-sm-6 col-md-6 col-lg-6">
-							<h1 id="breadcrumb-symbol">
-                <a ng-click="changeView('default')">Judges</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
-                <span class="label label-default">{{selectedCategory.judges.length}}</span>
-              </h1>
+						<div class="col col-sm-4 col-md-4 col-lg-4">
+              <h1 id="breadcrumb-symbol"
+                  custom-popover
+                  popover-content="{{hints['heading'].content}}" 
+                  popover-placement="{{hints['heading'].placement}}"
+                  popover-toggle="{{hints['heading'].enabled}}"
+                  popover-disable="disableSignleHint(key)">
+							  <a ng-click="changeView('default')">Judges</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
+							  <span class="label label-default">{{selectedCategory.judges.length}}</span>
+						  </h1>
 						</div>
 						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
 							<h4 general-error-message
@@ -34,13 +44,23 @@
 			</div>
 
 			<div class="row">
-				<div class="col-sm-8 col-md-8 col-lg-8">
+				<div class="col-sm-5 col-md-5 col-lg-5">
 					<em>Drag-'n-drop judges into categories to assign judges to teams.</em>
 				</div>
-				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
+				<div class="col-sm-7 col-md-7 col-lg-7 pull-right">
 					<div class="row">
 						<div class="col-sm-12 col-md-12 col-lg-12">
-							<div class="btn-group" role="group" id="team-buttons">
+							<div class="btn-group custom-btn-group" 
+                   role="group" 
+                   custom-popover
+                   popover-content="{{hints['organize'].content}}" 
+                   popover-placement="{{hints['organize'].placement}}"
+                   popover-toggle="{{hints['organize'].enabled}}"
+                   popover-disable="disableSignleHint(key)">
+							  <input type="button" 
+							         class="btn btn-warning" 
+							         ng-click="enableHints();"
+							         value="{{enableButtonText}}" />
 								<button class="btn btn-default" type="button" cng-organize-items>
 									Organize
 									<span class="glyphicon glyphicon-th-large"></span>
@@ -70,7 +90,12 @@
 							<button class="btn btn-lg btn-success add-entity-btn"
 											data-toggle="modal"
 											data-target="#judge-modal"
-											ng-click="changeJudgeModalView('create', null)">
+											ng-click="changeJudgeModalView('create', null)"
+											custom-popover
+							        popover-content="{{hints['addJudge'].content}}" 
+							        popover-placement="{{hints['addJudge'].placement}}"
+							        popover-toggle="{{hints['addJudge'].enabled}}"
+							        popover-disable="disableSignleHint(key)">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Judge
 							</button>
@@ -79,7 +104,12 @@
 						<button ng-click="addJudgeById(addByJudgeId)">magic add judge by id button</button>
 					</div>
           
-          <div class="draggable-item-wrapper">
+          <div class="draggable-item-wrapper"
+               custom-popover
+               popover-content="{{hints['dragItem'].content}}" 
+               popover-placement="{{hints['dragItem'].placement}}"
+               popover-toggle="{{hints['dragItem'].enabled}}"
+               popover-disable="disableSignleHint(key)">
             <div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
               <div class="media draggable-item"
                    cng-draggable-item
@@ -111,35 +141,47 @@
 				<div ng-switch-when="selectedCategory">
           <div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
-							<button class="btn btn-lg btn-success add-entity-btn">
+							<button class="btn btn-lg btn-success add-entity-btn"
+							        custom-popover
+							        popover-content="{{hints['addJudgeCategory'].content}}" 
+							        popover-placement="{{hints['addJudgeCategory'].placement}}"
+							        popover-toggle="{{hints['addJudgeCategory'].enabled}}"
+							        popover-disable="disableSignleHint(key)">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Judge (Does Nothing ATM)
 							</button>
 						</div>
 					</div>
          
-          <div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
-            <div class="media draggable-item"
-                 cng-draggable-item
-                 item-id="{{judgeObj.judge.id}}"
-                 cog=".glyphicon-cog"
-                 is-transferable="true">
-              <div class="media-left"></div>
-              <div class="media-body">
-                <h4 class="media-heading">
-                  <span class="glyphicon glyphicon-cog"
-                        data-toggle="modal"
-                        data-target="#judge-modal"
-                        ng-click="changeJudgeModalView('edit', judgeObj)">
-                  </span>
-                </h4>
-                <div class="media-text judge-media-text"
-                     cng-wrap-word word="{{judgeObj.judge.name}}"
-                     line-width="25"
-                     total-width="50">
+          <div class="draggable-item-wrapper"
+               custom-popover
+               popover-content="{{hints['dragItem'].content}}" 
+               popover-placement="{{hints['dragItem'].placement}}"
+               popover-toggle="{{hints['dragItem'].enabled}}"
+               popover-disable="disableSignleHint(key)">
+            <div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
+              <div class="media draggable-item"
+                   cng-draggable-item
+                   item-id="{{judgeObj.judge.id}}"
+                   cog=".glyphicon-cog"
+                   is-transferable="true">
+                <div class="media-left"></div>
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    <span class="glyphicon glyphicon-cog"
+                          data-toggle="modal"
+                          data-target="#judge-modal"
+                          ng-click="changeJudgeModalView('edit', judgeObj)">
+                    </span>
+                  </h4>
+                  <div class="media-text judge-media-text"
+                       cng-wrap-word word="{{judgeObj.judge.name}}"
+                       line-width="25"
+                       total-width="50">
+                  </div>
+                  <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
+                  <span>Judging {{judgeObj.teams_in_cat}}/{{selectedCategory.teams.length}} teams in this cat.</span>
                 </div>
-                <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
-                <span>Judging {{judgeObj.teams_in_cat}}/{{selectedCategory.teams.length}} teams in this cat.</span>
               </div>
             </div>
           </div>

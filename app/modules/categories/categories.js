@@ -9,9 +9,9 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
   });
 }])
 
-.controller('CategoriesCtrl', ['$q', 'sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService',
+.controller('CategoriesCtrl', ['$rootScope', '$q', 'sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService',
                                'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
-    function($q, sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService,
+    function($rootScope, $q, sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService,
              TeamManagementService, RubricManagementService) {
 
         var catWatchService = CatWatchService(sessionStorage, $scope);
@@ -117,6 +117,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         $scope.viewCategoryDetails = function(cat) {
             $scope.updateStoredCategory(cat);
+            $rootScope.enableHints();
             if ($location.path().indexOf('teams') !== -1) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().indexOf('judges') !== -1) {

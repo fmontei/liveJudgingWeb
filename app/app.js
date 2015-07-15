@@ -12,8 +12,7 @@ angular.module('liveJudgingAdmin', [
   'liveJudgingAdmin.judges',
   'liveJudgingAdmin.rubrics',
   'liveJudgingAdmin.categories',
-  'liveJudgingAdmin.settings',
-  'liveJudgingAdmin.notifications'
+  'liveJudgingAdmin.settings'
 ])
 
 .config(['$routeProvider', function($routeProvider) {
@@ -29,13 +28,29 @@ angular.module('liveJudgingAdmin', [
   });
   
   $rootScope.hints = new Object();
-  $rootScope.hints['addButton'] = {'content': '1) Click here to add a team to this event.', 'placement': 'right', 'enabled': false};
-  $rootScope.hints['dragItem'] = {'content': '2) Drag these items over to the right &rarr;', 'placement': 'bottom', 'enabled': false};
-  $rootScope.hints['destroyItem'] = {'content': '3a) Drop item here to permanently delete it from this event.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['heading'] = {'content': 'Default view. Click category to see category view, then click here to return to default view.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['addTeam'] = {'content': '1) Click here to add a team to this event.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addTeamCategory'] = {'content': '1) Click here to add a team to this category.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addJudge'] = {'content': '1) Click here to add a judge to this event.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addJudgeCategory'] = {'content': '1) Click here to add a judge to this category.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addRubric'] = {'content': '1) Click here to add a rubric to this event.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addRubricCategory'] = {'content': '1) Click here to add a rubric to this category.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addCategory'] = {'content': '2) Click here to add a category to this event.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['dragItem'] = {'content': '3) Drag these items over to the right &rarr;', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['destroyItem'] = {'content': '4a) Drop item here to permanently delete it from this event.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['removeItem'] = {'content': '4b) Drop item here to permanently remove it from selected category.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['uncategorized'] = {'content': 'Uncategorized items. Cannot interact with.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['category'] = {'content': '5) Drop item here to add to category. Click to see details. Click cog to edit.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['organize'] = {'content': 'Organize out-of-place items.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.enableButtonText = 'Enable Hints';
   $rootScope.enableHints = function() {
     angular.forEach($rootScope.hints, function(hint) {
       hint.enabled = !hint.enabled;
     });
+    if ($rootScope.enableButtonText === 'Enable Hints')
+      $rootScope.enableButtonText = 'Disable Hints';
+    else if ($rootScope.enableButtonText === 'Disable Hints')
+      $rootScope.enableButtonText = 'Enable Hints';
   }
   $rootScope.disableSingleHint = function(key) {
     $rootScope.hints[key].enabled = false;

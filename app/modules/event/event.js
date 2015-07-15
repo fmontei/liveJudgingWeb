@@ -431,7 +431,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   };
 })
 
-.directive('notificationWidget', function() {
+.directive('notification', function() {
 
     var link = function(scope, elem, attrs) {
         /*

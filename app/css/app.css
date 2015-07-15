@@ -46,6 +46,11 @@
   cursor: pointer;
 }
 
+.custom-btn-group {
+	margin-top: -5px;
+	float: right;
+}
+
 .general-error-message-row {
 	border-bottom: solid #ccc 1px; 
 	display: flex; 
@@ -65,16 +70,21 @@
 .popover  {
   background: tomato;
   color: white;
+  font-size: 12px;
 }
+
 .popover.left .arrow:after {
   border-left-color:tomato;
 }
+
 .popover.right .arrow:after {
   border-right-color:tomato;
 }
+
 .popover.top .arrow:after {
   border-top-color:tomato;
 }
+
 .popover.bottom .arrow:after {
   border-bottom-color:tomato;
 }
