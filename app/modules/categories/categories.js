@@ -110,6 +110,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 categoryManagementService.transferTeamToCategory(categoryId, itemId);
             } else if ($location.path().indexOf('judges') !== -1) {
                 judgeManagementService.openAssignByCatModal(categoryId, itemId);
+            } else if ($location.path().indexOf('rubrics') !== -1) {
+                categoryManagementService.transferRubricToCategory(categoryId, itemId);
             }
         }
 
@@ -172,8 +174,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 }])
 
-.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService', 'TeamRESTService',
-    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService, TeamRESTService) {
+.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService', 'RubricRESTService', 'TeamRESTService',
+    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService, RubricRESTService, TeamRESTService) {
     return function($scope) {
         var authHeader = CurrentUserService.getAuthHeader();
         var eventId = sessionStorage.getObject('selected_event').id;
@@ -388,6 +390,17 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }).catch(function() {
                 sessionStorage.put('generalErrorMessage', 'Error transferring team to category.');
                 $scope.error = 'Error transferring team to category.';
+            });
+        }
+
+        categoryManagement.transferRubricToCategory = function(categoryId, rubricId) {
+            var rubricRESTService = RubricRESTService(authHeader);
+            var req = {category_id: categoryId};
+            CategoryRESTService(authHeader).category.update({id: categoryId}, {rubric_id: rubricId}).$promise.then(function(resp) {
+                console.log(resp);
+                console.log('Successfully transferred rubric to category');
+            }).catch(function() {
+                console.log('Error transferring rubric to category');
             });
         }
 
