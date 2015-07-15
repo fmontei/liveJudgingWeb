@@ -541,23 +541,16 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
     var updateJudgesInSelectedCategory = function() {
       var judgeTeams = sessionStorage.getObject('judges');
       var selectedCategory = sessionStorage.getObject('selectedCategory');
-      selectedCategory.judges = [];
+      selectedCategory.judge_list = {};
+      selectedCategory.judge_list.judges = [];
+      selectedCategory.judge_list.teams_in_cat = 0;
+      
+  
       for (var i = 0; i < judgeTeams.length; i++) {
         var teams = judgeTeams[i].teams;
         for (var j = 0; j < teams.length; j++) {
-          if (inSelectedCategory(teams[j].team.id, judgeTeams[i]))
-            break;
+          
         }
-      }
-      
-      function inSelectedCategory(teamId, judgeTeam) {
-       for (var k = 0; k < selectedCategory.teams.length; k++) {
-          if (selectedCategory.teams[k].id === teamId) {
-            selectedCategory.judges.push(judgeTeam);
-            return true;
-          }
-        }
-        return false;
       }
       
       sessionStorage.putObject('selectedCategory', selectedCategory); 

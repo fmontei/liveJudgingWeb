@@ -546,16 +546,16 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     var link = function(scope, elem, attrs) {
         elem.droppable({
             drop: function(event, ui) {
-                var droppedTeam = ui.draggable;
-                var isTransferable = droppedTeam.data('isTransferable');
+                var droppedItem = ui.draggable;
+                var isTransferable = droppedItem.data('isTransferable');
                 if (isTransferable === false) {
-                    droppedTeam.goBack();
+                    droppedItem.goBack();
                     return;
                 }
-                scope.itemId = droppedTeam.attr('item-id').trim();
+                scope.itemId = droppedItem.attr('item-id').trim();
                 scope.categoryId = event.target.getAttribute('category-id');
                 scope.transferItemToCategory(scope.categoryId, scope.itemId);
-                droppedTeam.goBack();
+                droppedItem.goBack();
                 var categoryContainer = $(event.target).find('a');
                 performFlashAnimation(categoryContainer);
             }

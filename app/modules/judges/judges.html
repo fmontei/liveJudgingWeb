@@ -80,7 +80,7 @@
 					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'" class="draggable-item-col">
             <div class="media draggable-item"
                  cng-draggable-item
-                 item-id="{{judgeObj.id}}"
+                 item-id="{{judgeObj.judge.id}}"
                  item-type="judge"
                  cog=".glyphicon-cog"
                  is-transferable="true">
@@ -114,10 +114,10 @@
 						</div>
 					</div>
          
-          <div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
+          <div ng-repeat="judgeObj in selectedCategory.judge_list.judges track by $index | orderBy: '+judge.name'">
             <div class="media draggable-item"
                  cng-draggable-item
-                 itemId="{{judgeObj.id}}"
+                 item-id="{{judgeObj.judge.id}}"
                  cog=".glyphicon-cog"
                  is-transferable="true">
               <div class="media-left"></div>
@@ -135,7 +135,7 @@
                      total-width="50">
                 </div>
                 <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
-                <span>Judging {{judgeObj.teams.length}}/{{selectedCategory.teams.length}} teams in this cat.</span>
+                <span>Judging {{selectedCategory.judge_list.teams_in_cat}}/{{selectedCategory.teams.length}} teams in this cat.</span>
               </div>
             </div>
           </div>
