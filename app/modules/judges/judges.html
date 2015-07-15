@@ -20,7 +20,7 @@
 						<div class="col col-sm-6 col-md-6 col-lg-6">
 							<h1 id="breadcrumb-symbol">
                 <a ng-click="changeView('default')">Judges</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
-                <span class="label label-default">TODO</span>
+                <span class="label label-default">{{selectedCategory.judges.length}}</span>
               </h1>
 						</div>
 						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
@@ -114,7 +114,7 @@
 						</div>
 					</div>
          
-          <div ng-repeat="judgeObj in selectedCategory.judge_list.judges track by $index | orderBy: '+judge.name'">
+          <div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
             <div class="media draggable-item"
                  cng-draggable-item
                  item-id="{{judgeObj.judge.id}}"
@@ -135,7 +135,7 @@
                      total-width="50">
                 </div>
                 <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
-                <span>Judging {{selectedCategory.judge_list.teams_in_cat}}/{{selectedCategory.teams.length}} teams in this cat.</span>
+                <span>Judging {{judgeObj.teams_in_cat}}/{{selectedCategory.teams.length}} teams in this cat.</span>
               </div>
             </div>
           </div>

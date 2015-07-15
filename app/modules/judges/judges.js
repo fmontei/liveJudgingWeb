@@ -218,8 +218,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 
 	$scope.assignTeamsToJudge = function() {
-		var teamsToAdd = [];
+		var teamsToAdd = [], teamsToRemove = [];
     var judge = sessionStorage.getObject('draggedJudge');
+    
 		for (var i = 0; i < $scope.teamsInDropCat.length; i++) {
 			if ($scope.teamsInDropCat[i].checked) {
         var alreadyExists = false;
@@ -230,14 +231,28 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
           }
         }
         if (!alreadyExists)
-          teamsToAdd.push($scope.teamsInDropCat[i]);
-			}
+          teamsToAdd.push($scope.teamsInDropCat[i]); // Add selected teams
+			} else {
+        teamsToRemove.push($scope.teamsInDropCat[i]); // Remove de-selected teams
+      }
 		}
+    
 		if (teamsToAdd.length > 0) {
 			judgeManagementService.assignTeamsToJudge(teamsToAdd, judge).then(function() {
-        judgeManagementService.getJudges();
+        return judgeManagementService.getJudges();
+      }).then(function() {
+        judgeManagementService.updateJudgesInSelectedCategory();
       });
 		}
+    
+    if (teamsToRemove.length > 0) {
+			judgeManagementService.removeTeamsFromJudge(teamsToRemove, judge).then(function() {
+        return judgeManagementService.getJudges();
+      }).then(function() {
+        judgeManagementService.updateJudgesInSelectedCategory();
+      });
+		}
+    
 		$scope.closeAssignByCatModal();
 	}
   
@@ -390,7 +405,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
         $scope.teamsToAdd.length = 0;
         $scope.teamsToRemove.length = 0;
         judgeManagement.getJudges().then(function() {
-          updateJudgesInSelectedCategory();
+          judgeManagement.updateJudgesInSelectedCategory();
         });
       });
       
@@ -511,7 +526,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 			var judgeId = judge.id;
       angular.forEach(teams, function(teamObj) {
-        promises.push(judgeManagement.removeTeamFromJudge(teamObj.team.id, judgeId));
+        var teamId = (teamObj.team !== undefined) ? teamObj.team.id : teamObj.id;
+        promises.push(judgeManagement.removeTeamFromJudge(teamId, judgeId));
       });
 
       $q.all(promises).then(function() {
@@ -523,7 +539,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 		judgeManagement.removeTeamFromJudge = function(teamId, judgeId) {
       var defer = $q.defer();
-      
+     
 			judgeRESTService.judgeTeams.remove({judge_id: judgeId}, {team_id: teamId}).$promise.then(function(resp) {
         defer.resolve();
 			}).catch(function() {
@@ -534,22 +550,33 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		}
     
     judgeManagement.changeView = function(view) {
-      updateJudgesInSelectedCategory();
+      judgeManagement.updateJudgesInSelectedCategory();
       sessionStorage.put('judgeView', view);
 		}
     
-    var updateJudgesInSelectedCategory = function() {
-      var judgeTeams = sessionStorage.getObject('judges');
+    judgeManagement.updateJudgesInSelectedCategory = function() {
+      var judgeObj = sessionStorage.getObject('judges');
       var selectedCategory = sessionStorage.getObject('selectedCategory');
-      selectedCategory.judge_list = {};
-      selectedCategory.judge_list.judges = [];
-      selectedCategory.judge_list.teams_in_cat = 0;
-      
+      selectedCategory.judges = [];
   
-      for (var i = 0; i < judgeTeams.length; i++) {
-        var teams = judgeTeams[i].teams;
-        for (var j = 0; j < teams.length; j++) {
-          
+      for (var i = 0; i < judgeObj.length; i++) {
+        var judgeTeams = judgeObj[i].teams;
+        var inSelectedCategory = false;
+        var teams_in_cat = 0;
+        for (var j = 0; j < judgeTeams.length; j++) {
+          var judgeTeam = JSON.stringify(judgeTeams[j].team);
+          for (var k = 0; k < selectedCategory.teams.length; k++) {
+            var catTeam = JSON.stringify(selectedCategory.teams[k]);
+            if (catTeam === judgeTeam) {
+              inSelectedCategory = true;
+              teams_in_cat++;
+              break;
+            }
+          }
+        }
+        if (inSelectedCategory) {
+          judgeObj[i].teams_in_cat = teams_in_cat;
+          selectedCategory.judges.push(judgeObj[i]);
         }
       }
       
