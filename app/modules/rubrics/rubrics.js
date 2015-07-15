@@ -108,7 +108,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			var eventId = sessionStorage.getObject('selected_event').id;
 			RubricRESTService(authHeader).rubrics.get({event_id: eventId}).$promise.then(function(resp) {
 				sessionStorage.putObject('rubrics', resp);
-				console.log(sessionStorage.getObject('rubrics'));
+				return sessionStorage.getObject('rubrics');
 			}).catch(function() {
 				console.log('Error getting rubrics');
 			});
@@ -321,7 +321,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	}
 })
 
-.factory('RubricWatchService', function() {
+.factory('RubricWatchService', ['sessionStorage', function(sessionStorage) {
 	return function($scope, sessionStorage) {
 		var service = {};
 
@@ -349,4 +349,4 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 		return service;
 	}
-});
+}]);
