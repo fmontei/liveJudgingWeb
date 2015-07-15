@@ -105,7 +105,10 @@
 		<div class="modal-content panel-success">
 			<div class="modal-header panel-heading">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="notification-modal-label">Add New Rubric</h4>
+				<h4 class="modal-title" id="notification-modal-label">
+					<span ng-if"rubricModalView == 'create'">Add New Rubric</span>
+					<span ng-if"rubricModalView == 'edit'">Edit Rubric {{rubric.name}}</span>
+				</h4>
 			</div>
 			<div class="modal-body">
 
@@ -230,11 +233,19 @@
 			<div class="modal-footer">
 				<div class="row">
 					<span class="col col-sm-5">
-						<button type="button"
+						<button ng-if="rubricModalView == 'create'"
+								type="button"
 								class="btn btn-success pull-right"
 								ng-click="createRubric()"
-								ng-disabled="modalCriteria.length == 0">
+								ng-disabled="modalCriteria.length == 0 || !rubricForm.name">
 							Create
+						</button>
+						<button ng-if="rubricModalView == 'edit'"
+								type="button"
+								class="btn btn-success pull-right"
+								ng-click="editRubric()"
+								ng-disabled="modalCriteria.length == 0 || !rubricForm.name">
+							Update
 						</button>
 					</span>
 					<span class="col col-sm-2"></span>

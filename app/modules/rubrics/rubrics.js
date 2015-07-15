@@ -20,6 +20,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 	$scope.rubricForm = {};
 	$scope.modalCriteria = [];
+	$scope.rubricId = null; // Used for storing the id of the rubric currently in the modal.
 
 	$scope.rubricRating = 5; // Default
 
@@ -51,7 +52,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 	$scope.editRubric = function() {
 		var rubricReq = {name: $scope.rubricForm.name};
-		rubricManagementService.editRubric(rubricReq, $scope.modalCriteria);
+		rubricManagementService.editRubric($scope.rubricId, rubricReq, $scope.modalCriteria);
 		$scope.closeRubricModal();
 	}
 
@@ -59,6 +60,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		if (isEdit) {
 			$scope.rubricModalView = 'edit';
 			$scope.rubricForm.name = rubric.name;
+			$scope.rubricId = rubric.id;
 			$scope.modalCriteria = rubric.criteria;
 		} else {
 			$scope.rubricModalView = 'create';
@@ -71,6 +73,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	$scope.closeRubricModal = function() {
 		$scope.rubricForm = {};
 		$scope.modalCriteria = [];
+		$scope.rubricId = null;
 		$('#rubric-modal').modal('hide');
 	}
 
@@ -151,7 +154,19 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}
 		}
 
-		rubricManagement.editRubric = function(rubricReq, criteriaReq) {
+		rubricManagement.editRubric = function(rubricId, rubricReq, criteriaReq) {
+			var rubricRESTService = RubricRESTService(authHeader);
+			rubricRESTService.rubric.update({id: rubricId}, rubricReq).$promise.then(function(resp) {
+				// todo: make this more efficient by checking if the criteria have changed
+				rubricManagement.getRubrics();
+			}).catch(function() {
+				console.log('Error editing rubric');
+			});
+		}
+
+		rubricManagement.editCriterion = function(id, criterion) {
+			var rubricRESTService = RubricRESTService(authHeader);
+			//
 		}
 
 		return rubricManagement;
@@ -171,6 +186,14 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 				},
 				create: {
 					method: 'POST',
+					headers: authHeader
+				}
+			}),
+			rubric: $resource('http://api.stevedolan.me/rubrics/:id', {
+				id: '@id'
+			}, {
+				update: {
+					method: 'PUT',
 					headers: authHeader
 				}
 			}),
