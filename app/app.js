@@ -38,7 +38,7 @@ angular.module('liveJudgingAdmin', [
   $rootScope.hints['addCategory'] = {'content': '2) Click here to add a category to this event.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['dragItem'] = {'content': '3) Drag these items over to the right &rarr;', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['destroyItem'] = {'content': '4a) Drop item here to permanently delete it from this event.', 'placement': 'bottom', 'enabled': false};
-  $rootScope.hints['removeItem'] = {'content': '4b) Drop item here to permanently remove it from selected category.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['removeItem'] = {'content': '4b) Drop item here to remove it from selected category.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['uncategorized'] = {'content': 'Uncategorized items. Cannot interact with.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['category'] = {'content': '5) Drop item here to add to category. Click to see details. Click cog to edit.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['organize'] = {'content': 'Organize out-of-place items.', 'placement': 'bottom', 'enabled': false};
@@ -57,9 +57,6 @@ angular.module('liveJudgingAdmin', [
       hint.enabled = false;
     });
     $rootScope.enableButtonText = 'Enable Hints';
-  }
-  $rootScope.disableSingleHint = function(key) {
-    $rootScope.hints[key].enabled = false;
   }
 })
 
@@ -284,11 +281,9 @@ angular.module('liveJudgingAdmin', [
   return {
     restrict: 'A',
     scope: {
-      popoverName: '@',
       popoverContent: '@',
       popoverPlacement: '@',
-      popoverToggle: '@',
-      popoverDisable: '&'
+      popoverToggle: '@'
     },
     link: function(scope, elem, attrs) {
       elem.popover({
@@ -299,7 +294,6 @@ angular.module('liveJudgingAdmin', [
         trigger: 'manual'
       });
       elem.bind('mouseover', function() {
-        scope.popoverDisable({key: scope.popoverName});
         scope.$apply();
         elem.popover('hide');
       });

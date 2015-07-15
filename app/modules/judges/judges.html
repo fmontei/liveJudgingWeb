@@ -8,8 +8,7 @@
 							<h1 custom-popover
                   popover-content="{{hints['heading'].content}}" 
                   popover-placement="{{hints['heading'].placement}}"
-                  popover-toggle="{{hints['heading'].enabled}}"
-                  popover-disable="disableSignleHint(key)">Judges <span class="label label-default">{{judges.length}}</span>
+                  popover-toggle="{{hints['heading'].enabled}}">Judges <span class="label label-default">{{judges.length}}</span>
               </h1>
 						</div>
 						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
@@ -25,10 +24,10 @@
 						<div class="col col-sm-4 col-md-4 col-lg-4">
               <h1 id="breadcrumb-symbol"
                   custom-popover
+                  popover-name="'heading'"
                   popover-content="{{hints['heading'].content}}" 
                   popover-placement="{{hints['heading'].placement}}"
-                  popover-toggle="{{hints['heading'].enabled}}"
-                  popover-disable="disableSignleHint(key)">
+                  popover-toggle="{{hints['heading'].enabled}}">
 							  <a ng-click="changeView('default')">Judges</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
 							  <span class="label label-default">{{selectedCategory.judges.length}}</span>
 						  </h1>
@@ -55,8 +54,7 @@
                    custom-popover
                    popover-content="{{hints['organize'].content}}" 
                    popover-placement="{{hints['organize'].placement}}"
-                   popover-toggle="{{hints['organize'].enabled}}"
-                   popover-disable="disableSignleHint(key)">
+                   popover-toggle="{{hints['organize'].enabled}}">
 							  <input type="button" 
 							         class="btn btn-warning" 
 							         ng-click="enableHints();"
@@ -94,22 +92,18 @@
 											custom-popover
 							        popover-content="{{hints['addJudge'].content}}" 
 							        popover-placement="{{hints['addJudge'].placement}}"
-							        popover-toggle="{{hints['addJudge'].enabled}}"
-							        popover-disable="disableSignleHint(key)">
+							        popover-toggle="{{hints['addJudge'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Judge
 							</button>
 						</div>	
-						<input ng-model="addByJudgeId" />
-						<button ng-click="addJudgeById(addByJudgeId)">magic add judge by id button</button>
 					</div>
           
           <div class="draggable-item-wrapper"
                custom-popover
                popover-content="{{hints['dragItem'].content}}" 
                popover-placement="{{hints['dragItem'].placement}}"
-               popover-toggle="{{hints['dragItem'].enabled}}"
-               popover-disable="disableSignleHint(key)">
+               popover-toggle="{{hints['dragItem'].enabled}}">
             <div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
               <div class="media draggable-item"
                    cng-draggable-item
@@ -145,8 +139,7 @@
 							        custom-popover
 							        popover-content="{{hints['addJudgeCategory'].content}}" 
 							        popover-placement="{{hints['addJudgeCategory'].placement}}"
-							        popover-toggle="{{hints['addJudgeCategory'].enabled}}"
-							        popover-disable="disableSignleHint(key)">
+							        popover-toggle="{{hints['addJudgeCategory'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Judge (Does Nothing ATM)
 							</button>
@@ -157,8 +150,7 @@
                custom-popover
                popover-content="{{hints['dragItem'].content}}" 
                popover-placement="{{hints['dragItem'].placement}}"
-               popover-toggle="{{hints['dragItem'].enabled}}"
-               popover-disable="disableSignleHint(key)">
+               popover-toggle="{{hints['dragItem'].enabled}}">
             <div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
               <div class="media draggable-item"
                    cng-draggable-item

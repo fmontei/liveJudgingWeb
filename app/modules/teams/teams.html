@@ -8,8 +8,7 @@
 							<h1 custom-popover
                   popover-content="{{hints['heading'].content}}" 
                   popover-placement="{{hints['heading'].placement}}"
-                  popover-toggle="{{hints['heading'].enabled}}"
-                  popover-disable="disableSignleHint(key)">Teams <span class="label label-default">{{teams.length}}</span>
+                  popover-toggle="{{hints['heading'].enabled}}">Teams <span class="label label-default">{{teams.length}}</span>
               </h1>
 						</div>
 						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
@@ -27,8 +26,7 @@
                   custom-popover
                   popover-content="{{hints['heading'].content}}" 
                   popover-placement="{{hints['heading'].placement}}"
-                  popover-toggle="{{hints['heading'].enabled}}"
-                  popover-disable="disableSignleHint(key)">
+                  popover-toggle="{{hints['heading'].enabled}}">
 							  <a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
 							  <span class="label label-default">{{selectedCategory.teams.length}}</span>
 						  </h1>
@@ -55,8 +53,7 @@
                    custom-popover
                    popover-content="{{hints['organize'].content}}" 
                    popover-placement="{{hints['organize'].placement}}"
-                   popover-toggle="{{hints['organize'].enabled}}"
-                   popover-disable="disableSignleHint(key)">
+                   popover-toggle="{{hints['organize'].enabled}}">
 							  <input type="button" 
 							         class="btn btn-warning" 
 							         ng-click="enableHints();"
@@ -92,8 +89,7 @@
 							        custom-popover
 							        popover-content="{{hints['addTeam'].content}}" 
 							        popover-placement="{{hints['addTeam'].placement}}"
-							        popover-toggle="{{hints['addTeam'].enabled}}"
-							        popover-disable="disableSignleHint(key)">
+							        popover-toggle="{{hints['addTeam'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Team
 							</button>
@@ -104,8 +100,7 @@
                custom-popover
                popover-content="{{hints['dragItem'].content}}" 
                popover-placement="{{hints['dragItem'].placement}}"
-               popover-toggle="{{hints['dragItem'].enabled}}"
-               popover-disable="disableSignleHint(key)">
+               popover-toggle="{{hints['dragItem'].enabled}}">
             <div ng-repeat="team in teams | orderBy: '+name'" 
                  ng-if="sortType === 'name'">
               <div class="media draggable-item"
@@ -231,8 +226,7 @@
 							        custom-popover
 							        popover-content="{{hints['addTeamCategory'].content}}" 
 							        popover-placement="{{hints['addTeamCategory'].placement}}"
-							        popover-toggle="{{hints['addTeamCategory'].enabled}}"
-							        popover-disable="disableSignleHint(key)">
+							        popover-toggle="{{hints['addTeamCategory'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Team to {{selectedCategory.label}}
 							</button>
@@ -243,8 +237,7 @@
                 custom-popover
                 popover-content="{{hints['dragItem'].content}}" 
                 popover-placement="{{hints['dragItem'].placement}}"
-                popover-toggle="{{hints['dragItem'].enabled}}"
-                popover-disable="disableSignleHint(key)">
+                popover-toggle="{{hints['dragItem'].enabled}}">
             <div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
               <div class="media draggable-item"
                    cng-draggable-item

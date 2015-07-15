@@ -8,8 +8,7 @@
               <h1 custom-popover
                   popover-content="{{hints['heading'].content}}" 
                   popover-placement="{{hints['heading'].placement}}"
-                  popover-toggle="{{hints['heading'].enabled}}"
-                  popover-disable="disableSignleHint(key)">Rubrics <span class="label label-default">{{rubrics.length}}</span>
+                  popover-toggle="{{hints['heading'].enabled}}">Rubrics <span class="label label-default">{{rubrics.length}}</span>
               </h1>
             </div>
             <div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
@@ -27,8 +26,7 @@
                   custom-popover
                   popover-content="{{hints['heading'].content}}" 
                   popover-placement="{{hints['heading'].placement}}"
-                  popover-toggle="{{hints['heading'].enabled}}"
-                  popover-disable="disableSignleHint(key)">
+                  popover-toggle="{{hints['heading'].enabled}}">
                 <a ng-click="changeView('default')">Rubrics</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
                 <span class="label label-default">TODO</span>
               </h1>
@@ -55,8 +53,7 @@
                    custom-popover
                    popover-content="{{hints['organize'].content}}" 
                    popover-placement="{{hints['organize'].placement}}"
-                   popover-toggle="{{hints['organize'].enabled}}"
-                   popover-disable="disableSignleHint(key)">
+                   popover-toggle="{{hints['organize'].enabled}}">
 							  <input type="button" 
 							         class="btn btn-warning" 
 							         ng-click="enableHints();"
@@ -92,8 +89,7 @@
 									custom-popover
                   popover-content="{{hints['addRubric'].content}}" 
                   popover-placement="{{hints['addRubric'].placement}}"
-                  popover-toggle="{{hints['addRubric'].enabled}}"
-                  popover-disable="disableSignleHint(key)">
+                  popover-toggle="{{hints['addRubric'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span> Add Rubric
 							</button>
 						</div>
@@ -103,8 +99,7 @@
                custom-popover
                popover-content="{{hints['dragItem'].content}}" 
                popover-placement="{{hints['dragItem'].placement}}"
-               popover-toggle="{{hints['dragItem'].enabled}}"
-               popover-disable="disableSignleHint(key)">
+               popover-toggle="{{hints['dragItem'].enabled}}">
             <div ng-repeat="rubric in rubrics track by $index | orderBy: '+rubric.name'" class="draggable-item-col">
               <div class="media draggable-item"
                  cng-draggable-item
