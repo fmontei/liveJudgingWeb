@@ -108,7 +108,13 @@
                     </h3>
                     <div>
                         <div><u>{{category.label}}</u></div>
-                        <span>{{category.teams.length}} Teams</span>
+                        <div class="catSubText">{{category.teams.length}} Teams</div>
+                        <div class="catSubText" ng-if="category.rubric">
+                            Rubric: {{category.rubric.name}}
+                        </div>
+                        <div class="catSubText" ng-if="!category.rubric">
+                            Rubric: none
+                        </div>
                     </div>
                 </a>
             </li>
