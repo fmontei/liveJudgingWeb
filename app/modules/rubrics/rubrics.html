@@ -4,24 +4,24 @@
 			<div ng-switch on="rubricView">
 				<div ng-switch-default>
 					<div class="row general-error-message-row">
-            <div class="col col-sm-3 col-md-3 col-lg-3">
+            <div class="col col-sm-7 col-md-7 col-lg-7">
               <h1 custom-popover
                   popover-content="{{hints['heading'].content}}" 
                   popover-placement="{{hints['heading'].placement}}"
                   popover-toggle="{{hints['heading'].enabled}}">Rubrics <span class="label label-default">{{rubrics.length}}</span>
               </h1>
             </div>
-            <div class="col col-sm-9 col-md-9 col-lg-9 general-error-message-col">
+            <div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
 							<h4 general-error-message
-									 animate="true"
-									 color="red">
+								  animate="true"
+								  color="red">
 							</h4>
 						</div>
 					</div>
 				</div>
 				<div ng-switch-when="selectedCategory">
 					<div class="row general-error-message-row">
-            <div class="col col-sm-4 col-md-4 col-lg-4">
+            <div class="col col-sm-7 col-md-7 col-lg-7">
               <h1 id="breadcrumb-symbol"
                   custom-popover
                   popover-content="{{hints['heading'].content}}" 
@@ -31,10 +31,10 @@
                 <span class="label label-default">TODO</span>
               </h1>
             </div>
-            <div class="col col-sm-8 col-md-8 col-lg-8 general-error-message-col">
+            <div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
 							<h4 general-error-message
-									 animate="true"
-									 color="red">
+								  animate="true"
+								  color="red">
 							</h4>
 						</div>
 					</div>
@@ -265,6 +265,41 @@
 									</div>
 								</div accordion-group>
 							</div>
+							
+							<!-- Preview Rubric View -->
+							<div accordion-group is-open="preview.open" class="panel-info">
+                <div accordion-heading class="panel-heading rubric-accordion-heading">
+                  <div class="rubric-accordion-heading-content">
+                    Preview
+                    <i class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': preview.open, 'glyphicon-chevron-right': !preview.open}">
+                    </i>
+                  </div>
+                </div accordion-heading>
+
+                <label>Rubric name:</label>&nbsp;&nbsp;<u>{{rubricForm.name}}</u><br />
+                <p>Criteria are listed below. Teams in categories with this rubric will be judged according to the following:</p>
+                <table class="table table-striped" style="table-layout: fixed">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Rating</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="criterion in modalCriteria">
+                      <td style="overflow: hidden; white-space:nowrap;">{{criterion.label}}</td>
+                      <td ng-if="rubricModalView === 'create'">
+                        <span ng-if="criterion.ratingType === 'Inherited'">1 - {{rubricRating}}</span>
+                        <span ng-if="criterion.ratingType === 'Custom'">1 - {{criterion.rating}}</span>
+                      </td>
+                      <td ng-if="rubricModalView === 'edit'">1 - {{criterion.max_score}}</td>
+                      <td style="overflow: hidden; white-space:nowrap;">{{criterion.description}} (TODO)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div accordion-group>
 						</div accordion>
 
 					</div>

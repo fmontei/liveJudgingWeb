@@ -58,6 +58,10 @@
   margin-bottom: 30px;
 }
 
+.general-error-message-row h1 {
+  display: inline-block;
+}
+
 .general-error-message-col {
 	display: inline-block; 
 	align-self: flex-end;
@@ -71,6 +75,8 @@
   background: tomato;
   color: white;
   font-size: 12px;
+  max-width: 220px;
+  padding: 0px;
 }
 
 .popover.left .arrow:after {
