@@ -64,6 +64,7 @@
               </p>
             </div>
 
+            <!-- Overall event progress / Edit Event button-->
             <div class="row">
               <div class="col col-sm-8">
                 <div class="row">
@@ -87,7 +88,8 @@
               </div>
             </div>
 
-						<ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
+						<!-- Nav tabs-->
+            <ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
 							<li class="active" ng-repeat="tab in eventTabs" ng-if="$index === 0" cng-event-tab event-section="{{tab.sectionId}}">
 								<a id="{{tab.id}}" href="javascript:void(0)">{{tab.name}}</a>
 							</li>
@@ -99,6 +101,7 @@
             <!--Judge Tab-->
             <div class="beneath-tab" id="judge-progress-section">
 
+              <!-- sorter / expand & collapse buttons -->
               <span style="margin-right: 20px">Sort by:</span>
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
