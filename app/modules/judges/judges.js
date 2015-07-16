@@ -61,6 +61,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		if (action === 'create') {
 			$scope.judgeModalView = 'create';
 			$scope.tabs[0].active = true;
+			$scope.judgeInfoForm.isEmailTaken = true; // Guilty until proven innocent
 		} else if (action === 'edit') {
       var judge = judgeObj.judge;
       var lastSpace = judge.name.lastIndexOf(' ');
@@ -71,9 +72,27 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			$scope.judgeInfoForm.judgeEmail = judge.email;
       $scope.judgeInfoForm.originalJudgeEmail = judge.email; // Needed by verifyFormData()
 			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
+			$scope.judgeInfoForm.isEmailTaken = true;
       $scope.assignedTeams = judgeObj.teams;
       sessionStorage.putObject('draggedJudge', judgeObj); // Needed by judgeManagentService.assignedTeamsToJudge()
 		}
+	}
+
+	$scope.isEmailTaken = function(email) {
+		judgeManagementService.getUserByEmail(email).then(function(resp) {
+			if (resp.length == 1) {
+				$scope.judgeInfoForm.isEmailTaken = true;
+				$scope.judgeInfoForm.showOneName = true;
+				$scope.judgeInfoForm.judgeName = resp[0].name;
+				$scope.judgeId = resp[0].id;
+			} else {
+				$scope.judgeInfoForm.isEmailTaken = false;
+				$scope.judgeInfoForm.showOneName = false;
+			}
+			return $scope.judgeInfoForm.isEmailTaken;
+		}).catch(function() {
+			console.log('Error checking for user by email');
+		});
 	}
 
 	$scope.closeJudgeModal = function() {
@@ -191,10 +210,13 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
   
   $scope.addJudge = function() {
+  	var form = $scope.judgeInfoForm;
 		var judgeFormData = {
-      email: $scope.judgeInfoForm.judgeEmail.trim(),
-			first_name: $scope.judgeInfoForm.judgeFirstName.trim(),
-			last_name: $scope.judgeInfoForm.judgeLastName.trim()
+      		email: form.judgeEmail ? form.judgeEmail.trim() : null,
+			first_name: form.judgeFirstName ? form.judgeFirstName.trim() : null,
+			last_name: form.judgeLastName ? form.judgeLastName.trim() : null,
+			isExistingUser: form.isEmailTaken,
+			id: form.isEmailTaken ? $scope.judgeId : null
 		};
     judgeManagementService.verifyFormData(judgeFormData, false).then(function() {
       judgeManagementService.addJudge(judgeFormData).then(function() {
@@ -311,9 +333,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 })
 
 .factory('JudgeManagementService', ['$q', 'CategoryManagementService', 'CurrentUserService', 'JudgeRESTService',
-         'sessionStorage', 'TeamManagementService', 'UserRESTService', '$window',
+         'sessionStorage', 'TeamManagementService', 'RegistrationRESTService', 'UserRESTService', '$window',
 	function($q, CategoryManagementService, CurrentUserService, JudgeRESTService,
-				sessionStorage, TeamManagementService, UserRESTService, $window) {
+				sessionStorage, TeamManagementService, RegistrationRESTService, UserRESTService, $window) {
 	return function($scope, sessionStorage) {
 
 		var judgeManagement = {};
@@ -382,10 +404,32 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId});
 		}
 
+		judgeManagement.getUserByEmail = function(email) {
+			var defer = $q.defer();
+
+			UserRESTService(CurrentUserService.getAuthHeader()).get({email: email}).$promise.then(function(resp) {
+				defer.resolve(resp);
+			}).catch(function() {
+				defer.reject();
+				console.log('Error checking for user by email');
+			});
+
+			return defer.promise;
+		}
+
 		judgeManagement.addJudge = function(judgeFormData) {
 			var defer = $q.defer();
 
-			// Todo: Check if a user with the email already exists (once that's in the API).
+			if (judgeFormData.isExistingUser) {
+				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeFormData.id}).$promise.then(function(resp) {
+					defer.resolve('Judge successfully added to event');
+				}).catch(function() {
+					var error = 'Error adding judge to event';
+					defer.reject(error);
+				});
+				return defer.promise;
+			}
+
 			var judgeReq = judgeFormData;
 			var judgeId = null;
 			//var randomPass = judgeManagement.generatePassword();
@@ -393,7 +437,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			judgeReq.password_confirmation = 'password';
 
 			// Register judge as a user & adds them to the event.
-			UserRESTService.register(judgeReq).$promise.then(function(resp) {
+			RegistrationRESTService.register(judgeReq).$promise.then(function(resp) {
 				judgeId = resp.id;
 				judgeRESTService.judges.addToEvent({event_id: eventId}, {judge_id: judgeId}).$promise.then(function(resp) {
 					console.log('Judge successfully registered & added to event');
