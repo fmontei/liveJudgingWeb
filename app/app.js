@@ -28,7 +28,8 @@ angular.module('liveJudgingAdmin', [
   });
   
   $rootScope.hints = new Object();
-  $rootScope.hints['heading'] = {'content': 'Default view. Click category to see category view, then click here to return to default view.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['mainHeading'] = {'content': 'Default view. Click category to see category view, then click here to return to default view.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['catHeading'] = {'content': 'Category View. Click here to return to default view.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['addTeam'] = {'content': '1) Click here to add a team to this event.', 'placement': 'right', 'enabled': false};
   $rootScope.hints['addTeamCategory'] = {'content': '1) Click here to add a team to this category.', 'placement': 'right', 'enabled': false};
   $rootScope.hints['addJudge'] = {'content': '1) Click here to add a judge to this event.', 'placement': 'right', 'enabled': false};
