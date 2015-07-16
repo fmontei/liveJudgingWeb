@@ -336,7 +336,6 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
             var catRESTService = CategoryRESTService(authHeader);
             catRESTService.category.get({id: categoryId}).$promise.then(function(resp) {
-                console.log(resp);
                 defer.resolve(resp.teams);
             }).catch(function() {
                 console.log('Error getting teams in category ' + categoryId);
@@ -370,8 +369,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         categoryManagement.transferTeamToCategory = function(categoryId, teamId, isDragNDrop) {
-            // If isDrapNDrop is false, that means we don't have to
-            // worry about closing a modal.
+            // Note: If isDrapNDrop is false, that means we don't have to worry about closing a modal.
+            if (isTeamAlreadyInCategory(categoryId, teamId)) {
+              sessionStorage.put('generalErrorMessage', 'Team is already in category.');
+              return;
+            }
             var connection = TeamRESTService(authHeader);
             var req = {category_id: categoryId};
             connection.team_categories.add_team({team_id: teamId}, req).$promise.then(function(resp) {
@@ -392,6 +394,16 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 sessionStorage.put('generalErrorMessage', 'Error transferring team to category.');
                 $scope.error = 'Error transferring team to category.';
             });
+        }
+        
+        var isTeamAlreadyInCategory = function(categoryId, teamId) {
+          var category = categoryManagement.getCategoryById(categoryId);
+          for (var i = 0; i < category.teams.length; i++) {
+            var team = category.teams[i];
+            if (team.id == teamId)
+              return true;
+          }
+          return false;
         }
 
         categoryManagement.transferRubricToCategory = function(categoryId, rubricId) {

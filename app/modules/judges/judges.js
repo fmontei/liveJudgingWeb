@@ -32,10 +32,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	$scope.assignedTeams = []; // Teams actually assigned
 	/* end */
 
-	$scope.addJudgeById = function(judgeId) {
-		judgeManagementService.addJudgeById(judgeId);
-	}
-
 	$scope.tabs = [
 		{ title: 'Judge Information', active: true, view: 'judgeInfo' },
 		{ title: 'Assigned Teams', view: 'teams' },
@@ -73,6 +69,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			$scope.judgeInfoForm.judgeFirstName = judge.name.substring(0, lastSpace);
 			$scope.judgeInfoForm.judgeLastName = judge.name.substring(lastSpace + 1, judge.name.length);
 			$scope.judgeInfoForm.judgeEmail = judge.email;
+      $scope.judgeInfoForm.originalJudgeEmail = judge.email; // Needed by verifyFormData()
 			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
       $scope.assignedTeams = judgeObj.teams;
       sessionStorage.putObject('draggedJudge', judgeObj); // Needed by judgeManagentService.assignedTeamsToJudge()
@@ -81,6 +78,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 	$scope.closeJudgeModal = function() {
 		$scope.judgeInfoForm = {};
+    $scope.modalErrorMessage = undefined;
 		$('#judge-modal').modal('hide');
 	}
 
@@ -198,27 +196,51 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			first_name: $scope.judgeInfoForm.judgeFirstName.trim(),
 			last_name: $scope.judgeInfoForm.judgeLastName.trim()
 		};
-		judgeManagementService.addJudge(judgeFormData).then(function() {
-			// Refresh judge objects
-			judgeManagementService.getJudges();
-			$scope.closeJudgeModal();
-		}).catch(function(error) {
-			$scope.judgeErrorMessage = error;
+    judgeManagementService.verifyFormData(judgeFormData, false).then(function() {
+      judgeManagementService.addJudge(judgeFormData).then(function() {
+			   judgeManagementService.getJudges();
+			   $scope.closeJudgeModal();
+      }).catch(function() {
+        var error = 'Error creating judge.';
+        sessionStorage.put('generalErrorMessage', error);
+        console.log(error);
+      });
+    }).catch(function(error) {
+			$scope.modalErrorMessage = error;
 		});
+	}
+  
+  $scope.addJudgeById = function(judgeId) {
+		judgeManagementService.addJudgeById(judgeId);
 	}
 
 	$scope.editJudge = function() {
 		var judgeFormData = {
       email: $scope.judgeInfoForm.judgeEmail.trim(),
+      original_email: $scope.judgeInfoForm.originalJudgeEmail.trim(),
 			first_name: $scope.judgeInfoForm.judgeFirstName.trim(),
 			last_name: $scope.judgeInfoForm.judgeLastName.trim()
 		};
-		judgeManagementService.editJudge($scope.judgeId, 
-                                     judgeFormData, 
-                                     $scope.teamsToAdd, 
-                                     $scope.teamsToRemove, 
-                                     $scope.assignedTeams);
-		$scope.closeJudgeModal();
+    judgeManagementService.verifyFormData(judgeFormData, true).then(function() {
+      judgeManagementService.editJudge($scope.judgeId, 
+                                       judgeFormData, 
+                                       $scope.teamsToAdd, 
+                                       $scope.teamsToRemove, 
+                                       $scope.assignedTeams).then(function() {
+        $scope.teamsToAdd.length = 0;
+        $scope.teamsToRemove.length = 0;
+        judgeManagementService.getJudges().then(function() {
+          judgeManagementService.updateJudgesInSelectedCategory();
+        });
+      }).catch(function() {
+        var error = 'Error editing judge.';
+        sessionStorage.put('generalErrorMessage', error);
+        console.log(error);
+      });
+      $scope.closeJudgeModal();
+    }).catch(function(error) {
+			$scope.modalErrorMessage = error;
+		});
 	}
 
 	$scope.assignTeamsToJudge = function() {
@@ -392,6 +414,26 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			return defer.promise;
 		}
     
+    judgeManagement.verifyFormData = function(formData, isEdit) {
+      var defer = $q.defer();  
+      var judges = sessionStorage.getObject('judges');
+      
+      for (var i = 0; i < judges.length; i++) {
+        var judgeObj = judges[i];
+        if (isEdit) {
+          if (judgeObj.judge.email === formData.email && formData.email !== formData.original_email)
+            defer.reject('Email already exists. Please choose another.'); 
+        } else {
+          if (judgeObj.judge.email === formData.email) {
+            defer.reject('Email already exists. Please choose another.'); 
+          }
+        }
+      }
+      
+      defer.resolve();
+      return defer.promise;
+    }
+    
     judgeManagement.generatePassword = function() {
 			// Most certainly should be done on the server (would require a call to make a judge user)
 			var pass = "";
@@ -405,16 +447,15 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		}
 
 		judgeManagement.editJudge = function(judgeId, judgeFormData, teamsToAdd, teamsToRemove, assignedTeams) {
+      var defer = $q.defer();
       var judge = sessionStorage.getObject('draggedJudge');
       
       removeTeams().then(function() {
         return addTeams();
       }).then(function() {
-        $scope.teamsToAdd.length = 0;
-        $scope.teamsToRemove.length = 0;
-        judgeManagement.getJudges().then(function() {
-          judgeManagement.updateJudgesInSelectedCategory();
-        });
+        defer.resolve();
+      }).catch(function() {
+        defer.reject();
       });
       
       function removeTeams() {
@@ -498,6 +539,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
         for (var i = positions.length - 1; i >= 0; i--)
           teamsToAdd.splice(positions[i], 1);
       };
+      
+      return defer.promise;
 		}
     
     judgeManagement.assignTeamsToJudge = function(teams, judge) {
@@ -565,8 +608,11 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
     judgeManagement.updateJudgesInSelectedCategory = function() {
       var judgeObj = sessionStorage.getObject('judges');
       var selectedCategory = sessionStorage.getObject('selectedCategory');
+      if (!selectedCategory)
+        return;
+      
       selectedCategory.judges = [];
-  
+
       for (var i = 0; i < judgeObj.length; i++) {
         var judgeTeams = judgeObj[i].teams;
         var inSelectedCategory = false;

@@ -11,7 +11,7 @@
                   popover-toggle="{{hints['heading'].enabled}}">Judges <span class="label label-default">{{judges.length}}</span>
               </h1>
 						</div>
-						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
+						<div class="col col-sm-9 col-md-9 col-lg-9 general-error-message-col">
 							<h4 general-error-message
 									 animate="true"
 									 color="red">
@@ -32,7 +32,7 @@
 							  <span class="label label-default">{{selectedCategory.judges.length}}</span>
 						  </h1>
 						</div>
-						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
+						<div class="col col-sm-8 col-md-8 col-lg-8 general-error-message-col">
 							<h4 general-error-message
 									 animate="true"
 									 color="red">
@@ -193,7 +193,7 @@
 	</div> <!-- ./row -->
 </div> <!-- ./container-fluid -->
 
-<form name="judgeForm" novalidate>
+<form name="judgeForm" ng-submit="(judgeModalView == 'create') ? addJudge() : editJudge()">
 	<div class="modal fade" id="judge-modal" tabindex="-1" role="dialog" aria-labelledby="judge-modal" aria-hidden="true">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content panel-success">
@@ -371,11 +371,11 @@
 										</div>
 									</div>
 									<div class="col col-sm-5 col-md-5 col-lg-5 pull-left btn-group">
-										<button class="btn btn-info"
+										<button class="btn btn-info" type="button"
 												ng-click="selectAllFilteredTeams()">
 											Select All
 										</button>
-										<button class="btn btn-warning"
+										<button class="btn btn-warning" type="button"
 												ng-click="deselectAllFilteredTeams()">
 											Clear All
 										</button>
@@ -421,20 +421,20 @@
 					</tabset>
 					<br />
 
-					<div ng-switch on="judgeErrorMessage">
+					<div ng-switch on="modalErrorMessage">
 						<div ng-switch-when="undefined"></div>
 						<div ng-switch-default>
 							<div class="row">
 								<div class="col col-sm-2 col-md-2 col-lg-2"></div>
 								<div class="col col-sm-8 col-md-8 col-lg-8">
 									<div class="alert alert-danger">
-										{{judgeErrorMessage}}
+										{{modalErrorMessage}}
 									</div>
 								</div>
 								<div class="col col-sm-2 col-md-2 col-lg-2"></div>
 							</div> <!-- ./row -->
 						</div> <!-- ng-switch-when="undefined" -->
-					</div> <!-- ng-switch on="judgeErrorMessage" -->
+					</div> <!-- ng-switch on="modalErrorMessage" -->
 				</div> <!-- ./modal-body -->
 
 				<div class="modal-footer">
@@ -443,13 +443,11 @@
 							<input ng-show="judgeModalView == 'create'"
 									type="submit"
 									class="btn btn-success pull-right"
-									value="Create"
-									ng-click="addJudge()" />
+									value="Create" />
 							<input ng-show="judgeModalView == 'edit'"
 									type="submit"
 									class="btn btn-success pull-right"
-									value="Update"
-									ng-click="editJudge()" />
+									value="Update" />
 						</div>
 						<div class="col col-md-1"></div>
 						<div class="col col-md-5">
