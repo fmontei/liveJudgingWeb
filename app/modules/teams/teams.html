@@ -392,16 +392,29 @@
 			<div ng-switch on="teamModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" ng-click="createNewTeam()">Save changes</button>
-						<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
+            <div class="row">
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-success" ng-click="createNewTeam()">Create</button>
+              </span>
+              <span class="col col-sm-2"></span>
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-failure" ng-click="closeTeamModal()">Cancel</button>
+               </span>
+            </div>
 					</div> <!-- ./modal-footer -->
 				</div> <!-- ng-switch-when-"create" -->
 
 				<div ng-switch-when="edit">
 					<div class="modal-footer">
-						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteTeam()">Delete</button>
-						<button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Save changes</button>
-						<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
+					  <div class="row">
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Update</button>
+              </span>
+              <span class="col col-sm-2"></span>
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-failure" ng-click="closeTeamModal()">Cancel</button>
+              </span>
+            </div>
 					</div> <!-- /.modal-footer-->
 				</div> <!-- ng-switch-when-"edit" -->
 			</div> <!-- ng-switch on="categoryModalView" -->

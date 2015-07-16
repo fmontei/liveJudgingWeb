@@ -149,15 +149,19 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<h4 class="modal-title" id="notification-modal-label">
 					<span ng-if="rubricModalView == 'create'">Add New Rubric</span>
-					<span ng-if="rubricModalView == 'edit'">Edit Rubric {{rubricForm.name}}</span>
+          <span ng-if="rubricModalView == 'edit'">Edit Rubric <u>{{rubricForm.name}}</u></span>
 				</h4>
 			</div>
 			<div class="modal-body">
 
 				<div class="row"
-						ng-if="modalCriteria.length == 0 || !rubricForm.name">
-					<div class="col col-sm-1 col-md-1 col-lg-1"></div>
-						Rubric name and at least one criterion required to save.<br />
+						 ng-if="modalCriteria.length == 0 || !rubricForm.name">
+          <div class="col col-sm-4 col-md-4 col-lg-4"></div>
+					<div class="col col-sm-8 col-md-8 col-lg-8">
+						<div class="alert alert-danger" style="display: inline-block">
+						  <span class="glyphicon glyphicon-alert"></span>&nbsp;Rubric name and at least one criterion required to save.
+						</div>
+          </div>
 				</div>
 
 				<div class="row">
@@ -258,7 +262,7 @@
 							</div>
 							
 							<!-- Preview Rubric View -->
-							<div accordion-group is-open="preview.open" class="panel-info">
+							<div accordion-group is-open="preview.open" class="panel-info" ng-show="modalCriteria.length > 0">
                 <div accordion-heading class="panel-heading rubric-accordion-heading">
                   <div class="rubric-accordion-heading-content">
                     Preview
@@ -282,10 +286,10 @@
                     <tr ng-repeat="criterion in modalCriteria">
                       <td style="overflow: hidden; white-space:nowrap;">{{criterion.label}}</td>
                       <td ng-if="rubricModalView === 'create'">
-                        <span ng-if="criterion.ratingType === 'Inherited'">1 - {{rubricRating}}</span>
-                        <span ng-if="criterion.ratingType === 'Custom'">1 - {{criterion.rating}}</span>
+                        <span ng-if="criterion.ratingType === 'Inherited'">{{rubricRating}}/10</span>
+                        <span ng-if="criterion.ratingType === 'Custom'">{{criterion.rating}}/10</span>
                       </td>
-                      <td ng-if="rubricModalView === 'edit'">1 - {{criterion.max_score}}</td>
+                      <td ng-if="rubricModalView === 'edit'">{{criterion.max_score}}/10</td>
                       <td style="overflow: hidden; white-space:nowrap;">{{criterion.description}} (TODO)</td>
                     </tr>
                   </tbody>
@@ -317,7 +321,7 @@
 						</button>
 					</span>
 					<span class="col col-sm-2"></span>
-					<span class="col col-sm-5"><button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button></span>
+					<span class="col col-sm-5"><button type="button" class="btn btn-failure pull-left" data-dismiss="modal">Cancel</button></span>
 				</div>
 			</div> <!-- ./modal-footer -->
 		</div>
