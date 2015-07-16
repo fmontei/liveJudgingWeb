@@ -64,9 +64,9 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 		} else if (action === 'edit') {
 			$scope.judgeModalView = 'edit';
 			$scope.judgeId = judge.id;
-      var seperator = judge.name.lastIndexOf(' ');
-			$scope.judgeInfoForm.judgeFirstName = judge.name.substring(0, seperator);
-			$scope.judgeInfoForm.judgeLastName = judge.name.substring(seperator + 1, judge.name.length);
+      var lastSpace = judge.name.lastIndexOf(' '); // Last space for compound first names, e.g. Lee Ann
+			$scope.judgeInfoForm.judgeFirstName = judge.name.substring(0, lastSpace);
+			$scope.judgeInfoForm.judgeLastName = judge.name.substring(lastSpace + 1, judge.name.length);
 			$scope.judgeInfoForm.judgeEmail = judge.email;
 			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
       $scope.assignedTeams = $scope.teams; // TODO: change to teams
