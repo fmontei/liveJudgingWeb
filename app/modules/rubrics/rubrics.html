@@ -178,10 +178,10 @@
 					<div class="col col-sm-1 col-md-1 col-lg-1">
 					</div>
 					<div class="col col-sm-3 col-md-3 col-lg-3">
-						<label>*Overall Rating Scale:</label>
+						<label>Criterion Max Score Mass Update:</label>
 					</div>
 					<div class="col col-sm-7 col-md-7 col-lg-7">
-						<div><rating ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
+						<div><rating ng-change="updateCriteriaRating(rubricRating)" ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
 					</div>
 				</div> <!-- ./row -->
 				<br />
@@ -245,20 +245,11 @@
 									<br />
 									<div class="row rubric-accordion-row">
 										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default"
-												 ng-style="inheritedActive"
-												 ng-click="updateRatingType($index, 'Inherited'); inheritedActive={'background-color':'#d6e9c6'}; customActive={'background-color':'white'}">
-												<label>Inherited</label>
-												<div ng-init="$scope.rubricRating"><rating ng-model="rubricRating" readonly="true" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
-											</div>
-										</div>
-										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default"
-												 ng-style="customActive"
-												 ng-click="updateRatingType($index, 'Custom'); customActive={'background-color':'#d6e9c6'}; inheritedActive={'background-color':'white'}">
-												<label>Custom</label>
-												<div ng-init="$scope.rubricRating">
-													<rating ng-model="modalCriteria[$index].rating" max="10"></rating> <b>({{modalCriteria[$index].rating}} / 10)</b>
+											<div class="panel panel-default">
+												<label>Criterion Max Score</label>
+												<div>
+													<rating ng-model="modalCriteria[$index].max_score" readonly="true" max="10"></rating>
+													<b>({{modalCriteria[$index].max_score}} / 10)</b>
 												</div>
 											</div>
 										</div>
