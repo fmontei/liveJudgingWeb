@@ -221,20 +221,11 @@
 										<label>*E-mail:</label>
 									</div>
 									<div class="col col-sm-5 col-md-5 col-lg-5">
-										<div class="input-group">
-											<input class="form-control"
-													 type="email"
-													 ng-model="judgeInfoForm.judgeEmail"
-													 required />
-											<span class="input-group-btn"
-													ng-if="judgeModalView =='create'">
-												<button class="btn btn-default"
-														type="button"
-														ng-click="isEmailTaken(judgeInfoForm.judgeEmail)">
-													check email
-												</button>
-											</span>
-										</div>
+										<input class="form-control"
+												 type="email"
+												 ng-model="judgeInfoForm.judgeEmail"
+												 ng-blur="isEmailTaken(judgeInfoForm.judgeEmail)"
+												 required />
 									</div>
 								</div> <!-- ./row -->
 								<br />
