@@ -237,59 +237,59 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	return function($scope) {
         var authHeader = CurrentUserService.getAuthHeader();
 
-		var service = {};
+				var service = {};
 
-		service.init =  function() {
-            var authHeader = CurrentUserService.getAuthHeader();
-            var eventId = sessionStorage.getObject('selected_event').id;
+				service.init =  function() {
+						var authHeader = CurrentUserService.getAuthHeader();
+						var eventId = sessionStorage.getObject('selected_event').id;
 
-        	var categoryManagementService = CategoryManagementService($scope);
-        	categoryManagementService.getCategories();
+						var categoryManagementService = CategoryManagementService($scope);
+						categoryManagementService.getCategories();
 
-            var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-            teamManagmentService.getTeams().then(function() {
-              service.getJudgmentsOfAllTeams();
-            });
+						var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+						teamManagmentService.getTeams().then(function() {
+							service.getJudgmentsOfAllTeams();
+						});
 
-            var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-            judgeManagementService.getJudges().then(function() {
-                service.getJudgmentsByAllJudges().then(function(resp) {
-                    sessionStorage.putObject('judgeJudgments', resp);
-                });
-            });
+						var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+						judgeManagementService.getJudges().then(function() {
+								service.getJudgmentsByAllJudges().then(function(resp) {
+										sessionStorage.putObject('judgeJudgments', resp);
+								});
+						});
 
-    		$scope.$watch(function() {
-    			return sessionStorage.getObject('categories');
-    		}, function(newValue) {
-    			$scope.categories = newValue;
-    		}, true);
+						$scope.$watch(function() {
+							return sessionStorage.getObject('categories');
+						}, function(newValue) {
+							$scope.categories = newValue;
+						}, true);
 
-    		$scope.$watch(function() {
-    				return sessionStorage.getObject('teams');
-    		}, function(newValue) {
-    				$scope.teams = newValue;
-    		}, true);
+						$scope.$watch(function() {
+								return sessionStorage.getObject('teams');
+						}, function(newValue) {
+								$scope.teams = newValue;
+						}, true);
 
-    		$scope.$watch(function() {
-    				return sessionStorage.getObject('judges');
-    		}, function(newValue) {
-    				$scope.judges = newValue;
-    		}, true);
+						$scope.$watch(function() {
+								return sessionStorage.getObject('judges');
+						}, function(newValue) {
+								$scope.judges = newValue;
+						}, true);
 
-    		$scope.$watch(function() {
-    				return sessionStorage.getObject('selected_event');
-    		}, function(newValue) {
-    				$scope.selectedEvent = newValue;
-    		}, true);
+						$scope.$watch(function() {
+								return sessionStorage.getObject('selected_event');
+						}, function(newValue) {
+								$scope.selectedEvent = newValue;
+						}, true);
 
-            $scope.$watch(function() {
-                return sessionStorage.getObject('judgeJudgments');
-            }, function(newValue) {
-                $scope.judgeJudgments = newValue;
-            }, true);
+						$scope.$watch(function() {
+								return sessionStorage.getObject('judgeJudgments');
+						}, function(newValue) {
+								$scope.judgeJudgments = newValue;
+						}, true);
 
-    		sessionStorage.put('categoryInc', '0');
-		}
+						sessionStorage.put('categoryInc', '0');
+				}
 
         service.getJudgmentsByAllJudges = function() {
             var defer = $q.defer();
@@ -420,7 +420,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             return defer.promise;
         }
 
-		return service;
+			return service;
 	}
 }])
 

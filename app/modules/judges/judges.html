@@ -222,6 +222,7 @@
 									</div>
 									<div class="col col-sm-5 col-md-5 col-lg-5">
 										<input class="form-control"
+                         typeahead="judgeObj.judge.email for judgeObj in judges | filter:$viewValue | limitTo: 10"
 												 type="email"
 												 ng-model="judgeInfoForm.judgeEmail"
 												 ng-blur="isEmailTaken(judgeInfoForm.judgeEmail)"
