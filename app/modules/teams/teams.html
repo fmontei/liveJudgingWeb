@@ -4,37 +4,60 @@
 			<div ng-switch on="teamView">
 				<div ng-switch-default>
 					<div class="row general-error-message-row">
-						<div class="col col-sm-6 col-md-6 col-lg-6">
-							<h1>Teams <span class="label label-default">{{teams.length}}</span></h1>
+						<div class="col col-sm-7 col-md-7 col-lg-7">
+							<h1 custom-popover
+                  popover-content="{{hints['mainHeading'].content}}" 
+                  popover-placement="{{hints['mainHeading'].placement}}"
+                  popover-toggle="{{hints['mainHeading'].enabled}}">Teams <span class="label label-default">{{teams.length}}</span>
+              </h1>
 						</div>
-						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
+						<div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
 							<h4 general-error-message
-									 animate="true"
-									 color="red">
+								  animate="true"
+								  color="red">
 							</h4>
 						</div>
 					</div>
-					<br />
 				</div>
 				<div ng-switch-when="selectedCategory">
-					<div class="row">
-						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
-							<span class="label label-default">{{selectedCategory.teams.length}}</span>
-						</h1>
-						<hr>
+				  <div class="row general-error-message-row">
+						<div class="col col-sm-7 col-md-7 col-lg-7">
+							<h1 id="breadcrumb-symbol"
+                  custom-popover
+                  popover-content="{{hints['catHeading'].content}}" 
+                  popover-placement="{{hints['catHeading'].placement}}"
+                  popover-toggle="{{hints['catHeading'].enabled}}">
+							  <a ng-click="changeView('default')">Teams</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
+							  <span class="label label-default">{{selectedCategory.teams.length}}</span>
+						  </h1>
+						</div>
+						<div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
+							<h4 general-error-message 
+								  animate="true"
+									color="red">
+							</h4>
+						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="col-sm-8 col-md-8 col-lg-8">
+				<div class="col-sm-5 col-md-5 col-lg-5">
 					<em>Drag-'n-drop teams into categories.</em>
 				</div>
-				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
+				<div class="col-sm-7 col-md-7 col-lg-7 pull-right">
 					<div class="row">
 						<div class="col-sm-12 col-md-12 col-lg-12">
-							<div class="btn-group" role="group" id="team-buttons">
+							<div class="btn-group custom-btn-group" 
+                   role="group"  
+                   custom-popover
+                   popover-content="{{hints['organize'].content}}" 
+                   popover-placement="{{hints['organize'].placement}}"
+                   popover-toggle="{{hints['organize'].enabled}}">
+							  <input type="button" 
+							         class="btn btn-warning" 
+							         ng-click="enableHints();"
+							         value="{{enableButtonText}}" />
 								<button class="btn btn-default" type="button" cng-organize-items>
 									Organize
 									<span class="glyphicon glyphicon-th-large"></span>
@@ -61,65 +84,77 @@
 				<div ng-switch-default>
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
-							<button class="btn btn-lg btn-success add-entity-btn" ng-click="changeTeamModalView('create')">
+							<button class="btn btn-lg btn-success add-entity-btn" 
+							        ng-click="changeTeamModalView('create')"
+							        custom-popover
+							        popover-content="{{hints['addTeam'].content}}" 
+							        popover-placement="{{hints['addTeam'].placement}}"
+							        popover-toggle="{{hints['addTeam'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Team
 							</button>
 						</div>
 					</div><br />
-
-					<div ng-repeat="team in teams | orderBy: '+name'" ng-if="sortType === 'name'">
-						<div class="media draggable-item"
-								 cng-draggable-item
-								 item-id="{{team.id}}"
-								 item-type="team"
-								 cog=".glyphicon-cog"
-								 is-transferable="true">
-							<div class="media-left">
-								<a href="javascript:void(0)">
-									<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-								</a>
-							</div>
-							<div class="media-body">
-								<h4 class="media-heading">
-									{{team.id}}
-									<div class="glyphicon glyphicon-cog"
-											 ng-click="changeTeamModalView('edit', team)">
-									</div>
-								</h4>
-								<div class="media-text" cng-wrap-word word="{{team.name}}"
-										 line-width="18"
-										 total-width="36">
-								</div>
-							</div>
-						</div>
-					</div>
-					<div ng-repeat="team in teams | orderBy: '+id'" ng-if="sortType === 'number'">
-						<div class="media draggable-item"
-								 cng-draggable-item
-								 item-id="{{team.id}}"
-								 item-type="team"
-								 cog=".glyphicon-cog"
-								 is-transferable="true">
-							<div class="media-left">
-								<a href="javascript:void(0)">
-									<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-								</a>
-							</div>
-							<div class="media-body">
-								<h4 class="media-heading">
-									{{team.id}}
-									<div class="glyphicon glyphicon-cog"
-											 ng-click="changeTeamModalView('edit', team)">
-									</div>
-								</h4>
-								<div class="media-text" cng-wrap-word word="{{team.name}}"
-										 line-width="18"
-										 total-width="36">
-								</div>
-							</div>
-						</div>
-					</div>
+          
+          <div class="draggable-item-wrapper"
+               custom-popover
+               popover-content="{{hints['dragItem'].content}}" 
+               popover-placement="{{hints['dragItem'].placement}}"
+               popover-toggle="{{hints['dragItem'].enabled}}">
+            <div ng-repeat="team in teams | orderBy: '+name'" 
+                 ng-if="sortType === 'name'">
+              <div class="media draggable-item"
+                   cng-draggable-item
+                   item-id="{{team.id}}"
+                   item-type="team"
+                   cog=".glyphicon-cog"
+                   is-transferable="true">
+                <div class="media-left">
+                  <a href="javascript:void(0)">
+                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                  </a>
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    {{team.id}}
+                    <div class="glyphicon glyphicon-cog"
+                         ng-click="changeTeamModalView('edit', team)">
+                    </div>
+                  </h4>
+                  <div class="media-text" cng-wrap-word word="{{team.name}}"
+                       line-width="18"
+                       total-width="36">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div ng-repeat="team in teams | orderBy: '+id'" ng-if="sortType === 'number'">
+              <div class="media draggable-item"
+                   cng-draggable-item
+                   item-id="{{team.id}}"
+                   item-type="team"
+                   cog=".glyphicon-cog"
+                   is-transferable="true">
+                <div class="media-left">
+                  <a href="javascript:void(0)">
+                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                  </a>
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    {{team.id}}
+                    <div class="glyphicon glyphicon-cog"
+                         ng-click="changeTeamModalView('edit', team)">
+                    </div>
+                  </h4>
+                  <div class="media-text" cng-wrap-word word="{{team.name}}"
+                       line-width="18"
+                       total-width="36">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 				</div> <!--ng-switch-default-->
 
 				<div ng-switch-when="category">
@@ -186,40 +221,51 @@
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
-							<button class="btn btn-lg btn-success add-entity-btn" ng-click="changeTeamModalView('create')">
+							<button class="btn btn-lg btn-success add-entity-btn" 
+							        ng-click="changeTeamModalView('create')"
+							        custom-popover
+							        popover-content="{{hints['addTeamCategory'].content}}" 
+							        popover-placement="{{hints['addTeamCategory'].placement}}"
+							        popover-toggle="{{hints['addTeamCategory'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Team to {{selectedCategory.label}}
 							</button>
 						</div>
 					</div><br />
 
-					<div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
-						<div class="media draggable-item"
-								 cng-draggable-item
-								 item-id="{{team.id}}"
-								 item-type="team"
-								 cog=".glyphicon-cog"
-								 is-transferable="true">
-							<div class="media-left">
-								<a href="javascript:void(0)">
-									<img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-								</a>
-							</div>
-								<div class="media-body">
-									<h4 class="media-heading">
-										{{team.id}}
-										<div class="glyphicon glyphicon-cog"
-												 ng-click="changeTeamModalView('edit', team)">
-										</div>
-									</h4>
-									<div class="media-text" cng-wrap-word word="{{team.name}}"
-											 line-width="18"
-											 total-width="36">
-									</div>
-								</div>
-						</div>
-
-					</div>
+           <div class="draggable-item-wrapper"
+                custom-popover
+                popover-content="{{hints['dragItem'].content}}" 
+                popover-placement="{{hints['dragItem'].placement}}"
+                popover-toggle="{{hints['dragItem'].enabled}}">
+            <div ng-repeat="team in selectedCategory.teams| orderBy: '+name'">
+              <div class="media draggable-item"
+                   cng-draggable-item
+                   item-id="{{team.id}}"
+                   item-type="team"
+                   cog=".glyphicon-cog"
+                   is-transferable="true">
+                <div class="media-left">
+                  <a href="javascript:void(0)">
+                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                  </a>
+                </div>
+                  <div class="media-body">
+                    <h4 class="media-heading">
+                      {{team.id}}
+                      <div class="glyphicon glyphicon-cog"
+                           ng-click="changeTeamModalView('edit', team)">
+                      </div>
+                    </h4>
+                    <div class="media-text" cng-wrap-word word="{{team.name}}"
+                         line-width="18"
+                         total-width="36">
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+					
 				</div> <!--ng-switch-when-->
 
 			</div> <!--ng-switch on-->
@@ -346,16 +392,29 @@
 			<div ng-switch on="teamModalView">
 				<div ng-switch-when="create">
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" ng-click="createNewTeam()">Save changes</button>
-						<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
+            <div class="row">
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-success" ng-click="createNewTeam()">Create</button>
+              </span>
+              <span class="col col-sm-2"></span>
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-failure" ng-click="closeTeamModal()">Cancel</button>
+               </span>
+            </div>
 					</div> <!-- ./modal-footer -->
 				</div> <!-- ng-switch-when-"create" -->
 
 				<div ng-switch-when="edit">
 					<div class="modal-footer">
-						<button type="button" class="btn btn-danger btn-delete" ng-click="deleteTeam()">Delete</button>
-						<button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Save changes</button>
-						<button type="button" class="btn btn-default" ng-click="closeTeamModal()">Cancel</button>
+					  <div class="row">
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Update</button>
+              </span>
+              <span class="col col-sm-2"></span>
+              <span class="col col-sm-4">
+                <button type="button" class="btn btn-failure" ng-click="closeTeamModal()">Cancel</button>
+              </span>
+            </div>
 					</div> <!-- /.modal-footer-->
 				</div> <!-- ng-switch-when-"edit" -->
 			</div> <!-- ng-switch on="categoryModalView" -->

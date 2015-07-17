@@ -11,14 +11,24 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	height: 100px;
+	z-index: 1;
 }
 
 .draggable-item a {
 	cursor: move;
 }
 
-.draggable-item-col {
-  width: 700px;
+.draggable-item-wrapper {
+	@media only screen 
+	and (max-width: 1230px) {
+		width: 300px;
+	}
+	@media only screen 
+	and (max-width: 9999px) {
+		width: 700px;
+	}
+  
+  min-height: 50px;
 }
 
 .draggable-item .glyphicon-cog, .glyphicon-cog {

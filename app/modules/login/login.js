@@ -17,7 +17,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
                           'CurrentUserService',
                           'LoginService',
                           'LogoutService',
-                          'UserRESTService', 
+                          'RegistrationRESTService', 
     function($base64,
              sessionStorage,
              $location,
@@ -26,9 +26,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
              CurrentUserService,
              LoginService,
              LogoutService,
-             UserRESTService) {
-
-        /* TODO: Use hash not base64 */
+             RegistrationRESTService) {
 
         $scope.newUser = {};
 			
@@ -49,7 +47,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 					} else {
 						$scope.registerError = undefined;
 					}
-					UserRESTService.register(user).$promise.then(function(user) {
+					RegistrationRESTService.register(user).$promise.then(function(user) {
 						console.log('User registered.');
 						$scope.tabs = [{active: true}, {active: false}];
 						$scope.success = 'Successfully registered.';
@@ -66,17 +64,30 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     }
 ])
 
-.factory('UserRESTService', ['$resource', 'CurrentUserService', function($resource, CurrentUserService) {
+.factory('RegistrationRESTService', ['$resource', 'CurrentUserService', function($resource, CurrentUserService) {
     return $resource('http://api.stevedolan.me/users', {}, {
         register: {
             method: 'POST'
         }
-    }); 
+    });
+}])
+
+.factory('UserRESTService', ['$resource', function($resource) {
+    return function(authHeader) {
+        return $resource('http://api.stevedolan.me/users', {}, {
+            get: {
+                method: 'GET',
+                params: {email: '@email'},
+                headers: authHeader,
+                isArray: true
+            }
+        });
+    }
 }])
 
 .factory('LoginService', function($resource) {
     return function(authHeader) {
-        return $resource('http://api.stevedolan.me/login', {}, {
+        return $resource('http://api.stevedolan.me/login', {'platform': 'Web'}, {
             login: {
                 method: 'GET',
                 headers: authHeader,
@@ -128,7 +139,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     },
 
     service.login = function(user) {
-				service.hasLoginError = false;
+		service.hasLoginError = false;
         LoginService(service.getLoginAuthHeader(user.email, user.password)).login().$promise.then(function(resp) {
             console.log(service);
             service.currentUser = resp;

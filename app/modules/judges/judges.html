@@ -4,37 +4,61 @@
 			<div ng-switch on="judgeView">
 				<div ng-switch-default>
 					<div class="row general-error-message-row">
-						<div class="col col-sm-6 col-md-6 col-lg-6">
-							<h1>Judges <span class="label label-default">{{judges.length}}</span></h1>
+						<div class="col col-sm-7 col-md-7 col-lg-7">
+							<h1 custom-popover
+                  popover-content="{{hints['mainHeading'].content}}" 
+                  popover-placement="{{hints['mainHeading'].placement}}"
+                  popover-toggle="{{hints['mainHeading'].enabled}}">Judges <span class="label label-default">{{judges.length}}</span>
+              </h1>
 						</div>
-						<div class="col col-sm-6 col-md-6 col-lg-6 general-error-message-col">
+						<div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
 							<h4 general-error-message
-									 animate="true"
-									 color="red">
+								  animate="true"
+								  color="red">
 							</h4>
 						</div>
 					</div>
-					<br />
 				</div>
 				<div ng-switch-when="selectedCategory">
-					<div class="row">
-						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Judges</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
-							<span class="label label-default">TODO</span>
-						</h1>
-						<hr>
+         <div class="row general-error-message-row">
+						<div class="col col-sm-7 col-md-7 col-lg-7">
+              <h1 id="breadcrumb-symbol"
+                  custom-popover
+                  popover-name="'heading'"
+                  popover-content="{{hints['catHeading'].content}}" 
+                  popover-placement="{{hints['catHeading'].placement}}"
+                  popover-toggle="{{hints['catHeading'].enabled}}">
+							  <a ng-click="changeView('default')">Judges</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
+							  <span class="label label-default">{{selectedCategory.judges.length}}</span>
+						  </h1>
+						</div>
+						<div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
+							<h4 general-error-message
+								  animate="true"
+								  color="red">
+							</h4>
+						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="col-sm-8 col-md-8 col-lg-8">
-					<em>Drag-'n-drop judges into categories.</em>
+				<div class="col-sm-5 col-md-5 col-lg-5">
+					<em>Drag-'n-drop judges into categories to assign judges to teams.</em>
 				</div>
-				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
+				<div class="col-sm-7 col-md-7 col-lg-7 pull-right">
 					<div class="row">
 						<div class="col-sm-12 col-md-12 col-lg-12">
-							<div class="btn-group" role="group" id="team-buttons">
+							<div class="btn-group custom-btn-group" 
+                   role="group" 
+                   custom-popover
+                   popover-content="{{hints['organize'].content}}" 
+                   popover-placement="{{hints['organize'].placement}}"
+                   popover-toggle="{{hints['organize'].enabled}}">
+							  <input type="button" 
+							         class="btn btn-warning" 
+							         ng-click="enableHints();"
+							         value="{{enableButtonText}}" />
 								<button class="btn btn-default" type="button" cng-organize-items>
 									Organize
 									<span class="glyphicon glyphicon-th-large"></span>
@@ -64,53 +88,82 @@
 							<button class="btn btn-lg btn-success add-entity-btn"
 											data-toggle="modal"
 											data-target="#judge-modal"
-											ng-click="changeJudgeModalView('create', null, null)">
+											ng-click="changeJudgeModalView('create', null)"
+											custom-popover
+							        popover-content="{{hints['addJudge'].content}}" 
+							        popover-placement="{{hints['addJudge'].placement}}"
+							        popover-toggle="{{hints['addJudge'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add Judge
 							</button>
-						</div>
+						</div>	
 					</div>
-
-					<div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'" class="draggable-item-col">
-            <div class="media draggable-item"
-                 cng-draggable-item
-                 item-id="{{judgeObj.judge.id}}"
-                 item-type="judge"
-                 cog=".glyphicon-cog"
-                 is-transferable="true">
-              <div class="media-left"></div>
-              <div class="media-body">
-                <h4 class="media-heading">
-                  <span class="glyphicon glyphicon-cog"
-                        data-toggle="modal"
-                        data-target="#judge-modal"
-                        ng-click="changeJudgeModalView('edit', judgeObj.judge, judgeObj.teams)">
-                  </span>
-                </h4>
-                <div class="media-text judge-media-text"
-                     cng-wrap-word word="{{judgeObj.judge.name}}"
-                     line-width="25"
-                     total-width="50">
-                </div> 
-                {{judgeObj.judge.id}}
-              </div>
-            </div>
-					</div>
-				</div> <!-- ng-switch-default -->
-
-				<div ng-switch-when="selectedCategory">
-					<div class="row">
-						<div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
+          
+          <div class="draggable-item-wrapper"
+               custom-popover
+               popover-content="{{hints['dragItem'].content}}" 
+               popover-placement="{{hints['dragItem'].placement}}"
+               popover-toggle="{{hints['dragItem'].enabled}}">
+            <div ng-repeat="judgeObj in judges track by $index | orderBy: '+judge.name'">
               <div class="media draggable-item"
                    cng-draggable-item
-                   itemId="{{judgeObj.judge.id}}"
+                   item-id="{{judgeObj.judge.id}}"
+                   item-type="judge"
                    cog=".glyphicon-cog"
                    is-transferable="true">
                 <div class="media-left"></div>
                 <div class="media-body">
                   <h4 class="media-heading">
                     <span class="glyphicon glyphicon-cog"
-                        ng-click="changeJudgeModalView('edit', judge)">
+                          data-toggle="modal"
+                          data-target="#judge-modal"
+                          ng-click="changeJudgeModalView('edit', judgeObj)">
+                    </span>
+                  </h4>
+                  <div class="media-text judge-media-text"
+                       cng-wrap-word word="{{judgeObj.judge.name}}"
+                       line-width="25"
+                       total-width="50">
+                  </div> 
+                  <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
+                </div>
+              </div>
+            </div>
+          </div>
+				</div> <!-- ng-switch-default -->
+
+				<div ng-switch-when="selectedCategory">
+          <div class="row">
+						<div class="col col-sm-12 col-md-12 col-lg-12">
+							<button class="btn btn-lg btn-success add-entity-btn"
+							        custom-popover
+							        popover-content="{{hints['addJudgeCategory'].content}}" 
+							        popover-placement="{{hints['addJudgeCategory'].placement}}"
+							        popover-toggle="{{hints['addJudgeCategory'].enabled}}">
+								<span class="glyphicon glyphicon-plus"></span>
+								Add Judge (Does Nothing ATM)
+							</button>
+						</div>
+					</div>
+         
+          <div class="draggable-item-wrapper"
+               custom-popover
+               popover-content="{{hints['dragItem'].content}}" 
+               popover-placement="{{hints['dragItem'].placement}}"
+               popover-toggle="{{hints['dragItem'].enabled}}">
+            <div ng-repeat="judgeObj in selectedCategory.judges track by $index | orderBy: '+judge.name'">
+              <div class="media draggable-item"
+                   cng-draggable-item
+                   item-id="{{judgeObj.judge.id}}"
+                   cog=".glyphicon-cog"
+                   is-transferable="true">
+                <div class="media-left"></div>
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    <span class="glyphicon glyphicon-cog"
+                          data-toggle="modal"
+                          data-target="#judge-modal"
+                          ng-click="changeJudgeModalView('edit', judgeObj)">
                     </span>
                   </h4>
                   <div class="media-text judge-media-text"
@@ -118,10 +171,12 @@
                        line-width="25"
                        total-width="50">
                   </div>
+                  <a href="javascript:void(0)">{{judgeObj.judge.email}}</a><br />
+                  <span>Judging {{judgeObj.teams_in_cat}}/{{selectedCategory.teams.length}} teams in this cat.</span>
                 </div>
               </div>
-						</div>
-					</div>
+            </div>
+          </div>
 				</div> <!-- ng-switch-when="selectedCategory" -->
 
 				<div ng-switch-when="team">
@@ -138,7 +193,7 @@
 	</div> <!-- ./row -->
 </div> <!-- ./container-fluid -->
 
-<form name="judgeForm" novalidate>
+<form name="judgeForm" ng-submit="(judgeModalView == 'create') ? addJudge() : editJudge()">
 	<div class="modal fade" id="judge-modal" tabindex="-1" role="dialog" aria-labelledby="judge-modal" aria-hidden="true">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content panel-success">
@@ -163,12 +218,29 @@
 									<div class="col col-sm-2 col-md-2 col-lg-2">
 									</div>
 									<div class="col col-sm-3 col-md-3 col-lg-3">
+										<label>*E-mail:</label>
+									</div>
+									<div class="col col-sm-5 col-md-5 col-lg-5">
+										<input class="form-control"
+												 type="email"
+												 ng-model="judgeInfoForm.judgeEmail"
+												 ng-blur="isEmailTaken(judgeInfoForm.judgeEmail)"
+												 required />
+									</div>
+								</div> <!-- ./row -->
+								<br />
+
+								<span ng-if="!judgeInfoForm.showOneName"><div class="row">
+									<div class="col col-sm-2 col-md-2 col-lg-2">
+									</div>
+									<div class="col col-sm-3 col-md-3 col-lg-3">
 										<label>*First Name:</label>
 									</div>
 									<div class="col col-sm-5 col-md-5 col-lg-5">
 										<input class="form-control"
 													 type="text"
 													 ng-model="judgeInfoForm.judgeFirstName"
+													 ng-disabled="judgeInfoForm.isEmailTaken || !judgeInfoForm.judgeEmail"
 													 required />
 									</div>
 								</div> <!-- ./row -->
@@ -184,21 +256,22 @@
 										<input class="form-control"
 													 type="text"
 													 ng-model="judgeInfoForm.judgeLastName"
-													 required	/>
+													 ng-disabled="judgeInfoForm.isEmailTaken || !judgeInfoForm.judgeEmail"
+													 required />
 									</div>
-								</div> <!-- ./row -->
-								<br />
+								</div></span> <!-- ./row -->
 
-								<div class="row">
+								<div class="row" ng-if="judgeInfoForm.showOneName">
 									<div class="col col-sm-2 col-md-2 col-lg-2">
 									</div>
 									<div class="col col-sm-3 col-md-3 col-lg-3">
-										<label>*E-mail:</label>
+										<label>Name:</label>
 									</div>
 									<div class="col col-sm-5 col-md-5 col-lg-5">
 										<input class="form-control"
-													 type="email"
-													 ng-model="judgeInfoForm.judgeEmail"
+													 type="text"
+													 ng-model="judgeInfoForm.judgeName"
+													 ng-disabled="true"
 													 required />
 									</div>
 								</div> <!-- ./row -->
@@ -230,16 +303,16 @@
 											No teams assigned to this judge.
 										</span>
 										<span ng-if="assignedTeams.length > 0">
-											<span ng-repeat="team in assignedTeams"
+											<span ng-repeat="teamObj in assignedTeams"
 												 class="assigned-team">
-												<span ng-show="!team.toRemove">
-												 	#{{team.id}} {{team.name}} [<!-- comment prevents space
-											 		--><a ng-click="removeTeamFromJudge(team)"
+												<span ng-show="!teamObj.toRemove">
+												 	#{{teamObj.team.id}} {{teamObj.team.name}} [<!-- comment prevents space
+											 		--><a ng-click="removeTeamFromJudge(teamObj)"
 											 				class="clickable">x</a>]
 										 		</span>
-										 		<span ng-show="team.toRemove">
-										 			<s><i>#{{team.id}} {{team.name}}</i></s> [<!--
-										 			--><a ng-click="undoRemoveTeamFromJudge(team)"
+										 		<span ng-show="teamObj.toRemove">
+										 			<s><i>#{{teamObj.team.id}} {{teamObj.team.name}}</i></s> [<!--
+										 			--><a ng-click="undoRemoveTeamFromJudge(teamObj)"
 										 					class="clickable">+</a>]
 										 		</span>
 											</span>
@@ -261,7 +334,28 @@
 											<span ng-repeat="team in teamsToAdd"
 													class="team-to-add">
 												#{{team.id}} {{team.name}} [<!--
-												--><a ng-click="removeTeamToAdd(team.id)"
+												--><a ng-click="removeTeamFromTeamsToAdd(team)"
+														class="clickable">x</a>]
+											</span>
+										</span>
+									</div>
+								</div>
+								<br />
+								
+								<label>Teams to Be Removed: ({{teamsToRemove.length}}) [<!--
+								--><a ng-click="clearTeamsToRemove()" class="clickable">
+									Clear all
+								</a>]</label>
+								<div class="row">
+									<div class="col col-sm-12 col-md-12 col-lg-12">
+										<span ng-if="teamsToRemove.length === 0">
+											No teams to be removed.
+										</span>
+										<span ng-if="teamsToRemove.length > 0">
+											<span ng-repeat="teamObj in teamsToRemove"
+													  class="team-to-add">
+												#{{teamObj.team.id}} {{teamObj.team.name}} [<!--
+												--><a ng-click="undoRemoveTeamFromJudge(teamObj)"
 														class="clickable">x</a>]
 											</span>
 										</span>
@@ -295,18 +389,13 @@
 										</div>
 									</div>
 									<div class="col col-sm-5 col-md-5 col-lg-5 pull-left btn-group">
-										<button class="btn btn-info"
+										<button class="btn btn-info" type="button"
 												ng-click="selectAllFilteredTeams()">
 											Select All
 										</button>
-										<button class="btn btn-warning"
+										<button class="btn btn-warning" type="button"
 												ng-click="deselectAllFilteredTeams()">
 											Clear All
-										</button>
-										<button class="btn btn-success"
-												type="button"
-												ng-click="addSelectedTeamsToJudgeModal(filteredTeams)">
-											Assign Selected
 										</button>
 									</div>
 								</div>
@@ -327,8 +416,10 @@
 													<td>{{team.id}}</td>
 													<td>{{team.name}}</td>
 													<td>{{team | printAllCategories}}</td>
-													<td><input type="checkbox"
-																ng-model="team.selected" />
+													<td>
+                              <input type="checkbox"
+                                     ng-checked="team.selected"
+                                     ng-click="(team.selected) ? deselectFilteredTeam(team) : selectFilteredTeam(team)" />
 													</td>
 												</tr>
 											</tbody>
@@ -348,20 +439,20 @@
 					</tabset>
 					<br />
 
-					<div ng-switch on="judgeErrorMessage">
+					<div ng-switch on="modalErrorMessage">
 						<div ng-switch-when="undefined"></div>
 						<div ng-switch-default>
 							<div class="row">
 								<div class="col col-sm-2 col-md-2 col-lg-2"></div>
 								<div class="col col-sm-8 col-md-8 col-lg-8">
 									<div class="alert alert-danger">
-										{{judgeErrorMessage}}
+										{{modalErrorMessage}}
 									</div>
 								</div>
 								<div class="col col-sm-2 col-md-2 col-lg-2"></div>
 							</div> <!-- ./row -->
 						</div> <!-- ng-switch-when="undefined" -->
-					</div> <!-- ng-switch on="judgeErrorMessage" -->
+					</div> <!-- ng-switch on="modalErrorMessage" -->
 				</div> <!-- ./modal-body -->
 
 				<div class="modal-footer">
@@ -370,15 +461,14 @@
 							<input ng-show="judgeModalView == 'create'"
 									type="submit"
 									class="btn btn-success pull-right"
-									value="Create"
-									ng-click="addJudge()" />
+									value="Create" />
+
 							<input ng-show="judgeModalView == 'edit'"
 									type="submit"
 									class="btn btn-success pull-right"
-									value="Update"
-									ng-click="editJudge()" />
+									value="Update" />
 						</div>
-						<div class="col col-md-1"></div>
+						<div class="col col-md-2"></div>
 						<div class="col col-md-5">
 							<button type="button"
 									class="btn btn-failure pull-left"
@@ -405,9 +495,12 @@
 				<div ng-repeat="team in teamsInDropCat" class="teams-in-cat-list">
 					<label>
 						<input type="checkbox" ng-model="team.checked" />
-							{{team.name}}
+            {{team.name}}
 					</label>
 				</div>
+				<label ng-if="teamsInDropCat.length === 0">
+          There are currently no teams in this category.
+        </label>
 			</div>
 
 			<div class="modal-footer">
@@ -422,7 +515,7 @@
 					<span class="col col-sm-2"></span>
 					<span class="col col-sm-5">
 						<button type="button"
-								class="btn btn-default pull-left"
+								class="btn btn-failure pull-left"
 								data-dismiss="modal"
 								ng-click="closeAssignByCatModal()">
 							Cancel

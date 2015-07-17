@@ -25,7 +25,41 @@ angular.module('liveJudgingAdmin', [
     if (CurrentUserService.isLoggedIn()) {
       $location.path('/event');
     }
-  })
+  });
+  
+  $rootScope.hints = new Object();
+  $rootScope.hints['mainHeading'] = {'content': 'Default view. Click category to see category view, then click here to return to default view.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['catHeading'] = {'content': 'Category View. Click here to return to default view.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['addTeam'] = {'content': '1) Click here to add a team to this event.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addTeamCategory'] = {'content': '1) Click here to add a team to this category.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addJudge'] = {'content': '1) Click here to add a judge to this event.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addJudgeCategory'] = {'content': '1) Click here to add a judge to this category.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addRubric'] = {'content': '1) Click here to add a rubric to this event.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addRubricCategory'] = {'content': '1) Click here to add a rubric to this category.', 'placement': 'right', 'enabled': false};
+  $rootScope.hints['addCategory'] = {'content': '2) Click here to add a category to this event.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['dragItem'] = {'content': '3) Drag these items over to the right &rarr;', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['destroyItem'] = {'content': '4a) Drop item here to permanently delete it from this event.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['removeItem'] = {'content': '4b) Drop item here to remove it from selected category.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['uncategorized'] = {'content': 'Uncategorized items. Cannot interact with.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['category'] = {'content': '5) Drop item here to add to category. Click to see details. Click cog to edit.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['organize'] = {'content': 'Organize out-of-place items.', 'placement': 'bottom', 'enabled': false};
+  $rootScope.hints['notify'] = {'content': 'Send notification to judges.', 'placement': 'right', 'enabled': false};
+  $rootScope.enableButtonText = 'Enable Hints';
+  $rootScope.enableHints = function() {
+    angular.forEach($rootScope.hints, function(hint) {
+      hint.enabled = !hint.enabled;
+    });
+    if ($rootScope.enableButtonText === 'Enable Hints')
+      $rootScope.enableButtonText = 'Disable Hints';
+    else if ($rootScope.enableButtonText === 'Disable Hints')
+      $rootScope.enableButtonText = 'Enable Hints';
+  }
+  $rootScope.disableHints = function() {
+    angular.forEach($rootScope.hints, function(hint) {
+      hint.enabled = false;
+    });
+    $rootScope.enableButtonText = 'Enable Hints';
+  }
 })
 
 .controller('MainCtrl', ['sessionStorage',
@@ -86,6 +120,9 @@ angular.module('liveJudgingAdmin', [
 
     sessionStorage.getObject = function(key) {
       var stringValue = $window.sessionStorage.getItem(key);
+      if (stringValue == "undefined") {
+        return undefined;
+      }
       return JSON.parse(stringValue);
     }
 
@@ -136,7 +173,7 @@ angular.module('liveJudgingAdmin', [
     }
 })
 
-.directive('cngDraggableItem', [function() { 
+.directive('cngDraggableItem', ['$timeout', function($timeout) { 
 
     return {
         restrict: 'A',
@@ -147,6 +184,7 @@ angular.module('liveJudgingAdmin', [
         link: function(scope, elem, attrs) {
             elem.data('isTransferable', scope.isTransferable === 'true');
             elem.draggable({
+								containment: 'document',
                 cursor: 'grab',
                 start: function(event, ui) {
 										$(this).css('zIndex', '100');
@@ -163,6 +201,10 @@ angular.module('liveJudgingAdmin', [
                     $(this).css('zIndex', '1');
                   });
                   $(this).css('zIndex', '2');
+									
+									$timeout(function() {
+										elem.goBack();
+									}, 3000);
                 }
             });
 
@@ -188,12 +230,6 @@ angular.module('liveJudgingAdmin', [
                 }, 500);
               }
             }
-
-            $(window).resize(function() {
-              var originalPos = elem.data('originalPosition');
-              if (originalPos !== undefined && originalPos !== elem.offset())
-                elem.goBack();
-            });
         }
     }
 
@@ -240,4 +276,36 @@ angular.module('liveJudgingAdmin', [
 			}, true);
 		}
 	}
-}]);
+}])
+
+.directive('customPopover', function() {
+  return {
+    restrict: 'A',
+    scope: {
+      popoverContent: '@',
+      popoverPlacement: '@',
+      popoverToggle: '@'
+    },
+    link: function(scope, elem, attrs) {
+      elem.popover({
+        animation: true,
+        content: scope.popoverContent,
+        html: true,
+        placement: scope.popoverPlacement,
+        trigger: 'manual'
+      });
+      elem.bind('mouseover', function() {
+        scope.$apply();
+        elem.popover('hide');
+      });
+      scope.$watch(function() {
+        return scope.popoverToggle;
+      }, function(newValue) {
+        if (newValue == 'true') {
+          elem.popover('show');
+        } else if (newValue == 'false')
+          elem.popover('hide');
+      });
+    }
+  }
+});

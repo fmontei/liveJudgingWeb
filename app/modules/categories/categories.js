@@ -9,9 +9,9 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
   });
 }])
 
-.controller('CategoriesCtrl', ['$q', 'sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService',
+.controller('CategoriesCtrl', ['$rootScope', '$q', 'sessionStorage', '$location', '$scope', 'CategoryManagementService', 'CatWatchService',
                                'JudgeManagementService', 'TeamManagementService', 'RubricManagementService',
-    function($q, sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService,
+    function($rootScope, $q, sessionStorage, $location, $scope, CategoryManagementService, CatWatchService, JudgeManagementService,
              TeamManagementService, RubricManagementService) {
 
         var catWatchService = CatWatchService(sessionStorage, $scope);
@@ -22,7 +22,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         var teamManagementService = TeamManagementService($scope, sessionStorage);
         var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-              var rubricManagementService = RubricManagementService($scope, sessionStorage);
+        var rubricManagementService = RubricManagementService($scope, sessionStorage);
 
         $scope.createNewCategory = function() {
             categoryManagementService.createNewCategory();
@@ -45,9 +45,13 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     defer.resolve(wasSuccessful);
                 });
             } else if ($location.path().indexOf('judges') !== -1) {
-                judgeManagementService.deleteJudge(itemId, item).then(function(wasSuccessful) {
+                judgeManagementService.deleteJudge(itemId).then(function(wasSuccessful) {
                     defer.resolve(wasSuccessful);
                 });
+            } else if ($location.path().indexOf('rubrics') !== -1) {
+                rubricManagementService.deleteRubric(itemId).then(function(wasSuccessful) {
+                    defer.resolve(wasSuccessful);
+                })
             }
             return defer.promise;
         }
@@ -106,11 +110,14 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 categoryManagementService.transferTeamToCategory(categoryId, itemId);
             } else if ($location.path().indexOf('judges') !== -1) {
                 judgeManagementService.openAssignByCatModal(categoryId, itemId);
+            } else if ($location.path().indexOf('rubrics') !== -1) {
+                categoryManagementService.transferRubricToCategory(categoryId, itemId);
             }
         }
 
         $scope.viewCategoryDetails = function(cat) {
             $scope.updateStoredCategory(cat);
+            $rootScope.disableHints();
             if ($location.path().indexOf('teams') !== -1) {
                 teamManagementService.changeView('selectedCategory');
             } else if ($location.path().indexOf('judges') !== -1) {
@@ -168,8 +175,8 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 }])
 
-.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService', 'TeamRESTService',
-    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService, TeamRESTService) {
+.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService', 'RubricRESTService', 'TeamRESTService',
+    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService, RubricRESTService, TeamRESTService) {
     return function($scope) {
         var authHeader = CurrentUserService.getAuthHeader();
         var eventId = sessionStorage.getObject('selected_event').id;
@@ -329,7 +336,6 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
             var catRESTService = CategoryRESTService(authHeader);
             catRESTService.category.get({id: categoryId}).$promise.then(function(resp) {
-                console.log(resp);
                 defer.resolve(resp.teams);
             }).catch(function() {
                 console.log('Error getting teams in category ' + categoryId);
@@ -344,7 +350,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
             var teamRESTService = TeamRESTService(authHeader);
             teamRESTService.team_categories.get({team_id: teamId}).$promise.then(function(resp) {
-                defer.resolve(resp.team_categories);
+                defer.resolve(resp);
             }).catch(function() {
                 defer.reject('Error getting categories in team.');
             });
@@ -363,8 +369,11 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         }
 
         categoryManagement.transferTeamToCategory = function(categoryId, teamId, isDragNDrop) {
-            // If isDrapNDrop is false, that means we don't have to
-            // worry about closing a modal.
+            // Note: If isDrapNDrop is false, that means we don't have to worry about closing a modal.
+            if (isTeamAlreadyInCategory(categoryId, teamId)) {
+              sessionStorage.put('generalErrorMessage', 'Team is already in category.');
+              return;
+            }
             var connection = TeamRESTService(authHeader);
             var req = {category_id: categoryId};
             connection.team_categories.add_team({team_id: teamId}, req).$promise.then(function(resp) {
@@ -380,10 +389,32 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 if (!isDragNDrop) {
                     $scope.closeTeamModal();
                 }
-                $log.log("Added team #" + teamId + " to category " + resp.team_category.category.label + ".");
+                $log.log("Added team #" + teamId + " to category " + resp.category.label + ".");
             }).catch(function() {
                 sessionStorage.put('generalErrorMessage', 'Error transferring team to category.');
                 $scope.error = 'Error transferring team to category.';
+            });
+        }
+        
+        var isTeamAlreadyInCategory = function(categoryId, teamId) {
+          var category = categoryManagement.getCategoryById(categoryId);
+          for (var i = 0; i < category.teams.length; i++) {
+            var team = category.teams[i];
+            if (team.id == teamId)
+              return true;
+          }
+          return false;
+        }
+
+        categoryManagement.transferRubricToCategory = function(categoryId, rubricId) {
+            var rubricRESTService = RubricRESTService(authHeader);
+            var req = {category_id: categoryId};
+            CategoryRESTService(authHeader).category.update({id: categoryId}, {rubric_id: rubricId}).$promise.then(function(resp) {
+                categoryManagement.getCategories();
+                console.log(resp);
+                console.log('Successfully transferred rubric to category');
+            }).catch(function() {
+                console.log('Error transferring rubric to category');
             });
         }
 
@@ -546,16 +577,16 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     var link = function(scope, elem, attrs) {
         elem.droppable({
             drop: function(event, ui) {
-                var droppedTeam = ui.draggable;
-                var isTransferable = droppedTeam.data('isTransferable');
+                var droppedItem = ui.draggable;
+                var isTransferable = droppedItem.data('isTransferable');
                 if (isTransferable === false) {
-                    droppedTeam.goBack();
+                    droppedItem.goBack();
                     return;
                 }
-                scope.itemId = droppedTeam.attr('item-id').trim();
+                scope.itemId = droppedItem.attr('item-id').trim();
                 scope.categoryId = event.target.getAttribute('category-id');
                 scope.transferItemToCategory(scope.categoryId, scope.itemId);
-                droppedTeam.goBack();
+                droppedItem.goBack();
                 var categoryContainer = $(event.target).find('a');
                 performFlashAnimation(categoryContainer);
             }

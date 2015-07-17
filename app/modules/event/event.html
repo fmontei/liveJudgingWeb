@@ -11,7 +11,7 @@
           </div>
           <div class="col col-md-11 col-lg-11">
             <div class="row">
-              <span class="col col-lg-3 col-md-3 col-sm-4  col-xs-4 event-ready">
+              <span class="col col-lg-3 col-md-3 col-sm-4 col-xs-4 event-ready">
                 <button class="btn btn-default" ng-click="editEvent()">
                   Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
                 </button>
@@ -64,8 +64,9 @@
               </p>
             </div>
 
+            <!-- Overall event progress / Edit Event button-->
             <div class="row">
-              <div class="col col-sm-8">
+              <div class="col col-sm-7">
                 <div class="row">
                   <span class="col col-sm-6 col-lg-5">
                     <div class="progress">
@@ -80,14 +81,24 @@
                   </span>
                 </div>
               </div>
-              <div class="col col-sm-4">
-                <button class="btn btn-default" ng-click="editEvent()" style="margin-top: -20px; float: right">
-                  Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
-                </button>
+              <div class="col col-sm-5">
+                <div class="btn-group" 
+                     role="group"
+                     style="margin-top: -10px; float: right">
+                  <input type="button" 
+							           class="btn btn-warning" 
+							           ng-click="enableHints();"
+							           value="{{enableButtonText}}" />
+                  <button class="btn btn-default" 
+                          ng-click="editEvent()">
+                    Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
+                  </button>
+                </div>
               </div>
             </div>
 
-						<ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
+						<!-- Nav tabs-->
+            <ul class="nav nav-tabs" role="tablist" style="margin-top: 20px">
 							<li class="active" ng-repeat="tab in eventTabs" ng-if="$index === 0" cng-event-tab event-section="{{tab.sectionId}}">
 								<a id="{{tab.id}}" href="javascript:void(0)">{{tab.name}}</a>
 							</li>
@@ -99,6 +110,7 @@
             <!--Judge Tab-->
             <div class="beneath-tab" id="judge-progress-section">
 
+              <!-- sorter / expand & collapse buttons -->
               <span style="margin-right: 20px">Sort by:</span>
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -141,14 +153,35 @@
                             <div class="accordion-heading judge-heading-text">
                               <change-accordion-chevron>
                                 <a class="accordion-toggle" data-toggle="collapse" href="#judge{{$index}}" onclick="return false;">
-                                  <span class="glyphicon glyphicon-chevron-right"></span> {{judgeObj.judge.first_name}} {{judgeObj.judge.last_name}}
+                                  <span class="glyphicon glyphicon-chevron-right"></span> {{judgeObj.judge.name}}
                                 </a>
                               <change-accordion-chevron>
                             </div>
                           </div>
                         </span>
-                        <span class="col-sm-1 col-md-1 col-lg-1">
-                          <button type="button" class="btn btn-primary notification-btn" data-toggle="modal" data-target="#notification-modal">
+                        <!-- Show notification hint for first bell glyphicon only -->
+                        <span class="col-sm-1 col-md-1 col-lg-1"
+                              ng-if="$index === 0"
+                              custom-popover
+                              popover-content="{{hints['notify'].content}}" 
+                              popover-placement="{{hints['notify'].placement}}"
+                              popover-toggle="{{hints['notify'].enabled}}">
+                          <button type="button" 
+                                  class="btn btn-primary notification-btn" 
+                                  data-toggle="modal" 
+                                  data-target="#notification-modal"
+                                  ng-click="initRecipientList(judgeObj)">
+                            <span class="glyphicon glyphicon-bell"></span>
+                          </button>
+                        </span>
+                        <!-- Otherwise, just show the bell glyphicon -->
+                        <span class="col-sm-1 col-md-1 col-lg-1"
+                              ng-if="$index > 0">
+                          <button type="button" 
+                                  class="btn btn-primary notification-btn" 
+                                  data-toggle="modal" 
+                                  data-target="#notification-modal"
+                                  ng-click="initRecipientList(judgeObj)">
                             <span class="glyphicon glyphicon-bell"></span>
                           </button>
                         </span>
@@ -200,12 +233,14 @@
                               </div>
                             </div>
                           </div>
-
+      
                           <!--List of judge's completed teams-->
-                          <h4>Completed</h4>
+                          <h4>Completed&nbsp;(Click objects to see judgment details)</h4>
                           <div class="row">
                             <div class="col col-sm-3 col-md-3 col-lg-3">
-                              <div class="media media-completed" data-toggle="modal" data-target="#completed-team-modal">
+                              <div class="media media-completed" 
+                                   data-toggle="modal" 
+                                   data-target="#completed-team-modal">
                                 <div class="media-left">
                                   <a href="#" class="team-pic">
                                     <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
@@ -582,15 +617,27 @@
 </div> <!--Event Ctrl-->
 
 <!--Judge Notification Modal-->
-<notification-widget>
-  <div class="modal fade" id="notification-modal" tabindex="-1" role="dialog" aria-labelledby="notification-modal" aria-hidden="true">
+<div notification-modal>
+  <div class="modal fade" 
+       id="notification-modal" 
+       tabindex="-1" 
+       role="dialog" 
+       aria-labelledby="notification-modal" 
+       aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content panel-primary">
         <div class="modal-header panel-heading">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
           <h4 class="modal-title" id="notification-modal-label">Send Notification</h4>
         </div>
         <div class="modal-body">
+        	<div class="alert alert-info">
+        		<p>To send a notification to multiple judges, type their names into the search box.
+        			 The first judge has been automatically added.
+        		</p>
+        	</div>
           <div class="row">
             <div class="col col-sm-3">
               Recipients:
@@ -599,7 +646,7 @@
               <!--Recipient List-->
               <div class="row" id="recipients-div" style="margin-bottom: 8px"></div>
               <div class="row">
-                <input type="text" class="form-control" id="judge_search" placeholder="Search by name..." style="width: 50%">
+                <input type="text" class="form-control" id="judge-search" placeholder="Search by name..." style="width: 50%">
               </div>
             </div>
           </div>
@@ -625,16 +672,20 @@
           <div class="row">
             <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Send</button></span>
             <span class="col col-sm-2"></span>
-            <span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+            <span class="col col-sm-5"><button type="button" class="btn btn-failure pull-left" data-dismiss="modal">Cancel</button></span>
           </div>
         </div>
       </div>
     </div>
   </div>
-<notification-widget>
+</div>
 
 <!--Judge Completed Scoring Team Modal-->
-<div class="modal fade" id="completed-team-modal" tabindex="-1" role="dialog" aria-labelledby="completed-team-modal-label" aria-hidden="true">
+<div class="modal fade" 
+     id="completed-team-modal" 
+     tabindex="-1" role="dialog" 
+     aria-labelledby="completed-team-modal-label" 
+     aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content panel-primary">
       <div class="modal-header panel-heading">
@@ -643,7 +694,7 @@
           <div class="row">
             <div class="media media-modal">
               <div class="media-left">
-                <a href="#" class="team-pic">
+                <a href="javascript:void(0)" class="team-pic">
                   <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
                   <span class="completed">
                     <span class="glyphicon glyphicon-ok"></span>
@@ -690,10 +741,15 @@
       </div>
       <div class="modal-footer">
         <div class="row">
-          <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Save</button></span>
+          <span class="col col-sm-5">
+            <button type="button" class="btn btn-primary" style="float: right">Save</button>
+          </span>
           <span class="col col-sm-2"></span>
-          <span class="col col-sm-5"><button type="button" class="btn btn-default" data-dismiss="modal" style="float: left">Close</button></span>
+          <span class="col col-sm-5">
+            <button type="button" class="btn btn-failure pull-left" data-dismiss="modal">Cancel</button>
+          </span>
         </div>
       </div>
     </div>
   </div>
+</div>

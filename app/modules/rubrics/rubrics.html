@@ -3,30 +3,61 @@
 		<div class="col col-sm-8 col-md-8 col-lg-8">
 			<div ng-switch on="rubricView">
 				<div ng-switch-default>
-					<div class="row">
-						<h1>Rubrics <span class="label label-default">{{rubrics.length}}</span></h1>
-						<hr>
+					<div class="row general-error-message-row">
+            <div class="col col-sm-7 col-md-7 col-lg-7">
+              <h1 custom-popover
+                  popover-content="{{hints['mainHeading'].content}}" 
+                  popover-placement="{{hints['mainHeading'].placement}}"
+                  popover-toggle="{{hints['mainHeading'].enabled}}">Rubrics <span class="label label-default">{{rubrics.length}}</span>
+              </h1>
+            </div>
+            <div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
+							<h4 general-error-message
+								  animate="true"
+								  color="red">
+							</h4>
+						</div>
 					</div>
 				</div>
 				<div ng-switch-when="selectedCategory">
-					<div class="row">
-						<h1 id="breadcrumb-symbol">
-							<a ng-click="changeView('default')">Rubrics</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
-							<span class="label label-default">TODO</span>
-						</h1>
-						<hr>
+					<div class="row general-error-message-row">
+            <div class="col col-sm-7 col-md-7 col-lg-7">
+              <h1 id="breadcrumb-symbol"
+                  custom-popover
+                  popover-content="{{hints['catHeading'].content}}" 
+                  popover-placement="{{hints['catHeading'].placement}}"
+                  popover-toggle="{{hints['catHeading'].enabled}}">
+                <a ng-click="changeView('default')">Rubrics</a><span id="slash">&nbsp;/</span> {{selectedCategory.label}}
+                <span class="label label-default">TODO</span>
+              </h1>
+            </div>
+            <div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
+							<h4 general-error-message
+								  animate="true"
+								  color="red">
+							</h4>
+						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="col-sm-8 col-md-8 col-lg-8">
-					<em>Drag-'n-drop rubrics into categories.</em>
+				<div class="col-sm-5 col-md-5 col-lg-5">
+					<em>Drag-'n-drop rubrics into categories. (One rubric per category!)</em>
 				</div>
-				<div class="col-sm-4 col-md-4 col-lg-4 pull-right">
+				<div class="col-sm-7 col-md-7 col-lg-7 pull-right">
 					<div class="row">
 						<div class="col-sm-12 col-md-12 col-lg-12">
-							<div class="btn-group" role="group" id="team-buttons">
+							<div class="btn-group custom-btn-group" 
+                   role="group"
+                   custom-popover
+                   popover-content="{{hints['organize'].content}}" 
+                   popover-placement="{{hints['organize'].placement}}"
+                   popover-toggle="{{hints['organize'].enabled}}">
+							  <input type="button" 
+							         class="btn btn-warning" 
+							         ng-click="enableHints();"
+							         value="{{enableButtonText}}" />
 								<button class="btn btn-default" type="button">
 									Organize
 									<span class="glyphicon glyphicon-th-large"></span>
@@ -53,12 +84,47 @@
 					<div class="row">
 						<div class="col col-sm-12 col-md-12 col-lg-12">
 							<button class="btn btn-lg btn-success add-entity-btn"
-											data-toggle="modal"
-											data-target="#rubric-modal">
+									data-toggle="modal"
+									ng-click="openRubricModal(false)"
+									custom-popover
+                  popover-content="{{hints['addRubric'].content}}" 
+                  popover-placement="{{hints['addRubric'].placement}}"
+                  popover-toggle="{{hints['addRubric'].enabled}}">
 								<span class="glyphicon glyphicon-plus"></span> Add Rubric
 							</button>
 						</div>
-					</div>
+          </div>
+
+          <div class="draggable-item-wrapper"
+               custom-popover
+               popover-content="{{hints['dragItem'].content}}" 
+               popover-placement="{{hints['dragItem'].placement}}"
+               popover-toggle="{{hints['dragItem'].enabled}}">
+            <div ng-repeat="rubric in rubrics track by $index | orderBy: '+rubric.name'" class="draggable-item-col">
+              <div class="media draggable-item"
+                 cng-draggable-item
+                 item-id="{{rubric.id}}"
+                 item-type="rubric"
+                 cog=".glyphicon-cog"
+                 is-transferable="true">
+                <div class="media-left"></div>
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    <span class="glyphicon glyphicon-cog"
+                        data-toggle="modal"
+                        ng-click="openRubricModal(true, rubric)">
+                    </span>
+                  </h4>
+                  <div class="media-text rubric-media-text"
+                     cng-wrap-word word="{{rubric.name}}"
+                     line-width="25"
+                     total-width="50">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+					
 				</div>
 				<div ng-switch-when="selectedCategory">
 					<div class="row">
@@ -81,9 +147,22 @@
 		<div class="modal-content panel-success">
 			<div class="modal-header panel-heading">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="notification-modal-label">Add New Rubric</h4>
+				<h4 class="modal-title" id="notification-modal-label">
+					<span ng-if="rubricModalView == 'create'">Add New Rubric</span>
+          <span ng-if="rubricModalView == 'edit'">Edit Rubric <u>{{rubricForm.name}}</u></span>
+				</h4>
 			</div>
 			<div class="modal-body">
+
+				<div class="row"
+						 ng-if="modalCriteria.length == 0 || !rubricForm.name">
+          <div class="col col-sm-4 col-md-4 col-lg-4"></div>
+					<div class="col col-sm-8 col-md-8 col-lg-8">
+						<div class="alert alert-danger" style="display: inline-block">
+						  <span class="glyphicon glyphicon-alert"></span>&nbsp;Rubric name and at least one criterion required to save.
+						</div>
+          </div>
+				</div>
 
 				<div class="row">
 					<div class="col col-sm-1 col-md-1 col-lg-1">
@@ -103,10 +182,10 @@
 					<div class="col col-sm-1 col-md-1 col-lg-1">
 					</div>
 					<div class="col col-sm-3 col-md-3 col-lg-3">
-						<label>*Overall Rating Scale:</label>
+						<label>Criterion Max Score Mass Update:</label>
 					</div>
 					<div class="col col-sm-7 col-md-7 col-lg-7">
-						<div ng-init="rubricRating = 5"><rating ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
+						<div><rating ng-change="updateCriteriaRating(rubricRating)" ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
 					</div>
 				</div> <!-- ./row -->
 				<br />
@@ -121,7 +200,7 @@
 
 						<div accordion close-others="true">
 							<button class="btn btn-success"
-							        id="rubric-accordion-add-btn"
+									id="rubric-accordion-add-btn"
 									ng-click="createNewAccordionCriterion()">
 								<span class="glyphicon glyphicon-plus"></span>
 								Add New Criterion
@@ -130,7 +209,7 @@
 								<div accordion-group is-open="status.open" class="panel-success">
 									<div accordion-heading class="panel-heading rubric-accordion-heading">
 										<div class="rubric-accordion-heading-content">
-											{{criteria.name}}
+											{{criteria.label}}
 											<i class="pull-right glyphicon"
 												 ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}">
 											</i>
@@ -149,7 +228,7 @@
 											<label>*Name:</label>
 										</div>
 										<div class="col col-sm-7 col-md-7 col-lg-7">
-											<input ng-model="modalCriteria[$index].name" type="text" class="form-control" />
+											<input ng-model="modalCriteria[$index].label" type="text" class="form-control" />
 										</div>
 									</div>
 									<br />
@@ -164,32 +243,58 @@
 									<br />
 									<div class="row rubric-accordion-row">
 										<div class="col col-sm-5 col-md-5 col-lg-5">
-											<label>*Rating Scale: <span ng-init="modalCriteria[$index].ratingType=''"><em>{{modalCriteria[$index].ratingType}}</em></span></label>
+											<label>*Rating Scale: <span ng-init="modalCriteria[$index].ratingType"><em>{{modalCriteria[$index].ratingType}}</em></span></label>
 										</div>
 									</div>
 									<br />
 									<div class="row rubric-accordion-row">
 										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default"
-											     ng-style="inheritedActive"
-											     ng-click="updateRatingType($index, 'Inherited'); inheritedActive={'background-color':'#d6e9c6'}; customActive={'background-color':'white'}">
-												<label>Inherited</label>
-												<div><rating ng-model="rubricRating" readonly="true" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
-											</div>
-										</div>
-										<div class="col col-sm-6 col-md-6 col-lg-6">
-											<div class="panel panel-default"
-											     ng-style="customActive"
-											     ng-click="updateRatingType($index, 'Custom'); customActive={'background-color':'#d6e9c6'}; inheritedActive={'background-color':'white'}">
-												<label>Custom</label>
-												<div ng-init="modalCriteria[$index].rating = 0">
-													<rating ng-model="modalCriteria[$index].rating" max="10"></rating> <b>({{modalCriteria[$index].rating}} / 10)</b>
+											<div class="panel panel-default">
+												<label>Criterion Max Score</label>
+												<div>
+													<rating ng-model="modalCriteria[$index].max_score" readonly="true" max="10"></rating>
+													<b>({{modalCriteria[$index].max_score}} / 10)</b>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div accordion-group>
 							</div>
+							
+							<!-- Preview Rubric View -->
+							<div accordion-group is-open="preview.open" class="panel-info" ng-show="modalCriteria.length > 0">
+                <div accordion-heading class="panel-heading rubric-accordion-heading">
+                  <div class="rubric-accordion-heading-content">
+                    Preview
+                    <i class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': preview.open, 'glyphicon-chevron-right': !preview.open}">
+                    </i>
+                  </div>
+                </div accordion-heading>
+
+                <label>Rubric name:</label>&nbsp;&nbsp;<u>{{rubricForm.name}}</u><br />
+                <p>Criteria are listed below. Teams in categories with this rubric will be judged according to the following:</p>
+                <table class="table table-striped" style="table-layout: fixed">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Rating</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="criterion in modalCriteria">
+                      <td style="overflow: hidden; white-space:nowrap;">{{criterion.label}}</td>
+                      <td ng-if="rubricModalView === 'create'">
+                        <span ng-if="criterion.ratingType === 'Inherited'">{{rubricRating}}/10</span>
+                        <span ng-if="criterion.ratingType === 'Custom'">{{criterion.rating}}/10</span>
+                      </td>
+                      <td ng-if="rubricModalView === 'edit'">{{criterion.max_score}}/10</td>
+                      <td style="overflow: hidden; white-space:nowrap;">{{criterion.description}} (TODO)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div accordion-group>
 						</div accordion>
 
 					</div>
@@ -200,14 +305,23 @@
 			<div class="modal-footer">
 				<div class="row">
 					<span class="col col-sm-5">
-						<button type="button"
+						<button ng-if="rubricModalView == 'create'"
+								type="button"
 								class="btn btn-success pull-right"
-								ng-click="createRubric()">
+								ng-click="createRubric()"
+								ng-disabled="modalCriteria.length == 0 || !rubricForm.name">
 							Create
+						</button>
+						<button ng-if="rubricModalView == 'edit'"
+								type="button"
+								class="btn btn-success pull-right"
+								ng-click="editRubric()"
+								ng-disabled="modalCriteria.length == 0 || !rubricForm.name">
+							Update
 						</button>
 					</span>
 					<span class="col col-sm-2"></span>
-					<span class="col col-sm-5"><button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button></span>
+					<span class="col col-sm-5"><button type="button" class="btn btn-failure pull-left" data-dismiss="modal">Cancel</button></span>
 				</div>
 			</div> <!-- ./modal-footer -->
 		</div>

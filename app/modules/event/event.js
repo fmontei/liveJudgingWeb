@@ -173,8 +173,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService,
 						 TeamStandingService) {
 
-				var teamStandingService = TeamStandingService($scope);
-				teamStandingService.init();
+		var teamStandingService = TeamStandingService($scope);
+		teamStandingService.init();
 
         $scope.event = {
             EVENT_READY_VIEW: EventUtilService.views.EVENT_READY_VIEW,
@@ -214,8 +214,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					else
 						sessionStorage.put('categoryInc', categoryInc);
 				}
+        
+        $scope.initRecipientList = function(judgeObj) {
+          $scope.first_recipient = judgeObj.judge.name;
+        }
 
-        $scope.judge_list = ["Abe Lincoln", "George Washington", "Thomas Jefferson"]; // Contains names of judges, pulled from server
         $scope.recipient_list = []; // Contains list of judges to be notified
         $scope.project_list = ["Sample Project 1", "Sample Project 2"];
 
@@ -238,20 +241,29 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.factory('TeamStandingService', ['sessionStorage', 'CategoryManagementService', 'JudgeManagementService', 'TeamManagementService',
-	function(sessionStorage, CategoryManagementService, JudgeManagementService, TeamManagmentService) {
+.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 'JudgeManagementService', 'JudgmentRESTService', 'TeamManagementService',
+	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgmentRESTService, TeamManagmentService) {
 	return function($scope) {
-		var service = {};
+      var authHeader = CurrentUserService.getAuthHeader();
 
-		service.init =  function() {
+		  var service = {};
+
+		  service.init =  function() {
+      var authHeader = CurrentUserService.getAuthHeader();
+      var eventId = sessionStorage.getObject('selected_event').id;
+
 			var categoryManagementService = CategoryManagementService($scope);
 			categoryManagementService.getCategories();
 
-            var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-            teamManagmentService.getTeams();
+      var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+      teamManagmentService.getTeams().then(function() {
+          service.getJudgmentsOfAllTeams();
+      });
 
-            var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-            judgeManagementService.getJudges();
+      var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+      judgeManagementService.getJudges().then(function() {
+          service.getJudgmentsByAllJudges();
+      });
 
 			$scope.$watch(function() {
 				return sessionStorage.getObject('categories');
@@ -279,6 +291,70 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 			sessionStorage.put('categoryInc', '0');
 		}
+
+        service.getJudgmentsByAllJudges = function() {
+            var defer = $q.defer();
+
+            var judges = sessionStorage.getObject('judges');
+            var eventId = sessionStorage.getObject('selected_event').id;
+            var promises = [];
+            for (var i = 0; i < judges.length; i++) {
+                promises.push(service.getJudgmentsByJudge(eventId, judges[i].id));
+            }
+
+            $q.all(promises).then(function(resp) {
+                defer.resolve(resp);
+                console.log(resp);
+            }).catch(function() {
+                defer.reject();
+                console.log('Error getting judgments by judge ids');
+            });
+
+            return defer.promise;
+        }
+
+        service.getJudgmentsByJudge = function(eventId, judgeId) {
+            var defer = $q.defer();
+            JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeId}).$promise.then(function(resp) {
+                defer.resolve(resp);
+            }).catch(function() {
+                defer.reject();
+            });
+
+            return defer.promise;
+        }
+
+        service.getJudgmentsOfAllTeams = function() {
+            var defer = $q.defer();
+
+            var teams = sessionStorage.getObject('teams');
+            var eventId = sessionStorage.getObject('selected_event').id;
+            var promises = [];
+            for (var i = 0; i < teams.length; i++) {
+                promises.push(service.getJudgmentsOfTeam(eventId, teams[i].id));
+            }
+
+            $q.all(promises).then(function(resp) {
+                defer.resolve(resp);
+                console.log(resp);
+            }).catch(function() {
+                defer.reject();
+                console.log('Error getting judgments by team ids');
+            });
+
+            return defer.promise;
+        }
+
+        service.getJudgmentsOfTeam = function(eventId, teamId) {
+            var defer = $q.defer();
+            JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId}).$promise.then(function(resp) {
+                defer.resolve(resp);
+            }).catch(function() {
+                defer.reject();
+            });
+
+            return defer.promise;
+        }
 
 		return service;
 	}
@@ -334,6 +410,34 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 },
                 update: {
                     method: 'PUT',
+                    headers: authHeader
+                }
+            })
+        }
+    }
+})
+
+.factory('JudgmentRESTService', function($resource) {
+    return function(authHeader) {
+        return {
+            judgments: $resource('http://api.stevedolan.me/events/:event_id/judgments', {
+                event_id: '@id'
+            }, {
+                get: {
+                    method: 'GET',
+                    isArray: true,
+                    headers: authHeader
+                },
+                getByJudge: {
+                    method: 'GET',
+                    params: {judge_id: '@judgeId'},
+                    isArray: true,
+                    headers: authHeader
+                },
+                getByTeam: {
+                    method: 'GET',
+                    params: {team_id: '@teamId'},
+                    isArray: true,
                     headers: authHeader
                 }
             })
@@ -431,22 +535,54 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   };
 })
 
-.directive('notificationWidget', function() {
+.directive('notificationModal', function() {
 
     var link = function(scope, elem, attrs) {
         /*
          * Initialize the Autocomplete Object for the Notification Modal
          */
-        $("#judge_search").autocomplete({
-            source: scope.judge_list,
-            select: function(event, ui) {
-                var recipient_name = ui.item.value;
-                if (jQuery.inArray(recipient_name, scope.recipient_list) === -1)
-                    create_new_judge_notification_object(recipient_name);
-                $(this).val(""); // Clear input after selecting judge
-                event.preventDefault();
-            }
+        scope.$watchCollection(function() {
+          return scope.judges;    
+        }, function(newJudgeList) {
+          if (newJudgeList)
+            updateAutoComplete(newJudgeList);
         });
+      
+        scope.$watch(function() {
+          return scope.first_recipient;
+        }, function(newValue) {
+          if (newValue)
+          create_new_judge_notification_object(newValue);
+        });
+      
+        var updateAutoComplete = function(judgeList) {
+					var input = $('#judge-search');
+          var judgeNames = parseJudgeNames(judgeList);
+					
+					if (input.data('ui-autocomplete') === undefined) {
+						input.autocomplete({
+								source: judgeNames,
+								select: function(event, ui) {
+										var recipient_name = ui.item.value;
+										if (jQuery.inArray(recipient_name, scope.recipient_list) === -1) {
+												create_new_judge_notification_object(recipient_name);
+										}
+										$(this).val(''); // Clear input after selecting judge
+										event.preventDefault();
+								}
+						});
+					} else {
+						input.autocomplete('option', 'source', judgeNames); // Update autocomplete source	
+					}
+        }
+        
+        var parseJudgeNames = function(judgeList) {
+          var judgeNames = [];
+          angular.forEach(judgeList, function(judgeObj) {
+            judgeNames.push(judgeObj.judge.name);
+          });
+          return judgeNames;
+        }
 
         /*
          * Append an interactive DOM object above the Autocomplete Search Bar
@@ -477,8 +613,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         var send_all_checkbox = $("#send-all-checkbox");
         send_all_checkbox.click(function() {
             if (!this.checked) return;
-            for (var i = 0; i < scope.judge_list.length; i++) {
-                var name = scope.judge_list[i];
+            for (var i = 0; i < scope.judges.length; i++) {
+                var name = scope.judges[i].judge.name;
                 if (jQuery.inArray(name, scope.recipient_list) === -1)
                     create_new_judge_notification_object(name);
             }
@@ -499,7 +635,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 
   return {
-        link: link
+    restrict: 'A',
+    link: link
   };
 })
 

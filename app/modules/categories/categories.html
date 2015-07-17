@@ -5,7 +5,14 @@
     </div>
 
     <ul>
-        <button class="btn btn-lg btn-success" id="add-category-btn" ng-click="changeCategoryModalView('create')">
+        <button class="btn btn-lg btn-success" 
+                id="add-category-btn" 
+                ng-click="changeCategoryModalView('create')"
+                custom-popover
+                 popover-content="{{hints['addCategory'].content}}" 
+                 popover-placement="{{hints['addCategory'].placement}}"
+                 popover-toggle="{{hints['destroyItem'].enabled}}"
+                 popover-disable="disableSignleHint(key)">
             <span class="glyphicon glyphicon-plus"></span> Add Category
         </button>
     </ul>
@@ -24,12 +31,18 @@
         </div>
         <div ng-switch on="currentView">
             <div ng-switch-default 
-                ng-style="specialCategoryShow">
+                 ng-style="specialCategoryShow">
                 <li class="droppable-category destroy-special-category" 
                     cng-special-droppable-category
                     delete-item="$parent.deleteItem(itemId)"
                     remove-item="$parent.removeItemFromCategory(itemId)">
-                    <a class="btn" href="javascript:void(0)">
+                    <a class="btn" 
+                       href="javascript:void(0)"
+                       custom-popover
+                       popover-content="{{hints['destroyItem'].content}}" 
+                       popover-placement="{{hints['destroyItem'].placement}}"
+                       popover-toggle="{{hints['destroyItem'].enabled}}"
+                       popover-disable="disableSignleHint(key)">
                         <div>
                             <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
                             <span>Drag item here to destroy.</span>
@@ -46,7 +59,13 @@
                     cng-special-droppable-category
                     delete-item="$parent.deleteItem(itemId)"
                     remove-item="$parent.removeItemFromCategory(itemId)">
-                    <a class="btn" href="javascript:void(0)">
+                    <a class="btn"
+                       href="javascript:void(0)"
+                       custom-popover
+                       popover-content="{{hints['destroyItem'].content}}" 
+                       popover-placement="{{hints['destroyItem'].placement}}"
+                       popover-toggle="{{hints['destroyItem'].enabled}}"
+                       popover-disable="disableSignleHint(key)">
                         <div>
                             <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
                             <span>Drag item here to destroy.</span>
@@ -63,7 +82,13 @@
                     cng-special-droppable-category
                     delete-item="$parent.deleteItem(itemId)"
                     remove-item="$parent.removeItemFromCategory(itemId)">
-                    <a class="btn" href="javascript:void(0)">
+                    <a class="btn"
+                       href="javascript:void(0)"
+                       custom-popover
+                       popover-content="{{hints['destroyItem'].content}}" 
+                       popover-placement="{{hints['destroyItem'].placement}}"
+                       popover-toggle="{{hints['destroyItem'].enabled}}"
+                       popover-disable="disableSignleHint(key)">
                         <div>
                             <div><u>Destroy</u> <i class="glyphicon glyphicon-fire"></i></div>
                             <span>Drag item here to destroy.</span>
@@ -74,7 +99,13 @@
                     cng-special-droppable-category
                     delete-item="$parent.deleteItem(itemId)"
                     remove-item="$parent.removeItemFromCategory(itemId)">
-                    <a class="btn" href="javascript:void(0)">
+                    <a class="btn" 
+                       href="javascript:void(0)"
+                       custom-popover
+                       popover-content="{{hints['removeItem'].content}}" 
+                       popover-placement="{{hints['removeItem'].placement}}"
+                       popover-toggle="{{hints['removeItem'].enabled}}"
+                       popover-disable="disableSignleHint(key)">
                         <div>
                             <div><u>Remove</u> <i class="glyphicon glyphicon-scissors"></i></div>
                             <span>Drag item here to remove<br />from current category</span>
@@ -86,14 +117,27 @@
             </div>
         </div>  
         <li class="droppable-category">
-            <a class="btn" style="background-color: {{uncategorized.color}}" ng-click="viewCategoryDetails(uncategorized)">
+            <a class="btn" 
+               style="background-color: {{uncategorized.color}}" 
+               ng-click="viewCategoryDetails(uncategorized)"
+               custom-popover
+               popover-content="{{hints['uncategorized'].content}}" 
+               popover-placement="{{hints['uncategorized'].placement}}"
+               popover-toggle="{{hints['uncategorized'].enabled}}"
+               popover-disable="disableSignleHint(key)">
                 <div>
                     <div><u>{{uncategorized.label}}</u></div>
                     <span>{{uncategorized.teams.length}} Teams</span>
                 </div>
             </a>
         </li>
-        <div ng-repeat="category in categories | orderBy: '+label'" ng-if="category.label != 'Uncategorized'">
+        <div ng-repeat="category in categories | orderBy: '+label'" 
+             ng-if="category.label != 'Uncategorized'"
+             custom-popover
+             popover-content="{{hints['category'].content}}" 
+             popover-placement="{{hints['category'].placement}}"
+             popover-toggle="{{hints['uncategorized'].enabled}}"
+             popover-disable="disableSignleHint(key)">
             <li class="droppable-category" 
                 cng-droppable-category 
                 category-id="{{category.id}}"
@@ -108,7 +152,13 @@
                     </h3>
                     <div>
                         <div><u>{{category.label}}</u></div>
-                        <span>{{category.teams.length}} Teams</span>
+                        <div class="catSubText">{{category.teams.length}} Teams</div>
+                        <div class="catSubText" ng-if="category.rubric">
+                            Rubric: {{category.rubric.name}}
+                        </div>
+                        <div class="catSubText" ng-if="!category.rubric">
+                            Rubric: none
+                        </div>
                     </div>
                 </a>
             </li>
