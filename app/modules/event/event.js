@@ -232,55 +232,63 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 'JudgeManagementService', 'JudgmentRESTService', 'TeamManagementService',
-	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgmentRESTService, TeamManagmentService) {
+.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 'JudgeManagementService', 'JudgmentRESTService', 'RubricRESTService', 'TeamManagementService',
+	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgmentRESTService, RubricRESTService, TeamManagmentService) {
 	return function($scope) {
-      var authHeader = CurrentUserService.getAuthHeader();
+        var authHeader = CurrentUserService.getAuthHeader();
 
-		  var service = {};
+		var service = {};
 
-		  service.init =  function() {
-      var authHeader = CurrentUserService.getAuthHeader();
-      var eventId = sessionStorage.getObject('selected_event').id;
+		service.init =  function() {
+            var authHeader = CurrentUserService.getAuthHeader();
+            var eventId = sessionStorage.getObject('selected_event').id;
 
-			var categoryManagementService = CategoryManagementService($scope);
-			categoryManagementService.getCategories();
+        	var categoryManagementService = CategoryManagementService($scope);
+        	categoryManagementService.getCategories();
 
-      var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-      teamManagmentService.getTeams().then(function() {
-          service.getJudgmentsOfAllTeams();
-      });
+            var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+            teamManagmentService.getTeams().then(function() {
+              service.getJudgmentsOfAllTeams();
+            });
 
-      var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-      judgeManagementService.getJudges().then(function() {
-          service.getJudgmentsByAllJudges();
-      });
+            var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+            judgeManagementService.getJudges().then(function() {
+                service.getJudgmentsByAllJudges().then(function(resp) {
+                    sessionStorage.putObject('judgeJudgments', resp);
+                });
+            });
 
-			$scope.$watch(function() {
-				return sessionStorage.getObject('categories');
-			}, function(newValue) {
-				$scope.categories = newValue;
-			}, true);
+    		$scope.$watch(function() {
+    			return sessionStorage.getObject('categories');
+    		}, function(newValue) {
+    			$scope.categories = newValue;
+    		}, true);
 
-			$scope.$watch(function() {
-					return sessionStorage.getObject('teams');
-			}, function(newValue) {
-					$scope.teams = newValue;
-			}, true);
+    		$scope.$watch(function() {
+    				return sessionStorage.getObject('teams');
+    		}, function(newValue) {
+    				$scope.teams = newValue;
+    		}, true);
 
-			$scope.$watch(function() {
-					return sessionStorage.getObject('judges');
-			}, function(newValue) {
-					$scope.judges = newValue;
-			}, true);
+    		$scope.$watch(function() {
+    				return sessionStorage.getObject('judges');
+    		}, function(newValue) {
+    				$scope.judges = newValue;
+    		}, true);
 
-			$scope.$watch(function() {
-					return sessionStorage.getObject('selected_event');
-			}, function(newValue) {
-					$scope.selectedEvent = newValue;
-			}, true);
+    		$scope.$watch(function() {
+    				return sessionStorage.getObject('selected_event');
+    		}, function(newValue) {
+    				$scope.selectedEvent = newValue;
+    		}, true);
 
-			sessionStorage.put('categoryInc', '0');
+            $scope.$watch(function() {
+                return sessionStorage.getObject('judgeJudgments');
+            }, function(newValue) {
+                $scope.judgeJudgments = newValue;
+            }, true);
+
+    		sessionStorage.put('categoryInc', '0');
 		}
 
         service.getJudgmentsByAllJudges = function() {
@@ -290,7 +298,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             var eventId = sessionStorage.getObject('selected_event').id;
             var promises = [];
             for (var i = 0; i < judges.length; i++) {
-                promises.push(service.getJudgmentsByJudge(eventId, judges[i].id));
+                promises.push(service.getJudgmentsByJudge(eventId, judges[i]));
             }
 
             $q.all(promises).then(function(resp) {
@@ -303,15 +311,82 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             return defer.promise;
         }
 
-        service.getJudgmentsByJudge = function(eventId, judgeId) {
+        service.getJudgmentsByJudge = function(eventId, judgeObj) {
             var defer = $q.defer();
-            JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeId}).$promise.then(function(resp) {
-                defer.resolve(resp);
+            JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeObj.id}).$promise.then(function(resp) {
+                if (resp.length > 0) {
+                    service.determineCompletedTeamsByJudge(judgeObj.id, resp).then(function(filledJudgments) {
+                        var judgeJudgments = {judge: judgeObj.judge, judgments: filledJudgments};
+                        defer.resolve(judgeJudgments);
+                    });
+                } else {
+                    defer.resolve({judge: judgeObj.judge, judgments: null});
+                }
             }).catch(function() {
                 defer.reject();
             });
 
             return defer.promise;
+        }
+
+        service.determineCompletedTeamsByJudge = function(id, judgments) {
+            var defer = $q.defer();
+            var rubricRESTService = RubricRESTService(authHeader);
+
+            var promises = [];
+            // Makes a mapping of rubric Ids to number of criteria in the rubric.
+            // Used to determine whether a judge has completed judging a specific team.
+            var seenRubrics = [];
+            for (var i = 0; i < judgments.length; i++) {
+                if (seenRubrics.indexOf(judgments[i].rubric.id) == -1) {
+                    seenRubrics.push(judgments[i].rubric.id);
+                    promises.push(getNumCriteriaInRubric(judgments[i].rubric.id));
+                }
+            }
+
+            $q.all(promises).then(function(rubricNumCriteriaMapping) {
+                // This makes a mapping of {teamId : numOfJudgments} for that team for a judge.
+                var judgedTeams = [];
+                var seenTeams = [];
+                for (var i = 0; i < judgments.length; i++) {
+                    var index = seenTeams.indexOf(judgments[i].team.id);
+                    if (index != -1) {
+                        judgedTeams[index].submitedCriteria++;
+                        if (judgedTeams[index].submitedCriteria = judgedTeams[index].totalCriteria) {
+                            judgedTeams[index].completed = true;
+                        }
+                    } else {
+                        seenTeams.push(judgments[i].team.id);
+                        var numCriteria;
+                        for (var j = 0; j < rubricNumCriteriaMapping.length; j++) {
+                            if (judgments[i].rubric.id == rubricNumCriteriaMapping[j].rubricId) {
+                                numCriteria = rubricNumCriteriaMapping[j].numCriteria;
+                            }
+                        }
+                        judgedTeams.push({
+                            completed: false,
+                            submitedCriteria: 1,
+                            totalCriteria: numCriteria,
+                            team: judgments[i].team,
+                        });
+                    }
+                }
+                defer.resolve(judgedTeams);
+            });
+
+            return defer.promise;
+
+            function getNumCriteriaInRubric(rId, rubricNumCriteriaMapping) {
+                var defer = $q.defer();
+                rubricRESTService.rubric.get({id: rId}).$promise.then(function(resp) {
+                    defer.resolve({rubricId: rId, numCriteria: resp.criteria.length});
+                }).catch(function() {
+                    defer.reject();
+                    console.log('Error getting rubric');
+                });
+
+                return defer.promise;
+            }
         }
 
         service.getJudgmentsOfAllTeams = function() {
