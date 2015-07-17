@@ -69,15 +69,21 @@
               <div class="col col-sm-7">
                 <div class="row">
                   <span class="col col-sm-6 col-lg-5">
-                    <div class="progress">
+                    <!-- <div class="progress">
                       <div class="progress-bar progress-bar-success" role="progressbar"
                         aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
                         <span class="progress-value">40% overall progress</span>
                       </div>
-                    </div>
+                    </div> -->
+                    <progressbar max="100"
+                                value="determineOverallJudgeProgress(judgeJudgments)[2]"
+                                class="progress-striped"
+                                type="success">
+                    <span>{{determineOverallJudgeProgress(judgeJudgments)[2]}}%</span>
+                  </progressbar>
                   </span>
                   <span class="col col-sm-6 col-md-6 col-lg-6">
-                    <span style="float: left">32/45 project assignments completed</span>
+                    <span style="float: left">{{determineOverallJudgeProgress(judgeJudgments)[0]}}/{{determineOverallJudgeProgress(judgeJudgments)[1]}} team assignments completed</span>
                   </span>
                 </div>
               </div>

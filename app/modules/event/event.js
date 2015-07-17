@@ -276,13 +276,31 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 $scope.event.current_view = view;
             }
         });
-        $scope.event.current_view = sessionStorage.get('event_view');
 
         /** DASHBOARD RELATED **/
         $scope.judgeOrderReverse = true;
+        $scope.judgeAssignmentCount = 0;
+        $scope.judgeCompletedCount = 0;
 
         $scope.orderByCompletion = function(judgeJudgment) {
             return parseInt(judgeJudgment.completion);
+        }
+
+        $scope.determineOverallJudgeProgress = function(judgeJudgments) {
+            var teamCount = 0;
+            var completedTeamCount = 0;
+            for (var i = 0; i < judgeJudgments.length; i++) {
+                for (var j = 0; j < judgeJudgments[i].judgments.length; j++) {
+                    if (judgeJudgments[i].judgments[j].completed) {
+                        completedTeamCount++;
+                    }
+                }
+                teamCount += judgeJudgments[i].judgments.length;
+                teamCount += judgeJudgments[i].theUnjudged.length;
+            }
+            $scope.judgeAssignmentCount = teamCount;
+            $scope.judgeCompletedCount = completedTeamCount;
+            return [completedTeamCount, teamCount, Math.floor(completedTeamCount/teamCount * 100)];
         }
     }
 ])
