@@ -1,6 +1,6 @@
-  <div ng-switch on="event.current_view">
+  <div ng-switch on="isEventRunning()">
 
-    <div ng-switch-when="event_ready_view">
+    <div ng-switch-when="false">
       <div class="container-fluid">
         <div class="row">
           <h1>Event Dashboard: <span ng-bind="getSelectedEvent().name"></h1>
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div ng-switch-when="event_in_progress_view">
+    <div ng-switch-when="true">
 
       <div class="container-fluid">
         <div class="row">

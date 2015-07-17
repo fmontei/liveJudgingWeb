@@ -15,8 +15,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     });
 }])
 
-.run(['sessionStorage', function(sessionStorage) {
-    sessionStorage.put("event_view", undefined);
+.run(['EventUtilService', 'sessionStorage', function(EventUtilService, sessionStorage) {
+    if (EventUtilService.isEventRunning(sessionStorage.getObject('selected_event'))) {
+        sessionStorage.put('event_view', EventUtilService.views.EVENT_IN_PROGRESS_VIEW);
+    } else {
+        sessionStorage.put('event_view', EventUtilService.views.EVENT_READY_VIEW);
+    }
 }])
 
 .controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
@@ -190,6 +194,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             return sessionStorage.getObject('selected_event');
         };
 
+        $scope.isEventRunning = function() {
+            return EventUtilService.isEventRunning();
+        };
+
         $scope.editEvent = function() {
             $location.path('/eventEdit');
         };
@@ -210,13 +218,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, updatedEvent).$promise.then(function(resp) {
                 console.log(resp);
                 sessionStorage.putObject('selected_event', resp);
+                var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
+                sessionStorage.put('event_view', view);
+                $scope.event.current_view = view;
+                console.log("Event started.");
             }).catch(function() {
                 console.log('Error updating event times');
             });
-            var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
-            sessionStorage.put('event_view', view);
-            $scope.event.current_view = view;
-            console.log("Event started.");
         };
 
         $scope.reveal_event_desc = function(desc) {
@@ -256,14 +264,21 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
           }
         }
 
-        // Decides whether an event is in progress or not whenever /event is hit.
-        if (EventUtilService.isEventRunning($scope.getSelectedEvent())) {
-            var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
-        } else {
-            var view = EventUtilService.views.EVENT_READY_VIEW;
-        }
-        sessionStorage.put('event_view', view);
-        $scope.event.current_view = view;
+        $scope.$on('$locationChangeStart', function(event, next, current) {
+            if ($location.path() !== '/event') {
+                // Decides whether an event is in progress or not whenever /event is hit.
+                if (EventUtilService.isEventRunning(sessionStorage.getObject('selected_event'))) {
+                    console.log('hi');
+                    var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
+                } else {
+                    console.log('bye');
+                    var view = EventUtilService.views.EVENT_READY_VIEW;
+                }
+                sessionStorage.put('event_view', view);
+                $scope.event.current_view = view;
+            }
+        });
+        $scope.event.current_view = sessionStorage.get('event_view');
 
         /** DASHBOARD RELATED **/
         $scope.judgeOrderReverse = true;
@@ -534,9 +549,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         setEventView: function(view) {
             sessionStorage.put('event_view', view);
         },
-        isEventRunning: function(event) {
-            var startDateTime = new Date(Date.parse(event.start_time));
-            if (startDateTime <= Date()) {
+        isEventRunning: function() {
+            var event = sessionStorage.getObject('selected_event');
+            var startDateTime = Date.parse(event.start_time);
+            var endDateTime = Date.parse(event.end_time);
+            if (startDateTime <= Date.now() && endDateTime >= Date.now()) {
                 sessionStorage.put("event" + event.id + "_running", "true");
                 return true;
             } else {
