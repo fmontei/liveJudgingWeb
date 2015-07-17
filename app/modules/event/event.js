@@ -19,9 +19,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     sessionStorage.put("event_view", undefined);
 }])
 
-.controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function(sessionStorage, $location, $scope, CurrentUserService, EventService, EventUtilService) {
-        EventService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
+.controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
+    function(sessionStorage, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
+        EventRESTService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
             console.log('Successfully retrieved events from server.');
             $scope.eventList = resp;
         }).catch(function(error) {
@@ -47,8 +47,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventService, EventUtilService) {
+.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
+    function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
         $scope.isCreation = sessionStorage.getObject('selected_event') ? false : true;
 
         $scope.datePicker = {
@@ -72,7 +72,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             }
 
             if ($scope.isCreation) {
-                EventService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
+                EventRESTService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
                     sessionStorage.putObject('selected_event', resp);
                     EventUtilService.setEventView(EventUtilService.views.EVENT_READY_VIEW);
                     $location.path('/event');
@@ -82,7 +82,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 });
             } else {
                 var eventId = sessionStorage.getObject('selected_event').id;
-                EventService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq).$promise.then(function(resp) {
+                EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq).$promise.then(function(resp) {
                     sessionStorage.putObject('selected_event', resp);
                     $location.path('/event');
                 }).catch(function() {
@@ -169,8 +169,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
-    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService,
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
+    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventRESTService, EventUtilService,
 						 TeamRESTService, TeamStandingService) {
 
 		var teamStandingService = TeamStandingService($scope);
@@ -195,6 +195,24 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         };
 
         $scope.beginEvent = function() {
+            var curEvent = sessionStorage.getObject('selected_event');
+            var eventId = curEvent.id;
+            var eventDuration = Date.parse(curEvent.end_time) - Date.parse(curEvent.start_time);
+            var newStartTime = Date.now();
+            var newEndTime = newStartTime + eventDuration;
+
+            var updatedEvent = {
+                    name: curEvent.name,
+                    start_time: $filter('date')(newStartTime, 'yyyy-MM-dd HH:mm:ss'),
+                    end_time: $filter('date')(newEndTime, 'yyyy-MM-dd HH:mm:ss'),
+                    location: curEvent.location
+            };
+            EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, updatedEvent).$promise.then(function(resp) {
+                console.log(resp);
+                sessionStorage.putObject('selected_event', resp);
+            }).catch(function() {
+                console.log('Error updating event times');
+            });
             var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
             sessionStorage.put('event_view', view);
             $scope.event.current_view = view;
@@ -530,7 +548,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     return service;
 })
 
-.factory('EventService', function($resource, CurrentUserService) {
+.factory('EventRESTService', function($resource, CurrentUserService) {
     return function(authHeader) {
         return {
             events: $resource('http://api.stevedolan.me/events', {}, {
@@ -540,7 +558,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 },
                 get: {
                     method: 'GET',
-										isArray: true,
+					isArray: true,
                     headers: authHeader
                 }
             }),

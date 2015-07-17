@@ -111,31 +111,33 @@
             <div class="beneath-tab" id="judge-progress-section">
 
               <!-- sorter / expand & collapse buttons -->
-              <span style="margin-right: 20px">Sort direction:</span>
-              <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                  Order <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu clickable" role="menu">
-                  <li><a ng-click="judgeOrderReverse = false">Ascending</a></li>
-                  <li><a ng-click="judgeOrderReverse = true">Descending</a></li>
-                </ul>
-              </div>
-              <span class="badge" style="margin-left: 20px">{{judges.length}}</span>
-              <div style="float: right">
-                <expand-all-accordions>
-                  <button class="btn btn-default expand-all-accordions judge">
-										Expand all 
-										<span class="glyphicon glyphicon-resize-full"></span>
+              <div style="margin-bottom: 5px">
+                <span style="margin-right: 20px">Sort direction:</span>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    Order <span class="caret"></span>
                   </button>
-                </expand-all-accordions>
-                <collapse-all-accordions>
-                  <button class="btn btn-default collapse-all-accordions judge">
-										Collapse all 
-										<span class="glyphicon glyphicon-resize-small"></span>
-                  </button>
-                </collapse-all-accordions>
-              </div>
+                  <ul class="dropdown-menu clickable" role="menu">
+                    <li><a ng-click="judgeOrderReverse = false">Ascending</a></li>
+                    <li><a ng-click="judgeOrderReverse = true">Descending</a></li>
+                  </ul>
+                </div>
+                <span class="badge" style="margin-left: 20px">{{judges.length}}</span>
+                <div style="float: right">
+                  <expand-all-accordions>
+                    <button class="btn btn-default expand-all-accordions judge">
+  										Expand all 
+  										<span class="glyphicon glyphicon-resize-full"></span>
+                    </button>
+                  </expand-all-accordions>
+                  <collapse-all-accordions>
+                    <button class="btn btn-default collapse-all-accordions judge">
+  										Collapse all 
+  										<span class="glyphicon glyphicon-resize-small"></span>
+                    </button>
+                  </collapse-all-accordions>
+                </div>
+              </div >
 
               <!--Judge Panels-->
               <div ng-repeat="judgeJudgment in judgeJudgments | orderBy:orderByCompletion:judgeOrderReverse"
