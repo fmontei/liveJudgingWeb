@@ -139,8 +139,8 @@
 
               <!--Judge Panels-->
               <div ng-repeat="judgeJudgment in judgeJudgments | orderBy:orderByCompletion:judgeOrderReverse">
-                <div class="accordion judge-accordion">
-                  <div class="panel panel-primary accordion-group">
+                <div class="accordion">
+                  <div class="panel judge-accordion accordion-group">
 
                     <div class="panel-heading" style="height: 60px">
                       <div class="row">
@@ -186,13 +186,13 @@
                           </div>
                         </span>
                         <span class="col col-sm-2 col-md-2 col-lg-2 pull-right projects-judged-text">
-                          {{judgeJudgment.numCompletedTeams}}/{{judgeJudgment.numAssignedTeams}} Projects Judged
+                          {{judgeJudgment.numCompletedTeams}}/{{judgeJudgment.numAssignedTeams}} Teams Judged
                         </span>
                       </div>
                     </div>
 
                     <div id="judge{{$index}}" class="accordion-body collapse judge">
-                      <div class="accordion-inner">
+                      <div class="judge-accordion-inner" style="background-color: white; color: black">
                         <div class="panel-body">
 
                           <!--List of judge's completed teams-->

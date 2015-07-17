@@ -123,7 +123,14 @@ a.team-pic span.completed {
 }
 
 .judge-accordion {
-	padding-top: 20px;
+  background-color: #339494;
+  margin-bottom: 5px;
+  color: #fff !important;
+}
+
+judge-accordion-inner {
+  background-color: #fff !important;
+  color: #000 !important;
 }
 
 .judge-col {
@@ -131,7 +138,7 @@ a.team-pic span.completed {
 }
 
 .judge-heading-text {
-	width: 90%; 
+	width: 90%;
 	overflow: hidden;
 }
 
