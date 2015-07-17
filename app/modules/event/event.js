@@ -218,7 +218,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				$scope.recipientList = []; // Contains list of judges to be notified
         
         $scope.initRecipientList = function(judgeObj) {
-					$scope.recipientList.push(judgeObj.judge.name);
+					$scope.$broadcast('firstRecipientAdded', judgeObj.judge.name);
         }
 
         // Decides whether an event is in progress or not whenever /event is hit.
@@ -538,14 +538,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             updateAutoComplete();
 					}
         }, true);
-      
-        scope.$watchCollection(function() {
-          return scope.recipientList;
-        }, function(newValue) {
-					if (newValue[0] !== undefined)
-						create_new_judge_notification_object(newValue[0]);
-        });
-      
+			
+				scope.$on('firstRecipientAdded', function (event, data) {
+					if (data)
+						create_new_judge_notification_object(data);
+				});
+
         var updateAutoComplete = function() {
 					var input = $('#judge-search');
           var judgeNames = parseJudgeNames();
@@ -579,6 +577,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
          * Append an interactive DOM object above the Autocomplete Search Bar
          */
         function create_new_judge_notification_object(name) {
+						scope.recipientList.push(name);
             var recipient_div = $("#recipients-div");
             recipient_div.append("<div class='recipient'>" + name +
                 "&nbsp;&nbsp;<span class='glyphicon glyphicon-remove'></span></div>");
