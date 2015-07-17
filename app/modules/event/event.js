@@ -316,7 +316,22 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeObj.id}).$promise.then(function(resp) {
                 service.determineCompletedTeamsByJudge(judgeObj.id, resp).then(function(resp2) { //great variable naming skills
                     service.determineUnstartedTeamsByJudge(judgeObj.id, resp2).then(function(resp3) {
-                        var judgeJudgments = {judge: judgeObj.judge, judgments: resp2, theUnjudged: resp3};
+                        var completedTeamCount = 0;
+                        for (var i = 0; i < resp2.length; i++) {
+                            if (resp2[i].completed) {
+                                completedTeamCount++;
+                            }
+                        }
+                        var assignedTeamsCount = resp2.length + resp3.length;
+                        var percentCompleted = Math.floor((completedTeamCount / assignedTeamsCount) * 100);
+                        var judgeJudgments = {
+                            judge: judgeObj.judge,
+                            judgments: resp2,
+                            theUnjudged: resp3,
+                            completion: percentCompleted,
+                            numCompletedTeams: completedTeamCount,
+                            numAssignedTeams: assignedTeamsCount
+                        };
                         defer.resolve(judgeJudgments);
                     })
                 });
@@ -328,7 +343,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         }
 
         service.determineCompletedTeamsByJudge = function(id, judgments) {
-            //console.log(judgments);
             var defer = $q.defer();
 
             if (judgments.length == 0) {
@@ -375,7 +389,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                             });
                         }
                     }
-                    console.log(judgedTeams);
                     defer.resolve(judgedTeams);
                 });
             }
