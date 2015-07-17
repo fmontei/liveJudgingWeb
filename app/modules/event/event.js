@@ -214,9 +214,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					else
 						sessionStorage.put('categoryInc', categoryInc);
 				}
-				
+
 				$scope.recipientList = []; // Contains list of judges to be notified
-        
+
         $scope.initRecipientList = function(judgeObj) {
 					$scope.$broadcast('firstRecipientAdded', judgeObj.judge.name);
         }
@@ -231,12 +231,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.event.current_view = view;
 
         /** DASHBOARD RELATED **/
-        $scope.judgeOrder = 'asc';
+        $scope.judgeOrderReverse = true;
 
         $scope.orderByCompletion = function(judgeJudgment) {
-            if ($scope.judgeOrder = 'desc') {
-                return -1 * parseInt(judgeJudgment.completion);
-            }
             return parseInt(judgeJudgment.completion);
         }
     }
