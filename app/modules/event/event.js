@@ -481,14 +481,23 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 .directive('expandAllAccordions', function() {
   return {
     link: function(scope, elem, attrs) {
-      $('.expand-all-accordions.judge').unbind().click(function() {
-        $('.accordion-body.judge').collapse('show');
+			$('.expand-all-accordions.judge').unbind().click(function() {
+				var judgeAccordion = $('.judge-accordion');
+        judgeAccordion.find('.accordion-body').collapse('show');
+				judgeAccordion.find('.accordion-toggle i')
+					.removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
       });
-      $('.expand-all-accordions.project').unbind().click(function() {
-        $('.accordion-body.project').collapse('show');
+      $('.expand-all-accordions.team').unbind().click(function() {
+        var teamAccordion = $('.team-accordion');
+        teamAccordion.find('.accordion-body').collapse('show');
+				teamAccordion.find('.accordion-toggle i')
+					.removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
       });
       $('.expand-all-accordions.category').unbind().click(function() {
-        $('.accordion-body.category').collapse('show');
+        var catAccordion = $('.category-accordion');
+        catAccordion.find('.accordion-body').collapse('show');
+				catAccordion.find('.accordion-toggle i')
+					.removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
       });
     }
   }
@@ -498,38 +507,30 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   return {
     link: function(scope, elem, attrs) {
       $('.collapse-all-accordions.judge').unbind().click(function() {
-        $('.accordion-body.judge').collapse('hide');
+				var judgeAccordion = $('.judge-accordion');
+        judgeAccordion.find('.accordion-body').collapse('hide');
+				judgeAccordion.find('.accordion-toggle i')
+					.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
       });
-      $('.collapse-all-accordions.project').unbind().click(function() {
-        $('.accordion-body.project').collapse('hide');
+      $('.collapse-all-accordions.team').unbind().click(function() {
+        var teamAccordion = $('.team-accordion');
+        teamAccordion.find('.accordion-body').collapse('hide');
+				teamAccordion.find('.accordion-toggle i')
+					.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
       });
       $('.collapse-all-accordions.category').unbind().click(function() {
-        $('.accordion-body.category').collapse('hide');
+        var catAccordion = $('.category-accordion');
+        catAccordion.find('.accordion-body').collapse('hide');
+				catAccordion.find('.accordion-toggle i')
+					.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
       });
     }
   }
 })
 
-.directive('changeAccordionChevron', function() {
-  return {
-        link: function(scope, elem, attrs) {
-            $(".accordion-toggle").unbind().click(function(event) {
-                var span = $(this).find("span");
-                if (span.hasClass("glyphicon-chevron-right"))
-                    span.removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-                else
-                    span.removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-            });
-        }
-  };
-})
-
 .directive('notificationModal', ['sessionStorage', function(sessionStorage) {
 
     var link = function(scope, elem, attrs) {
-        /*
-         * Initialize the Autocomplete Object for the Notification Modal
-         */
         scope.$watch(function() {
           return sessionStorage.getObject('judges');   
         }, function(newJudgeList) {
@@ -544,6 +545,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 						create_new_judge_notification_object(data);
 				});
 
+				/*
+         * Initialize the Autocomplete Object for the Notification Modal
+         */
         var updateAutoComplete = function() {
 					var input = $('#judge-search');
           var judgeNames = parseJudgeNames();
@@ -561,7 +565,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 								}
 						});
 					} else {
-						input.autocomplete('option', 'source', judgeNames); // Update autocomplete source	
+							input.autocomplete('option', 'source', judgeNames); // Update autocomplete source	
 					}
         }
         
@@ -587,7 +591,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 if ($(this).parent().html().indexOf(name) >= 0) {
                     /* Remove recipient from list if 'x' is clicked */
                     scope.recipientList = scope.recipientList.filter(function(elem) {
-                         return elem != name;
+												return elem != name;
                     });
                     /* Destroy HTML element */
                     $(this).parent().remove();
@@ -643,21 +647,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         link: function(scope, elm, attrs) {
             $("#datepicker-start").datepicker();
             $("#datepicker-end").datepicker();
-        }
-  };
-})
-
-.directive('amPmWidget', function() {
-    return {
-        link: function(scope, elm, attrs) {
-            $("#am-pm-start").bootstrapSwitch({
-                onText: 'am',
-                offText: 'pm'
-            });
-            $("#am-pm-end").bootstrapSwitch({
-                onText: 'am',
-                offText: 'pm'
-            });
         }
   };
 })
