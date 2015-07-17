@@ -159,32 +159,19 @@
                             </div>
                           </div>
                         </span>
-                        <!-- Show notification hint for first bell glyphicon only -->
                         <span class="col-sm-1 col-md-1 col-lg-1"
-                              ng-if="$index === 0"
-                              custom-popover
-                              popover-content="{{hints['notify'].content}}" 
-                              popover-placement="{{hints['notify'].placement}}"
-                              popover-toggle="{{hints['notify'].enabled}}">
-                          <button type="button" 
-                                  class="btn btn-primary notification-btn" 
-                                  data-toggle="modal" 
-                                  data-target="#notification-modal"
-                                  ng-click="initRecipientList(judgeObj)">
-                            <span class="glyphicon glyphicon-bell"></span>
-                          </button>
-                        </span>
-                        <!-- Otherwise, just show the bell glyphicon -->
-                        <span class="col-sm-1 col-md-1 col-lg-1"
-                              ng-if="$index > 0">
-                          <button type="button" 
-                                  class="btn btn-primary notification-btn" 
-                                  data-toggle="modal" 
-                                  data-target="#notification-modal"
-                                  ng-click="initRecipientList(judgeObj)">
-                            <span class="glyphicon glyphicon-bell"></span>
-                          </button>
-                        </span>
+															custom-popover
+															popover-content="{{hints['notify'].content}}" 
+															popover-placement="{{hints['notify'].placement}}"
+															popover-toggle="{{hints['notify'].enabled}}">
+													<button type="button" 
+																	class="btn btn-primary notification-btn" 
+																	data-toggle="modal" 
+																	data-target="#notification-modal"
+																	ng-click="$parent.initRecipientList(judgeObj)">
+														<span class="glyphicon glyphicon-bell"></span>
+													</button>
+												</span>
                         <span class="col-sm-6 col-md-6 col-lg-6">
                           <div class="progress inline">
                             <span class="progress-value">40%</span>
@@ -617,7 +604,7 @@
 </div> <!--Event Ctrl-->
 
 <!--Judge Notification Modal-->
-<div notification-modal>
+<div notification-modal recipient-list="recipientList">
   <div class="modal fade" 
        id="notification-modal" 
        tabindex="-1" 
@@ -633,11 +620,6 @@
           <h4 class="modal-title" id="notification-modal-label">Send Notification</h4>
         </div>
         <div class="modal-body">
-        	<div class="alert alert-info">
-        		<p>To send a notification to multiple judges, type their names into the search box.
-        			 The first judge has been automatically added.
-        		</p>
-        	</div>
           <div class="row">
             <div class="col col-sm-3">
               Recipients:
@@ -672,7 +654,14 @@
           <div class="row">
             <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Send</button></span>
             <span class="col col-sm-2"></span>
-            <span class="col col-sm-5"><button type="button" class="btn btn-failure pull-left" data-dismiss="modal">Cancel</button></span>
+            <span class="col col-sm-5">
+            	<button id="cancel-notification-btn"
+           						type="button" 
+            					class="btn btn-failure pull-left"
+            					data-dismiss="modal">
+            		Cancel
+							</button>
+						</span>
           </div>
         </div>
       </div>

@@ -214,20 +214,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					else
 						sessionStorage.put('categoryInc', categoryInc);
 				}
+				
+				$scope.recipientList = []; // Contains list of judges to be notified
         
         $scope.initRecipientList = function(judgeObj) {
-          $scope.first_recipient = judgeObj.judge.name;
-        }
-
-        $scope.recipient_list = []; // Contains list of judges to be notified
-        $scope.project_list = ["Sample Project 1", "Sample Project 2"];
-
-        $scope.times = [];
-        for (var i = 1; i <= 12; i++) {
-            for (var j = 0; j <= 45; j += 15) {
-                if (j == 0) $scope.times.push(i + ":" + j + j);
-                else $scope.times.push(i + ":" + j);
-            }
+					$scope.recipientList.push(judgeObj.judge.name);
         }
 
         // Decides whether an event is in progress or not whenever /event is hit.
@@ -271,23 +262,23 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				$scope.categories = newValue;
 			}, true);
 
-            $scope.$watch(function() {
-                return sessionStorage.getObject('teams');
-            }, function(newValue) {
-                $scope.teams = newValue;
-            }, true);
+			$scope.$watch(function() {
+					return sessionStorage.getObject('teams');
+			}, function(newValue) {
+					$scope.teams = newValue;
+			}, true);
 
-            $scope.$watch(function() {
-                return sessionStorage.getObject('judges');
-            }, function(newValue) {
-                $scope.judges = newValue;
-            }, true);
+			$scope.$watch(function() {
+					return sessionStorage.getObject('judges');
+			}, function(newValue) {
+					$scope.judges = newValue;
+			}, true);
 
-            $scope.$watch(function() {
-                return sessionStorage.getObject('selected_event');
-            }, function(newValue) {
-                $scope.selectedEvent = newValue;
-            }, true);
+			$scope.$watch(function() {
+					return sessionStorage.getObject('selected_event');
+			}, function(newValue) {
+					$scope.selectedEvent = newValue;
+			}, true);
 
 			sessionStorage.put('categoryInc', '0');
 		}
@@ -535,36 +526,39 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   };
 })
 
-.directive('notificationModal', function() {
+.directive('notificationModal', ['sessionStorage', function(sessionStorage) {
 
     var link = function(scope, elem, attrs) {
         /*
          * Initialize the Autocomplete Object for the Notification Modal
          */
-        scope.$watchCollection(function() {
-          return scope.judges;    
-        }, function(newJudgeList) {
-          if (newJudgeList)
-            updateAutoComplete(newJudgeList);
-        });
-      
         scope.$watch(function() {
-          return scope.first_recipient;
+          return sessionStorage.getObject('judges');   
+        }, function(newJudgeList) {
+          if (newJudgeList) { 
+						scope.judges = newJudgeList;
+            updateAutoComplete();
+					}
+        }, true);
+      
+        scope.$watchCollection(function() {
+          return scope.recipientList;
         }, function(newValue) {
-          if (newValue)
-          create_new_judge_notification_object(newValue);
+					console.log(newValue);
+					if (newValue[0] !== undefined)
+					create_new_judge_notification_object(newValue[0]);
         });
       
-        var updateAutoComplete = function(judgeList) {
+        var updateAutoComplete = function() {
 					var input = $('#judge-search');
-          var judgeNames = parseJudgeNames(judgeList);
+          var judgeNames = parseJudgeNames();
 					
 					if (input.data('ui-autocomplete') === undefined) {
 						input.autocomplete({
 								source: judgeNames,
 								select: function(event, ui) {
 										var recipient_name = ui.item.value;
-										if (jQuery.inArray(recipient_name, scope.recipient_list) === -1) {
+										if (jQuery.inArray(recipient_name, scope.recipientList) === -1) {
 												create_new_judge_notification_object(recipient_name);
 										}
 										$(this).val(''); // Clear input after selecting judge
@@ -576,9 +570,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					}
         }
         
-        var parseJudgeNames = function(judgeList) {
+        var parseJudgeNames = function() {
           var judgeNames = [];
-          angular.forEach(judgeList, function(judgeObj) {
+          angular.forEach(scope.judges, function(judgeObj) {
             judgeNames.push(judgeObj.judge.name);
           });
           return judgeNames;
@@ -591,13 +585,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             var recipient_div = $("#recipients-div");
             recipient_div.append("<div class='recipient'>" + name +
                 "&nbsp;&nbsp;<span class='glyphicon glyphicon-remove'></span></div>");
-            scope.recipient_list.push(name);
             clear_all_checkbox.attr("checked", false);
             /* Add listener to dynamically created HTML element */
             $(".recipient .glyphicon.glyphicon-remove").click(function() {
                 if ($(this).parent().html().indexOf(name) >= 0) {
                     /* Remove recipient from list if 'x' is clicked */
-                    scope.recipient_list = scope.recipient_list.filter(function(elem) {
+                    scope.recipientList = scope.recipientList.filter(function(elem) {
                          return elem != name;
                     });
                     /* Destroy HTML element */
@@ -615,7 +608,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             if (!this.checked) return;
             for (var i = 0; i < scope.judges.length; i++) {
                 var name = scope.judges[i].judge.name;
-                if (jQuery.inArray(name, scope.recipient_list) === -1)
+                if (jQuery.inArray(name, scope.recipientList) === -1)
                     create_new_judge_notification_object(name);
             }
             clear_all_checkbox.attr("checked", false);
@@ -629,16 +622,25 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             if (!this.checked) return;
             /* Use listener defined in create_new_judge_notification_object() to destroy */
             $(".recipient .glyphicon.glyphicon-remove").click();
-            scope.recipient_list.length = 0; // Clear recipient list
+            scope.recipientList.length = 0; // Clear recipient list
             send_all_checkbox.attr("checked", false);
         });
+				
+				// Clear recipient objects upon modal close
+				elem.find('#cancel-notification-btn').click(function() {
+					clear_all_checkbox.click();
+					scope.recipientList = [];
+				});
     }
 
   return {
     restrict: 'A',
+		scope: {
+			recipientList: '='
+		},
     link: link
   };
-})
+}])
 
 .directive('dateWidget', function() {
     return {
