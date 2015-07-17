@@ -137,7 +137,8 @@
              popover-content="{{hints['category'].content}}" 
              popover-placement="{{hints['category'].placement}}"
              popover-toggle="{{hints['uncategorized'].enabled}}"
-             popover-disable="disableSignleHint(key)">
+             popover-disable="disableSignleHint(key)"
+             popover-limit="{{$index === 0}}">
             <li class="droppable-category" 
                 cng-droppable-category 
                 category-id="{{category.id}}"

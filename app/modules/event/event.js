@@ -295,7 +295,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
             $q.all(promises).then(function(resp) {
                 defer.resolve(resp);
-                console.log(resp);
             }).catch(function() {
                 defer.reject();
                 console.log('Error getting judgments by judge ids');
@@ -327,7 +326,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
             $q.all(promises).then(function(resp) {
                 defer.resolve(resp);
-                console.log(resp);
             }).catch(function() {
                 defer.reject();
                 console.log('Error getting judgments by team ids');
@@ -544,9 +542,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         scope.$watchCollection(function() {
           return scope.recipientList;
         }, function(newValue) {
-					console.log(newValue);
 					if (newValue[0] !== undefined)
-					create_new_judge_notification_object(newValue[0]);
+						create_new_judge_notification_object(newValue[0]);
         });
       
         var updateAutoComplete = function() {

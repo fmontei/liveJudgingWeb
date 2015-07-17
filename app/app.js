@@ -183,6 +183,16 @@ angular.module('liveJudgingAdmin', [
         },
         link: function(scope, elem, attrs) {
             elem.data('isTransferable', scope.isTransferable === 'true');
+						elem.bind('mouseenter', function() {
+							elem.data('isDragged', true);
+						});
+						elem.bind('mouseleave', function() {
+							elem.data('isDragged', false);
+							$timeout(function() {
+								if (!elem.data('isDragged'))
+									elem.goBack();
+							}, 3000);
+						});
             elem.draggable({
 								containment: 'document',
                 cursor: 'grab',
@@ -201,10 +211,6 @@ angular.module('liveJudgingAdmin', [
                     $(this).css('zIndex', '1');
                   });
                   $(this).css('zIndex', '2');
-									
-									$timeout(function() {
-										elem.goBack();
-									}, 3000);
                 }
             });
 
@@ -220,14 +226,16 @@ angular.module('liveJudgingAdmin', [
             $.fn.goBack = function() {
               if ($(this).is('[cng-draggable-item]')) {
                 var originalPosition = $(this).data('originalPosition');
-                var leftDifference = $(this).offset().left - originalPosition.left;
-                var leftDecrement = '-=' + leftDifference;
-                var topDifference = $(this).offset().top - originalPosition.top;
-                var topDecrement = '-=' + topDifference;
-                $(this).animate({
-                    'left': leftDecrement,
-                    'top': topDecrement
-                }, 500);
+								if (originalPosition) {
+									var leftDifference = $(this).offset().left - originalPosition.left;
+									var leftDecrement = '-=' + leftDifference;
+									var topDifference = $(this).offset().top - originalPosition.top;
+									var topDecrement = '-=' + topDifference;
+									$(this).animate({
+											'left': leftDecrement,
+											'top': topDecrement
+									}, 500);
+								}
               }
             }
         }
@@ -284,9 +292,12 @@ angular.module('liveJudgingAdmin', [
     scope: {
       popoverContent: '@',
       popoverPlacement: '@',
-      popoverToggle: '@'
+      popoverToggle: '@',
+			popoverLimit: '@'
     },
     link: function(scope, elem, attrs) {
+			if (scope.popoverLimit !== undefined && scope.popoverLimit == 'false')
+				return;
       elem.popover({
         animation: true,
         content: scope.popoverContent,
