@@ -138,27 +138,26 @@
               </div>
 
               <!--Judge Panels-->
-              <div ng-repeat="judgeJudgment in judgeJudgments | orderBy:orderByCompletion:judgeOrderReverse">
+              <div ng-repeat="judgeJudgment in judgeJudgments | orderBy:orderByCompletion:judgeOrderReverse"
+                   style="margin-top: 10px">
                 <div class="accordion">
                   <div class="panel judge-accordion accordion-group">
 
-                    <div class="panel-heading" style="height: 60px">
+                    <div class="panel-heading">
                       <div class="row">
                         <span class="col-sm-3 col-md-3 col-lg-3 judge-col">
-                          <div class="truncate">
-                            <div class="accordion-heading judge-heading-text">
-                              <a class="accordion-toggle" 
-																	data-toggle="collapse" 
-																	href="#judge{{$index}}"
-																	onclick="return false;"
-																	ng-click="isOpen.$index = !isOpen.$index">
-																<i ng-init="isOpen.$index = false"
-																	 ng-class="{'glyphicon glyphicon-chevron-down': isOpen.$index, 
-																	 'glyphicon glyphicon-chevron-right': !isOpen.$index}">
-																 </i>
-																{{judgeJudgment.judge.name}}
-															</a>
-                            </div>
+                          <div class="accordion-heading judge-heading-text">
+                            <a class="accordion-toggle" 
+                                data-toggle="collapse" 
+                                href="#judge{{$index}}"
+                                onclick="return false;"
+                                ng-click="isOpen.$index = !isOpen.$index">
+                              <i ng-init="isOpen.$index = false"
+                                 ng-class="{'glyphicon glyphicon-chevron-down': isOpen.$index, 
+                                 'glyphicon glyphicon-chevron-right': !isOpen.$index}">
+                               </i>
+                              {{judgeJudgment.judge.name}}
+                            </a>
                           </div>
                         </span>
                         <span class="col-sm-1 col-md-1 col-lg-1"
@@ -178,9 +177,10 @@
                         <span class="col-sm-6 col-md-6 col-lg-6">
                           <div class="progress inline">
                             <progressbar max="100"
-                                          value="judgeJudgment.completion"
-                                          class="progress-striped"
-                                          type="success">
+                                         min="0"
+                                         value="judgeJudgment.completion"
+                                         class="progress-striped active"
+                                         type="success">
                               <span>{{judgeJudgment.completion}}%</span>
                             </progressbar>
                           </div>
@@ -196,46 +196,54 @@
                         <div class="panel-body">
 
                           <!--List of judge's completed teams-->
-                          <div class="row"  >
-                            <h4>Completed or in progress:</h4>
-                            <div class="media judgedTeam"
-                                  data-toggle="modal"
-                                  data-target="#completed-team-modal"
-                                  ng-repeat="judgment in judgeJudgment.judgments"> <!--beautiful-->
-                              <div class="media-left">
-                                <a href="#" class="team-pic">
-                                  <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-                                  <span ng-if="judgment.completed" class="completed">
-                                    <span class="glyphicon glyphicon-ok"></span>
-                                  </span>
-                                </a>
-                              </div>
-                              <div class="media-body">
-                                <h4 class="media-heading">#{{judgment.team.id}}</h4>
-                                <span>{{judgment.team.name}}</span><br />
-                                <!--Number of filled in stars-->
-                                <span class="glyphicon glyphicon-star"></span>
-                                <span class="glyphicon glyphicon-star"></span>
-                                <span class="glyphicon glyphicon-star"></span>
-                                <!--Number of unfilled stars-->
-                                <span class="glyphicon glyphicon-star-empty"></span>
-                                <span class="glyphicon glyphicon-star-empty"></span>
+                          <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <h4>Completed or in progress (click teams for details):</h4>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <div class="media judgedTeam active"
+                                    data-toggle="modal"
+                                    data-target="#completed-team-modal"
+                                    ng-repeat="judgment in judgeJudgment.judgments"> <!--beautiful-->
+                                <div class="media-left">
+                                  <a href="#" class="team-pic">
+                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                    <span ng-if="judgment.completed" class="completed">
+                                      <span class="glyphicon glyphicon-ok"></span>
+                                    </span>
+                                  </a>
+                                </div>
+                                <div class="media-body">
+                                  <h4 class="media-heading">#{{judgment.team.id}}</h4>
+                                  <span>{{judgment.team.name}}</span><br />
+                                  <!--Number of filled in stars-->
+                                  <span class="glyphicon glyphicon-star"></span>
+                                  <span class="glyphicon glyphicon-star"></span>
+                                  <span class="glyphicon glyphicon-star"></span>
+                                  <!--Number of unfilled stars-->
+                                  <span class="glyphicon glyphicon-star-empty"></span>
+                                  <span class="glyphicon glyphicon-star-empty"></span>
+                                </div>
                               </div>
                             </div>
                           </div>
                           <div class="row">
-                            <h4>Not yet started:</h4>
-                            <div class="media judgedTeam"
-                                  data-toggle="modal"
-                                  ng-repeat="unjudgment in judgeJudgment.theUnjudged"> <!--beautiful-->
-                              <div class="media-left">
-                                <a href="#" class="team-pic">
-                                  <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-                                </a>
-                              </div>
-                              <div class="media-body">
-                                <h4 class="media-heading">#{{unjudgment.id}}</h4>
-                                <span>{{unjudgment.name}}</span><br />
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <h4>Not yet started:</h4>
+                              <div class="media judgedTeam"
+                                    data-toggle="modal"
+                                    ng-repeat="unjudgment in judgeJudgment.theUnjudged"> <!--beautiful-->
+                                <div class="media-left">
+                                  <a href="#" class="team-pic">
+                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                  </a>
+                                </div>
+                                <div class="media-body">
+                                  <h4 class="media-heading">#{{unjudgment.id}}</h4>
+                                  <span>{{unjudgment.name}}</span><br />
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -247,7 +255,7 @@
               </div>
             </div>
 
-            <!--Project Tab-->
+            <!--Team Tab-->
             <div class="beneath-tab" id="team-progress-section" style="display:none">
 
               <span style="margin-right: 20px">Sort direction:</span>
@@ -275,111 +283,87 @@
                   </button>
                 </collapse-all-accordions>
               </div>
+              
+              <!--Team Panels-->
+              <div ng-repeat="team in teams"
+                   style="margin-top: 10px">
+                <div class="accordion">
+                  <div class="panel judge-accordion accordion-group">
 
-              <!--Project Panels-->
-              <div ng-repeat="team in teams">
-                <div class="team-accordion" style="padding-top: 20px">
-                  <div class="panel panel-primary accordion-group">
-
-                    <div class="panel-heading" style="height: 60px">
+                    <div class="panel-heading">
                       <div class="row">
-                        <span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
-                          <div class="truncate">
-                            <div class="accordion-heading">
-                           		<a class="accordion-toggle" 
-																	data-toggle="collapse" 
-																	href="#project{{$index}}"
-																	onclick="return false;"
-																	ng-click="isOpen.$index = !isOpen.$index">
-																<i ng-init="isOpen.$index = false"
-																	 ng-class="{'glyphicon glyphicon-chevron-down': isOpen.$index, 
-																	 'glyphicon glyphicon-chevron-right': !isOpen.$index}">
-																 </i>
-																{{team.name}}&nbsp;&nbsp;
-															</a>
-                            </div>
+                        <span class="col-sm-3 col-md-3 col-lg-3 judge-col">
+                          <div class="accordion-heading judge-heading-text">
+                            <a class="accordion-toggle" 
+                                data-toggle="collapse" 
+                                href="#team{{$index}}"
+                                onclick="return false;"
+                                ng-click="isOpen.$index = !isOpen.$index">
+                              <i ng-init="isOpen.$index = false"
+                                 ng-class="{'glyphicon glyphicon-chevron-down': isOpen.$index, 
+                                 'glyphicon glyphicon-chevron-right': !isOpen.$index}">
+                               </i>
+                              {{team.name}}
+                            </a>
                           </div>
                         </span>
-                        <span class="col-sm-1 col-md-1 col-lg-1">
-                          <button type="button" 
-                           				class="btn btn-primary notification-btn" 
-                           				data-toggle="modal" 
-                           				data-target="#notification-modal">
-                            <span class="glyphicon glyphicon-bell"></span>
-                          </button>
-                        </span>
-                        <span class="col-sm-6 col-md-5 col-lg-6">
+                        <span class="col-sm-1 col-md-1 col-lg-1"
+															custom-popover
+															popover-content="{{hints['notify'].content}}" 
+															popover-placement="{{hints['notify'].placement}}"
+															popover-toggle="{{hints['notify'].enabled}}"
+															popover-limit="{{$index === 0}}">
+													<button type="button" 
+																	class="btn btn-primary notification-btn" 
+																	data-toggle="modal" 
+																	data-target="#notification-modal">
+														<span class="glyphicon glyphicon-bell"></span>
+													</button>
+												</span>
+                        <span class="col-sm-6 col-md-6 col-lg-6">
                           <div class="progress inline">
-                            <span class="progress-value">70%</span>
-                            <div class="progress-bar progress-bar-success" 
-                             		 role="progressbar" 
-                             		 aria-valuenow="70" 
-                             		 aria-valuemin="0" 
-                             		 aria-valuemax="100" 
-                             		 style="width: 70%">
-                              <span class="sr-only">70% Complete (success)</span>
-                            </div>
+                            <progressbar max="100"
+                                         min="0"
+                                         value="0"
+                                         class="progress-striped active"
+                                         type="success">
+                              <span></span>
+                            </progressbar>
                           </div>
                         </span>
-                        <span class="col col-sm-2 col-md-3 col-lg-2 pull-right" style="margin-top: 10px; margin-right: 20px">
-                          <div style="width: 150%;">
-                            3/15 Judge Submissions
-                          </div>
+                        <span class="col col-sm-2 col-md-2 col-lg-2 pull-right projects-judged-text">
+                          0/0 Judge Submissions
                         </span>
                       </div>
                     </div>
 
-                    <div id="project{{$index}}" class="accordion-body collapse project">
-                      <div class="accordion-inner">
+                    <div id="team{{$index}}" class="accordion-body collapse judge">
+                      <div class="judge-accordion-inner" style="background-color: white; color: black">
                         <div class="panel-body">
 
-                          <!--Projects not yet judged-->
-                          <h4>Not yet submitted (2)</h4>
+                          <!--List of judge's completed teams-->
                           <div class="row">
-                            <div class="col col-sm-3 col-md-3 col-lg-3">
-                              <div class="media">
-                                <div class="media-left">
-                                  <a href="#">
-                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-                                  </a>
-                                </div>
-                                <div class="media-body">
-                                  <h4 class="media-heading">#76</h4>
-                                  <span>George Washington</span>
-                                </div>
-                              </div>
-                            </div>
-                             <div class="col col-sm-3 col-md-3 col-lg-3">
-                              <div class="media">
-                                <div class="media-left">
-                                  <a href="#">
-                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-                                  </a>
-                                </div>
-                                <div class="media-body">
-                                  <h4 class="media-heading">#52</h4>
-                                  <span>Thomas Jefferson</span>
-                                </div>
-                              </div>
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <h4>Completed or in progress (click teams for details):</h4>
                             </div>
                           </div>
-
-                          <!--Projects Judged-->
-                          <h4>Completed</h4>
                           <div class="row">
-                            <div class="col col-sm-3 col-md-3 col-lg-3">
-                              <div class="media media-completed" data-toggle="modal" data-target="#completed-team-modal">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <div class="media judgedTeam active"
+                                    data-toggle="modal"
+                                    data-target="#completed-team-modal"
+                                    ng-repeat="judgment in judgeJudgment.judgments"> 
                                 <div class="media-left">
                                   <a href="#" class="team-pic">
                                     <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
-                                    <span class="completed">
+                                    <span ng-if="judgment.completed" class="completed">
                                       <span class="glyphicon glyphicon-ok"></span>
                                     </span>
                                   </a>
                                 </div>
                                 <div class="media-body">
-                                  <h4 class="media-heading">#33</h4>
-                                  <span>Abe Lincoln</span><br />
+                                  <h4 class="media-heading">#{{judgment.team.id}}</h4>
+                                  <span>{{judgment.team.name}}</span><br />
                                   <!--Number of filled in stars-->
                                   <span class="glyphicon glyphicon-star"></span>
                                   <span class="glyphicon glyphicon-star"></span>
@@ -391,13 +375,31 @@
                               </div>
                             </div>
                           </div>
+                          <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <h4>Not yet started:</h4>
+                              <div class="media judgedTeam"
+                                    data-toggle="modal"
+                                    ng-repeat="unjudgment in judgeJudgment.theUnjudged"> <!--beautiful-->
+                                <div class="media-left">
+                                  <a href="#" class="team-pic">
+                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                  </a>
+                                </div>
+                                <div class="media-body">
+                                  <h4 class="media-heading">#{{unjudgment.id}}</h4>
+                                  <span>{{unjudgment.name}}</span><br />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
+              
             </div>
 
             <!--Category Tab-->
@@ -448,7 +450,7 @@
                       <div class="row">
                         <span class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 10px">
                           <div class="truncate">
-                            <div class="accordion-heading">
+                            <div class="accordion-heading judge-heading-text">
                            		<a class="accordion-toggle" 
 																	data-toggle="collapse" 
 																	href="#category{{$index}}"

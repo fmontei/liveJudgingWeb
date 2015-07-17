@@ -128,9 +128,13 @@ a.team-pic span.completed {
   color: #fff !important;
 }
 
-judge-accordion-inner {
+.judge-accordion-inner {
   background-color: #fff !important;
   color: #000 !important;
+}
+
+.judge-accordion .panel-heading {
+  height: 60px; 
 }
 
 .judge-col {
@@ -248,4 +252,8 @@ h4.modal-title {
   float: left;
   margin: 5px;
   margin-top: 5px !important;
+}
+
+.judgedTeam.active {
+ cursor: pointer; 
 }
