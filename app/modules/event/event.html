@@ -148,7 +148,7 @@
               </div>
 
               <!--Judge Panels-->
-              <div ng-repeat="judgeJudgment in judgeJudgments">
+              <div ng-repeat="judgeJudgment in judgeJudgments | orderBy:orderByCompletion">
                 <div class="accordion judge-accordion">
                   <div class="panel panel-primary accordion-group">
 

@@ -229,6 +229,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         }
         sessionStorage.put('event_view', view);
         $scope.event.current_view = view;
+
+        /** DASHBOARD RELATED **/
+        $scope.judgeOrder = 'asc';
+
+        $scope.orderByCompletion = function(judgeJudgment) {
+            if ($scope.judgeOrder = 'desc') {
+                return -1 * parseInt(judgeJudgment.completion);
+            }
+            return parseInt(judgeJudgment.completion);
+        }
     }
 ])
 
@@ -328,7 +338,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                             judge: judgeObj.judge,
                             judgments: resp2,
                             theUnjudged: resp3,
-                            completion: percentCompleted,
+                            completion: isNaN(percentCompleted) ? 0 : percentCompleted,
                             numCompletedTeams: completedTeamCount,
                             numAssignedTeams: assignedTeamsCount
                         };
