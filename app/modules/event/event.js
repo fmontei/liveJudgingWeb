@@ -232,8 +232,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 'JudgeManagementService', 'JudgmentRESTService', 'RubricRESTService', 'TeamManagementService',
-	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgmentRESTService, RubricRESTService, TeamManagmentService) {
+.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService', 'TeamManagementService',
+	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService, JudgmentRESTService, RubricRESTService, TeamManagmentService) {
 	return function($scope) {
         var authHeader = CurrentUserService.getAuthHeader();
 
@@ -314,14 +314,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         service.getJudgmentsByJudge = function(eventId, judgeObj) {
             var defer = $q.defer();
             JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeObj.id}).$promise.then(function(resp) {
-                if (resp.length > 0) {
-                    service.determineCompletedTeamsByJudge(judgeObj.id, resp).then(function(filledJudgments) {
-                        var judgeJudgments = {judge: judgeObj.judge, judgments: filledJudgments};
+                service.determineCompletedTeamsByJudge(judgeObj.id, resp).then(function(resp2) { //great variable naming skills
+                    service.determineUnstartedTeamsByJudge(judgeObj.id, resp2).then(function(resp3) {
+                        var judgeJudgments = {judge: judgeObj.judge, judgments: resp2, theUnjudged: resp3};
                         defer.resolve(judgeJudgments);
-                    });
-                } else {
-                    defer.resolve({judge: judgeObj.judge, judgments: null});
-                }
+                    })
+                });
             }).catch(function() {
                 defer.reject();
             });
@@ -330,49 +328,57 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         }
 
         service.determineCompletedTeamsByJudge = function(id, judgments) {
+            //console.log(judgments);
             var defer = $q.defer();
-            var rubricRESTService = RubricRESTService(authHeader);
 
-            var promises = [];
-            // Makes a mapping of rubric Ids to number of criteria in the rubric.
-            // Used to determine whether a judge has completed judging a specific team.
-            var seenRubrics = [];
-            for (var i = 0; i < judgments.length; i++) {
-                if (seenRubrics.indexOf(judgments[i].rubric.id) == -1) {
-                    seenRubrics.push(judgments[i].rubric.id);
-                    promises.push(getNumCriteriaInRubric(judgments[i].rubric.id));
-                }
-            }
+            if (judgments.length == 0) {
+                defer.resolve([]);
+            } else {
+                var rubricRESTService = RubricRESTService(authHeader);
 
-            $q.all(promises).then(function(rubricNumCriteriaMapping) {
-                // This makes a mapping of {teamId : numOfJudgments} for that team for a judge.
-                var judgedTeams = [];
-                var seenTeams = [];
+                var promises = [];
+                // Makes a mapping of rubric Ids to number of criteria in the rubric.
+                // Used to determine whether a judge has completed judging a specific team.
+                var seenRubrics = [];
                 for (var i = 0; i < judgments.length; i++) {
-                    var index = seenTeams.indexOf(judgments[i].team.id);
-                    if (index != -1) {
-                        judgedTeams[index].submitedCriteria++;
-                        if (judgedTeams[index].submitedCriteria = judgedTeams[index].totalCriteria) {
-                            judgedTeams[index].completed = true;
-                        }
-                    } else {
-                        seenTeams.push(judgments[i].team.id);
-                        var numCriteria;
-                        for (var j = 0; j < rubricNumCriteriaMapping.length; j++) {
-                            if (judgments[i].rubric.id == rubricNumCriteriaMapping[j].rubricId) {
-                                numCriteria = rubricNumCriteriaMapping[j].numCriteria;
-                            }
-                        }
-                        judgedTeams.push({
-                            completed: false,
-                            submitedCriteria: 1,
-                            totalCriteria: numCriteria,
-                            team: judgments[i].team,
-                        });
+                    if (seenRubrics.indexOf(judgments[i].rubric.id) == -1) {
+                        seenRubrics.push(judgments[i].rubric.id);
+                        promises.push(getNumCriteriaInRubric(judgments[i].rubric.id));
                     }
                 }
-                defer.resolve(judgedTeams);
-            });
+
+                $q.all(promises).then(function(rubricNumCriteriaMapping) {
+                    // I'd explain this but I barely remember how to put it into words
+                    var judgedTeams = [];
+                    var seenTeams = [];
+                    for (var i = 0; i < judgments.length; i++) {
+                        var index = seenTeams.indexOf(judgments[i].team.id);
+                        if (index != -1) {
+                            judgedTeams[index].submitedCriteria++;
+                            if (judgedTeams[index].submitedCriteria = judgedTeams[index].totalCriteria) {
+                                judgedTeams[index].completed = true;
+                            }
+                        } else {
+                            seenTeams.push(judgments[i].team.id);
+                            var numCriteria;
+                            for (var j = 0; j < rubricNumCriteriaMapping.length; j++) {
+                                if (judgments[i].rubric.id == rubricNumCriteriaMapping[j].rubricId) {
+                                    numCriteria = rubricNumCriteriaMapping[j].numCriteria;
+                                }
+                            }
+                            judgedTeams.push({
+                                completed: false,
+                                submitedCriteria: 1,
+                                totalCriteria: numCriteria,
+                                team: judgments[i].team,
+                                judgeId: judgments[i].judge.id
+                            });
+                        }
+                    }
+                    console.log(judgedTeams);
+                    defer.resolve(judgedTeams);
+                });
+            }
 
             return defer.promise;
 
@@ -387,6 +393,42 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
                 return defer.promise;
             }
+        }
+
+        service.determineUnstartedTeamsByJudge = function(judgeId, judgeJudgments) {
+            var defer = $q.defer();
+
+            var judges = sessionStorage.getObject('judges');
+            for (var i = 0; i < judges.length; i++) {
+                if (judges[i].id == judgeId) {
+                    var judge = judges[i];
+                    break;
+                }
+            }
+            JudgeRESTService(authHeader).judgeTeams.get({judge_id: judgeId}).$promise.then(function(resp) {
+                var assignedTeams = [];
+                for (var i = 0; i < resp.length; i++) {
+                    assignedTeams.push(resp[i].team);
+                }
+                if (judgeJudgments.length == 0) {
+                    defer.resolve(assignedTeams);
+                } else {
+                    for (var i = 0; i < judgeJudgments.length; i++) {
+                        for (var j = 0; j < assignedTeams.length; j++) {
+                            if (judgeJudgments[i].team.id == assignedTeams[j].id) {
+                                assignedTeams.splice(j, 1);
+                            }
+                        }
+                    }
+                    var theUnjudged = [];
+                    for (var i = 0; i < assignedTeams.length; i++) {
+                        theUnjudged.push(assignedTeams[i]);
+                    }
+                    defer.resolve(theUnjudged);
+                }
+            });
+
+            return defer.promise;
         }
 
         service.getJudgmentsOfAllTeams = function() {

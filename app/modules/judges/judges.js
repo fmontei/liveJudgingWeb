@@ -354,7 +354,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				console.log('Judges successfully retrieved from server.');
 			}).then(function() {
 				var judges = sessionStorage.getObject('judges');
-				getJudgeTeams(judges).then(function() {
+				judgeManagement.getJudgeTeams(judges).then(function() {
 					defer.resolve();
 				}).catch(function() {
 					defer.reject();
@@ -366,7 +366,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			return defer.promise;
 		}
 
-		var getJudgeTeams = function(judges) {
+		judgeManagement.getJudgeTeams = function(judges) {
 			var defer = $q.defer();
 
 			var judgePromises = [];
@@ -379,7 +379,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				sessionStorage.putObject('judges', judgesWithTeams);
 				defer.resolve();
 			}).catch(function() {
-        sessionStorage.putObject('generalErrorMessage', 'Error getting judge teams.');
+        		sessionStorage.putObject('generalErrorMessage', 'Error getting judge teams.');
 				defer.reject('Error getting judge teams.');
 			});
 
