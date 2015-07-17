@@ -268,10 +268,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             if ($location.path() !== '/event') {
                 // Decides whether an event is in progress or not whenever /event is hit.
                 if (EventUtilService.isEventRunning(sessionStorage.getObject('selected_event'))) {
-                    console.log('hi');
                     var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
                 } else {
-                    console.log('bye');
                     var view = EventUtilService.views.EVENT_READY_VIEW;
                 }
                 sessionStorage.put('event_view', view);
