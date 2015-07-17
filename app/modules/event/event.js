@@ -287,6 +287,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         }
 
         $scope.determineOverallJudgeProgress = function(judgeJudgments) {
+            if (!judgeJudgments) {
+                return [null, null, null];
+            }
             var teamCount = 0;
             var completedTeamCount = 0;
             for (var i = 0; i < judgeJudgments.length; i++) {
