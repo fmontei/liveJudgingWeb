@@ -198,9 +198,6 @@ angular.module('liveJudgingAdmin', [
                 cursor: 'grab',
                 start: function(event, ui) {
 										$(this).css('zIndex', '100');
-										if (elem.data('originalPosition') === undefined) {
-											elem.data('originalPosition', elem.offset());
-										}
 										$(this).draggable('option', 'cursorAt', {
 											left: Math.floor(ui.helper.width() / 2),
 											top: Math.floor(ui.helper.height() / 2)
@@ -225,17 +222,10 @@ angular.module('liveJudgingAdmin', [
 
             $.fn.goBack = function() {
               if ($(this).is('[cng-draggable-item]')) {
-                var originalPosition = $(this).data('originalPosition');
-								if (originalPosition) {
-									var leftDifference = $(this).offset().left - originalPosition.left;
-									var leftDecrement = '-=' + leftDifference;
-									var topDifference = $(this).offset().top - originalPosition.top;
-									var topDecrement = '-=' + topDifference;
-									$(this).animate({
-											'left': leftDecrement,
-											'top': topDecrement
-									}, 500);
-								}
+                $(this).animate({
+                    'left': '0px',
+                    'top': '0px'
+                }, 500);
               }
             }
         }
@@ -249,8 +239,7 @@ angular.module('liveJudgingAdmin', [
         link: function(scope, elem, attrs) {
             elem.bind('click', function() {
                 $('[cng-draggable-item]').each(function() {
-                    if (undefined !== $(this).data('originalPosition'))
-                        $(this).goBack();
+                    $(this).goBack();
                 });
             });
         }
