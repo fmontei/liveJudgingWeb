@@ -169,9 +169,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService', 'TeamStandingService',
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
     function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService,
-						 TeamStandingService) {
+						 TeamRESTService, TeamStandingService) {
 
 		var teamStandingService = TeamStandingService($scope);
 		teamStandingService.init();
@@ -184,7 +184,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 				$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
 														{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
-														{name: 'Category Progress', id: 'category-progress-tab', sectionId: 'category-progress-section'},
 														{name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
 
         $scope.getSelectedEvent = function() {
@@ -217,8 +216,26 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 				$scope.recipientList = []; // Contains list of judges to be notified
 
-        $scope.initRecipientList = function(judgeObj) {
-					$scope.$broadcast('firstRecipientAdded', judgeObj.judge.name);
+        $scope.initRecipientList = function(item, type) {
+          if (type === 'judge') {
+            $scope.$broadcast('firstRecipientsAdded', item.judge.name);
+          } else if (type === 'team') {
+            var judgeIds = item.judges;
+            var judgeObjs = sessionStorage.getObject('judges');
+            var judgeNames = [];
+            if (judgeObjs) {
+              for (var i = 0; i < judgeIds.length; i++) {
+                var judgeId = judgeIds[i].id;
+                for (var j = 0; j < judgeObjs.length; j++) {
+                  if (judgeObjs[i].id === judgeId) {
+                    judgeNames.push(judgeObjs[i].judge.name);
+                    break;
+                  }
+                }
+              }
+              $scope.$broadcast('firstRecipientsAdded', judgeNames);
+            }
+          }
         }
 
         // Decides whether an event is in progress or not whenever /event is hit.
@@ -677,10 +694,17 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					}
         }, true);
 			
-				scope.$on('firstRecipientAdded', function (event, data) {
-					if (data)
-						create_new_judge_notification_object(data);
-				});
+				scope.$on('firstRecipientsAdded', function (event, data) {
+					if (data) {
+            if ($.isArray(data)) {
+              angular.forEach(data, function(entry) {
+                create_new_judge_notification_object(entry); 
+              });
+            } else if (typeof data === 'string') {
+              create_new_judge_notification_object(data); 
+            }
+          }
+        });
 
 				/*
          * Initialize the Autocomplete Object for the Notification Modal
