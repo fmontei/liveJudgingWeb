@@ -430,11 +430,12 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				return defer.promise;
 			}
 
-			var judgeReq = judgeFormData;
+			var judgeReq = {
+				email: judgeFormData.email,
+				first_name: judgeFormData.first_name,
+				last_name: judgeFormData.last_name
+			};
 			var judgeId = null;
-			//var randomPass = judgeManagement.generatePassword();
-			judgeReq.password = 'password';
-			judgeReq.password_confirmation = 'password';
 
 			// Register judge as a user & adds them to the event.
 			RegistrationRESTService.register(judgeReq).$promise.then(function(resp) {
@@ -477,18 +478,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
       defer.resolve();
       return defer.promise;
     }
-    
-    judgeManagement.generatePassword = function() {
-			// Most certainly should be done on the server (would require a call to make a judge user)
-			var pass = "";
-				var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-				for(var i = 0; i < 6; i++) {
-						pass += possible.charAt(Math.floor(Math.random() * possible.length));
-				}
-
-				return pass;
-		}
 
 		judgeManagement.editJudge = function(judgeId, judgeFormData, teamsToAdd, teamsToRemove, assignedTeams) {
       var defer = $q.defer();

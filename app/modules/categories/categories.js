@@ -395,7 +395,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 $scope.error = 'Error transferring team to category.';
             });
         }
-        
+
         var isTeamAlreadyInCategory = function(categoryId, teamId) {
           var category = categoryManagement.getCategoryById(categoryId);
           for (var i = 0; i < category.teams.length; i++) {
@@ -409,7 +409,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
         categoryManagement.transferRubricToCategory = function(categoryId, rubricId) {
             var rubricRESTService = RubricRESTService(authHeader);
             var req = {category_id: categoryId};
-            CategoryRESTService(authHeader).category.update({id: categoryId}, {rubric_id: rubricId}).$promise.then(function(resp) {
+            CategoryRESTService(authHeader).rubrics.addToCat({rubric_id: rubricId}, {category_id: categoryId}).$promise.then(function(resp) {
                 categoryManagement.getCategories();
                 console.log(resp);
                 console.log('Successfully transferred rubric to category');
@@ -565,6 +565,14 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                 },
                 delete: {
                     method: 'DELETE',
+                    headers: authHeader
+                }
+            }),
+            rubrics: $resource('http://api.stevedolan.me/rubrics/:rubric_id/categories', {
+                category_id: '@id'
+            }, {
+                addToCat: {
+                    method: 'POST',
                     headers: authHeader
                 }
             })

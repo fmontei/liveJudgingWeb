@@ -295,6 +295,10 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			rubric: $resource('http://api.stevedolan.me/rubrics/:id', {
 				id: '@id'
 			}, {
+				get: {
+					method: 'GET',
+					headers: authHeader
+				},
 				update: {
 					method: 'PUT',
 					headers: authHeader
@@ -309,7 +313,6 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
-					isArray: true,
 					headers: authHeader
 				},
 				create: {
@@ -320,6 +323,10 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			criterion: $resource('http://api.stevedolan.me/criteria/:id', {
 				id: '@id'
 			}, {
+				get: {
+					method: 'GET',
+					headers: authHeader
+				},
 				update: {
 					method: 'PUT',
 					headers: authHeader
