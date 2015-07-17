@@ -183,17 +183,9 @@ angular.module('liveJudgingAdmin', [
         },
         link: function(scope, elem, attrs) {
             elem.data('isTransferable', scope.isTransferable === 'true');
-						elem.bind('mouseenter', function() {
-							elem.data('isDragged', true);
-						});
-						elem.bind('mouseleave', function() {
-							elem.data('isDragged', false);
-							$timeout(function() {
-								if (!elem.data('isDragged'))
-									elem.goBack();
-							}, 3000);
-						});
+          
             elem.draggable({
+                appendTo: 'body',
 								containment: 'document',
                 cursor: 'grab',
                 start: function(event, ui) {
@@ -212,12 +204,23 @@ angular.module('liveJudgingAdmin', [
             });
 
             var cog = elem.find(scope.cog);
+            var timeout = undefined;
+          
             elem.bind('mouseenter', function() {
               cog.show();
-            });
-
-            elem.bind('mouseleave', function() {
+							elem.data('isDragged', true).trigger('changeDragged'); 
+						});
+          
+						elem.bind('mouseleave', function() {
               cog.hide();
+							elem.data('isDragged', false).trigger('changeDragged'); 
+						});
+          
+            elem.on('changeDragged', function() {
+              if (!elem.data('isDragged'))
+                timeout = setTimeout(function() {elem.goBack()}, 3000);
+              else if (elem.data('isDragged') && timeout !== undefined)
+                clearTimeout(timeout);
             });
 
             $.fn.goBack = function() {
