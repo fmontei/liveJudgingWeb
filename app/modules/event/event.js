@@ -570,13 +570,15 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         },
         isEventRunning: function() {
             var event = sessionStorage.getObject('selected_event');
-            var startDateTime = Date.parse(event.start_time);
-            var endDateTime = Date.parse(event.end_time);
-            if (startDateTime <= Date.now() && endDateTime >= Date.now()) {
-                sessionStorage.put("event" + event.id + "_running", "true");
-                return true;
-            } else {
-                return false;
+            if (event) {
+            	var startDateTime = Date.parse(event.start_time);
+	            var endDateTime = Date.parse(event.end_time);
+	            if (startDateTime <= Date.now() && endDateTime >= Date.now()) {
+	                sessionStorage.put("event" + event.id + "_running", "true");
+	                return true;
+	            } else {
+	                return false;
+	            }
             }
         }
     };
