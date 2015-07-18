@@ -103,7 +103,7 @@
                popover-content="{{hints['dragItem'].content}}" 
                popover-placement="{{hints['dragItem'].placement}}"
                popover-toggle="{{hints['dragItem'].enabled}}">
-            <div ng-repeat="rubric in rubrics track by $index | orderBy: '+rubric.name'" class="draggable-item-col">
+            <div ng-repeat="rubric in rubrics | orderBy: '+rubric.name'" class="draggable-item-col">
               <div class="media draggable-item"
                  cng-draggable-item
                  item-id="{{rubric.id}}"
