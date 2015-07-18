@@ -496,7 +496,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
   return {
     restrict: 'A',
     scope: {
-      forceClass: '@',
+      mainClass: '@',
+      previewClass: '@',
       errorContainer: '@'
     },
     link: function(scope, elem, attrs) {
@@ -506,11 +507,21 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
         elErrorContainer: scope.errorContainer,
         showUpload: false,
         maxFileCount: 1,
-        mainClass: scope.forceClass,
-        previewClass: scope.forceClass
+        mainClass: scope.mainClass,
+        previewClass: scope.previewClass
       }); 
       elem.on('fileloaded', function(event, file, previewId, index, reader) {
-        alert('File added: ' + file);
+        //console.log('File added: ' + file);
+      });
+      elem.on('filereset', function(event) {
+        //console.log("filereset");
+      });
+      elem.on('fileerror', function(event, data) {
+         /*console.log(data.id);
+         console.log(data.index);
+         console.log(data.file);
+         console.log(data.reader);
+         console.log(data.files);*/
       });
     }
   }
