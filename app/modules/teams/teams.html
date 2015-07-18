@@ -342,22 +342,25 @@
 					<div class="col col-lg-5 col-md-5 col-sm-5" style="margin-left: -20px">
 						<div class="row">
 							<div class="col col-lg-12 col-md-12 col-sm-12">
-								<div class="input-group">
-									<span class="input-group-btn">
-								<button class="btn btn-sm btn-default"
-										type="button">Select file...</button>
-							  </span>
-								  <input type="text"
-										 class="form-control input-sm"
-										 placeholder="File"
-										 style="width: 115%"
-										 ng-model="teamLogo">
-								</div>
+				
+								    <input class="btn btn-sm btn-default"
+										        type="file" 
+                            nv-file-select 
+                            uploader="imageUploader"
+                            queueLimit="1"
+                            filters="isImageFilter" />
+					
+					         
 							</div>
 						</div>
+						
 						<div class="row" style="margin-top: 4px">
 							<div class="col col-lg-12 col-md-12 col-sm-12">
-								<button class="btn btn-sm btn-default">Upload</button>
+						
+                <button type="button" class="btn btn-success btn-xs" ng-click="createImagePreview()">
+                    <span class="glyphicon glyphicon-upload"></span> Upload
+                </button>
+							
 							</div>
 						</div>
 					</div>
@@ -379,7 +382,7 @@
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 					</div>
-					<div class="col col-lg-9 col-md-9 col-sm-3 modal-col">
+					<div class="col col-lg-9 col-md-9 col-sm-9 modal-col">
 						<div ng-switch on="teamModalError">
 							<div ng-switch-when="undefined">
 							</div>
@@ -391,6 +394,19 @@
 						</div>
 					</div>
 				</div>
+				
+				<div class="row">
+          <div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+					</div>
+				  <div class="col col-sm-9 col-md-9 col-lg-9 modal-col">
+               <div class="alert alert-danger" 
+                    style="display: inline-block"
+                    ng-show="imageUploadError !== null">
+                 {{imageUploadError}}
+               </div>
+           </div>
+          </div>
+        
 			</div> <!-- ./modal-body -->
 
 			<div ng-switch on="teamModalView">
