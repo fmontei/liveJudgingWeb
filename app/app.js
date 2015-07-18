@@ -28,6 +28,7 @@ angular.module('liveJudgingAdmin', [
   });
   
   $rootScope.hints = new Object();
+  $rootScope.hints['beginEvent'] = {'content': 'Click to begin event. <u>Important:</u> Event end time & date must not be expired.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['mainHeading'] = {'content': 'Default view. Click category to see category view, then click here to return to default view.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['catHeading'] = {'content': 'Category View. Click here to return to default view.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['addTeam'] = {'content': '1) Click here to add a team to this event.', 'placement': 'right', 'enabled': false};

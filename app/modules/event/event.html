@@ -1,7 +1,7 @@
   <div ng-switch on="isEventRunning()">
 
     <div ng-switch-when="false">
-      {{isEventRunning()}}
+
       <div class="container-fluid">
         <div class="row">
           <h1>Event Dashboard: <span ng-bind="getSelectedEvent().name"></h1>
@@ -12,19 +12,25 @@
           </div>
           <div class="col col-md-11 col-lg-11">
             <div class="row">
-              <span class="col col-lg-3 col-md-3 col-sm-4 col-xs-4 event-ready">
-                <button class="btn btn-default" ng-click="editEvent()">
-                  Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
-                </button>
+              <span class="col col-lg-5 col-md-5 col-sm-5 col-xs-6 event-ready">
+                <div class="btn-group" role="group">
+                  <input type="button" 
+                         class="btn btn-warning" 
+                         ng-click="enableHints();"
+                         value="{{enableButtonText}}" />
+                  <button class="btn btn-default" ng-click="editEvent()">
+                    Edit Event Info &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil"></span>
+                  </button>
+                </div>
               </span>
-              <span class="col col-lg-9 col-md-9 col-sm-8 col-xs-8">
+              <span class="col col-lg-7 col-md-7 col-sm-7 col-xs-6">
                 <div class="row">
-                  <div class="col col-xs-4 col-sm-4 col-md-4 col-lg-2 event-ready">
-                    <div class="checkbox">
+                  <div class="col col-xs-6 col-sm-6 col-md-6 col-lg-6 event-ready">
+                    <div class="checkbox pull-right">
                       <label><input type="checkbox" value="">Auto-start event at:</label>
                     </div>
                   </div>
-                  <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                  <div class="col col-xs-6 col-sm-6 col-md-6 col-lg-6">
                     <!-- This ng-model is just temporary -->
                     <timepicker ng-model="autoStart"
                                 minute-step="15"
@@ -40,8 +46,14 @@
         <div class="row">
           <div class="text-center">
             <button class="btn btn-lg btn-default"
-              id="begin-event-button"
-              ng-click="beginEvent()">Begin Event</button>
+                    id="begin-event-button"
+                    ng-click="beginEvent()"
+                    custom-popover
+                    popover-content="{{hints['beginEvent'].content}}" 
+                    popover-placement="{{hints['beginEvent'].placement}}"
+                    popover-toggle="{{hints['beginEvent'].enabled}}">
+                    Begin Event
+            </button>
           </div>
         </div>
       </div>

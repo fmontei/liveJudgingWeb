@@ -188,10 +188,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			current_view: sessionStorage.get('event_view')
 		};
 
-				$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
-														{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
-														{name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
-
+    $scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
+                        {name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
+                        {name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
+    
 		$scope.getSelectedEvent = function() {
 			return sessionStorage.getObject('selected_event');
 		};

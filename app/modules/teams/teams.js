@@ -587,7 +587,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
           // Copy the image contents to the canvas
           var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, 300, 200);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
           // Get the data-URL formatted image
           // Firefox supports PNG and JPEG. You could check img.src to
