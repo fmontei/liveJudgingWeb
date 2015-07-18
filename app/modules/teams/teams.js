@@ -4,21 +4,21 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/teams', {
-    templateUrl: 'modules/teams/teams.html',
-    controller: 'TeamsCtrl'
+	templateUrl: 'modules/teams/teams.html',
+	controller: 'TeamsCtrl'
   });
 }])
 
 .controller('TeamsCtrl', ['$scope', 'sessionStorage', 'TeamInitService', 'CategoryManagementService', 'ScopeInitService', 'TeamManagementService',
 	function($scope, sessionStorage, TeamInitService, CategoryManagementService, ScopeInitService, TeamManagementService) {
-                          
+
 		sessionStorage.remove('selectedCategory');
 
 		/*
 		 * Automatic synchronization between scope and cookies
 		 */
 
-	 	var scopeInitService = ScopeInitService($scope, sessionStorage);
+		var scopeInitService = ScopeInitService($scope, sessionStorage);
 		scopeInitService.init();
 
 		var teamInitService = TeamInitService($scope, sessionStorage);
@@ -27,7 +27,9 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 
 		var teamManagementService = TeamManagementService($scope, sessionStorage);
-		teamManagementService.getTeams();
+		teamManagementService.getTeams().then(function(resp) {
+			teamManagementService.getTeamsCategories(resp);
+		});
 		$scope.teamNumberOptions = teamManagementService.getTeamNumberOptions();
 
 		/*
@@ -150,7 +152,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			}, true);
 
 			$scope.selectedEvent = sessionStorage.getObject('selected_event');
-      $scope.imageUploadError = null;
+	  $scope.imageUploadError = null;
 		}
 
 		return initService;
@@ -174,7 +176,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				return getCategoriesForEachTeam(resp);
 			}).then(function(filledTeams) {
 				sessionStorage.putObject('teams', filledTeams);
-				defer.resolve('Successfully got teams.');
+				defer.resolve(filledTeams);
 			}).catch(function() {
 				sessionStorage.put('generalErrorMessage', 'Error getting teams from server.');
 				defer.reject('Error getting teams.');
@@ -182,6 +184,38 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			});
 
 			return defer.promise;
+		}
+
+		// Gets the team_category ids
+		teamManagement.getTeamsCategories = function(teams) {
+			var defer = $q.defer();
+
+			var promises = [];
+			for (var i = 0; i < teams.length; i++) {
+				promises.push(getTeamCategories(teams[i].id));
+			}
+
+			$q.all(promises).then(function(resp) {
+				sessionStorage.putObject('teamsCategories', resp);
+				defer.resolve(resp);
+			}).catch(function() {
+				defer.reject();
+			});
+
+			return defer.promise;
+
+			function getTeamCategories(teamId) {
+				var defer = $q.defer();
+
+				TeamRESTService(authHeader).team_categories.get({team_id: teamId}).$promise.then(function(resp) {
+					defer.resolve(resp);
+				}).catch(function() {
+					defer.reject();
+				});
+
+				return defer.promise;
+			}
+
 		}
 
 		var getCategoriesForEachTeam = function(eventTeams) {
@@ -400,7 +434,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		}
 
 		var isEmpty = function(str) {
-	    return (!str || 0 === str.length);
+		return (!str || 0 === str.length);
 		}
 
 		return teamManagement;
@@ -444,7 +478,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			}, {
 				get: {
 					method: 'GET',
-          isArray: true,
+					isArray: true,
 					headers: authHeader
 				},
 				add_team: {

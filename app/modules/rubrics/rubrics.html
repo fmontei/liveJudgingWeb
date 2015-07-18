@@ -103,7 +103,7 @@
                popover-content="{{hints['dragItem'].content}}" 
                popover-placement="{{hints['dragItem'].placement}}"
                popover-toggle="{{hints['dragItem'].enabled}}">
-            <div ng-repeat="rubric in rubrics track by $index | orderBy: '+rubric.name'" class="draggable-item-col">
+            <div ng-repeat="rubric in rubrics | orderBy: '+rubric.name'" class="draggable-item-col">
               <div class="media draggable-item"
                  cng-draggable-item
                  item-id="{{rubric.id}}"
@@ -264,7 +264,7 @@
 						<label>Criterion Max Score Mass Update:</label>
 					</div>
 					<div class="col col-sm-7 col-md-7 col-lg-7">
-						<div><rating ng-change="updateCriteriaRating(rubricRating)" ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
+						<div><rating ng-change="updateRubricRating(rubricRating)" ng-model="rubricRating" max="10"></rating> <b>({{rubricRating}} / 10)</b></div>
 					</div>
 				</div> <!-- ./row -->
 				<br />
@@ -331,7 +331,7 @@
 											<div class="panel panel-default">
 												<label>Criterion Max Score</label>
 												<div>
-													<rating ng-model="modalCriteria[$index].max_score" readonly="true" max="10"></rating>
+													<rating ng-model="modalCriteria[$index].max_score" max="10"></rating>
 													<b>({{modalCriteria[$index].max_score}} / 10)</b>
 												</div>
 											</div>
