@@ -1,6 +1,7 @@
   <div ng-switch on="isEventRunning()">
 
     <div ng-switch-when="false">
+      {{isEventRunning()}}
       <div class="container-fluid">
         <div class="row">
           <h1>Event Dashboard: <span ng-bind="getSelectedEvent().name"></h1>
@@ -216,8 +217,19 @@
                                     data-target="#completed-team-modal"
                                     ng-repeat="judgment in judgeJudgment.judgments"> <!--beautiful-->
                                 <div class="media-left">
-                                  <a href="#" class="team-pic">
-                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                  <a href="javascript:void(0)" class="team-pic">
+                                    <img class="media-object" 
+                                         src="{{team.logo}}"
+                                         ng-show="team.logo !== null"
+                                         width="64"
+                                         height="64" 
+                                         alt="64x64" />
+                                    <img class="media-object" 
+                                         src="http://placehold.it/64x64"
+                                         ng-show="team.logo === null" 
+                                         width="64"
+                                         height="64"
+                                         alt="64x64" />
                                     <span ng-if="judgment.completed" class="completed">
                                       <span class="glyphicon glyphicon-ok"></span>
                                     </span>
@@ -244,8 +256,19 @@
                                     data-toggle="modal"
                                     ng-repeat="unjudgment in judgeJudgment.theUnjudged"> <!--beautiful-->
                                 <div class="media-left">
-                                  <a href="#" class="team-pic">
-                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                  <a href="javascript:void(0)" class="team-pic">
+                                    <img class="media-object" 
+                                         src="{{team.logo}}"
+                                         ng-show="team.logo !== null"
+                                         width="64"
+                                         height="64" 
+                                         alt="64x64" />
+                                    <img class="media-object" 
+                                         src="http://placehold.it/64x64"
+                                         ng-show="team.logo === null" 
+                                         width="64"
+                                         height="64"
+                                         alt="64x64" />
                                   </a>
                                 </div>
                                 <div class="media-body">
@@ -363,8 +386,19 @@
                                     data-target="#completed-team-modal"
                                     ng-repeat="judgment in judgeJudgment.judgments"> 
                                 <div class="media-left">
-                                  <a href="#" class="team-pic">
-                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                  <a href="javascript:void(0)" class="team-pic">
+                                    <img class="media-object" 
+                                         src="{{team.logo}}"
+                                         ng-show="team.logo !== null"
+                                         width="64"
+                                         height="64" 
+                                         alt="64x64" />
+                                    <img class="media-object" 
+                                         src="http://placehold.it/64x64"
+                                         ng-show="team.logo === null" 
+                                         width="64"
+                                         height="64"
+                                         alt="64x64" />
                                     <span ng-if="judgment.completed" class="completed">
                                       <span class="glyphicon glyphicon-ok"></span>
                                     </span>
@@ -391,8 +425,19 @@
                                     data-toggle="modal"
                                     ng-repeat="unjudgment in judgeJudgment.theUnjudged"> <!--beautiful-->
                                 <div class="media-left">
-                                  <a href="#" class="team-pic">
-                                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                  <a href="javascript:void(0)" class="team-pic">
+                                    <img class="media-object" 
+                                         src="{{team.logo}}"
+                                         ng-show="team.logo !== null"
+                                         width="64"
+                                         height="64" 
+                                         alt="64x64" />
+                                     <img class="media-object" 
+                                         src="http://placehold.it/64x64"
+                                         ng-show="team.logo === null" 
+                                         width="64"
+                                         height="64"
+                                         alt="64x64" />
                                   </a>
                                 </div>
                                 <div class="media-body">
@@ -550,7 +595,18 @@
             <div class="media media-modal">
               <div class="media-left">
                 <a href="javascript:void(0)" class="team-pic">
-                  <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                  <img class="media-object" 
+                       src="{{team.logo}}"
+                       ng-show="team.logo !== null"
+                       width="64"
+                       height="64" 
+                       alt="64x64" />
+                  <img class="media-object" 
+                       src="http://placehold.it/64x64"
+                       ng-show="team.logo === null" 
+                       width="64"
+                       height="64"
+                       alt="64x64" />
                   <span class="completed">
                     <span class="glyphicon glyphicon-ok"></span>
                   </span>

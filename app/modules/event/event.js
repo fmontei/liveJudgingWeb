@@ -51,7 +51,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
-.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
+.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService',   
+                              'EventUtilService',
 	function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
 		$scope.isCreation = sessionStorage.getObject('selected_event') ? false : true;
 
@@ -86,7 +87,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				});
 			} else {
 				var eventId = sessionStorage.getObject('selected_event').id;
-				EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq).$promise.then(function(resp) {
+				EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq)
+          .$promise.then(function(resp) {
 					sessionStorage.putObject('selected_event', resp);
 					$location.path('/event');
 				}).catch(function() {
@@ -215,15 +217,17 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					end_time: $filter('date')(newEndTime, 'yyyy-MM-dd HH:mm:ss'),
 					location: curEvent.location
 			};
-			EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, updatedEvent).$promise.then(function(resp) {
-				console.log(resp);
+      
+			EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, 
+                                                                        updatedEvent)
+        .$promise.then(function(resp) {
 				sessionStorage.putObject('selected_event', resp);
 				var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
 				sessionStorage.put('event_view', view);
 				$scope.event.current_view = view;
 				console.log("Event started.");
 			}).catch(function() {
-				console.log('Error updating event times');
+				console.log('Error updating event times.');
 			});
 		};
 
@@ -634,6 +638,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					return false;
 				}
 			}
+      return false;
 		}
 	};
 

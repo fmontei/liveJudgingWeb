@@ -556,7 +556,6 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
         reader.onloadend = function () {
           scope.fileName = file.name;
           preview.style.display = 'block';
-          console.log(preview);
           preview.src = reader.result;
           var imageData = getBase64Image(preview);
           ngModel.$setViewValue(imageData);
