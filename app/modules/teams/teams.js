@@ -80,6 +80,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			$scope.teamName = team.name;
 			$scope.teamNumber = team.number;
 			$scope.teamLogo = team.logo;
+      $scope.teamThumbnail = team.logo;
 			$scope.teamDesc = team.desc;
 		}
 
@@ -538,24 +539,29 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
     },
     link: function(scope, elem, attrs, ngModel) {
       elem.change(function() {
+        selectAndRenderImage();
+      });
+      
+      function selectAndRenderImage() {
         var file = elem.context.files[0];
         var preview = document.getElementById(scope.previewContainer);
         var previewInfo = elem.find('#' + scope.previewInfoContainer);
-        
+
         if (!isCorrectFileFormat(file))
           return;
-                              
+
         var reader = new FileReader();
         reader.readAsDataURL(file);
 
         reader.onloadend = function () {
           scope.fileName = file.name;
           preview.style.display = 'block';
+          console.log(preview);
           preview.src = reader.result;
           var imageData = getBase64Image(preview);
           ngModel.$setViewValue(imageData);
-        }
-      });
+        }  
+      }
       
       function isCorrectFileFormat(file) { 
         if (!file)
@@ -577,12 +583,12 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
       function getBase64Image(img) {
           // Create an empty canvas element
           var canvas = document.createElement('canvas');
-          canvas.width = 64;
-          canvas.height = 64;
+          canvas.width = 300;
+          canvas.height = 200;
 
           // Copy the image contents to the canvas
           var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, 64, 64);
+          ctx.drawImage(img, 0, 0, 300, 200);
 
           // Get the data-URL formatted image
           // Firefox supports PNG and JPEG. You could check img.src to

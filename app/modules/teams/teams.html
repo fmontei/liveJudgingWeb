@@ -114,11 +114,14 @@
                     <img class="media-object" 
                          src="{{team.logo}}"
                          ng-show="team.logo !== null" 
+                         width="64"
+                         height="64"
                          alt="64x64">
                      <img class="media-object" 
                          src="http://placehold.it/64x64"
-                         ng-show="team.logo === null" 
-              
+                         ng-show="team.logo === null"
+                         width="64"
+                         height="64" 
                          alt="64x64">
                   </a>
                 </div>
@@ -147,7 +150,18 @@
                    is-transferable="true">
                 <div class="media-left">
                   <a href="javascript:void(0)">
-                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                    <img class="media-object" 
+                         src="{{team.logo}}"
+                         ng-show="team.logo !== null" 
+                         width="64"
+                         height="64"
+                         alt="64x64">
+                     <img class="media-object" 
+                         src="http://placehold.it/64x64"
+                         ng-show="team.logo === null" 
+                         width="64"
+                         height="64"
+                         alt="64x64">
                   </a>
                 </div>
                 <div class="media-body">
@@ -207,7 +221,18 @@
                                  is-transferable="true">
                               <div class="media-left">
                                 <a href="javascript:void(0)">
-                                  <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                                  <img class="media-object" 
+                                       src="{{team.logo}}"
+                                       ng-show="team.logo !== null" 
+                                       width="64"
+                                       height="64"
+                                       alt="64x64">
+                                   <img class="media-object" 
+                                       src="http://placehold.it/64x64"
+                                       ng-show="team.logo === null" 
+                                       width="64"
+                                       height="64"
+                                       alt="64x64">
                                 </a>
                               </div>
                                 <div class="media-body">
@@ -263,7 +288,18 @@
                    is-transferable="true">
                 <div class="media-left">
                   <a href="javascript:void(0)">
-                    <img class="media-object" src="http://placehold.it/64x64" alt="64x64">
+                    <img class="media-object" 
+                         src="{{team.logo}}"
+                         ng-show="team.logo !== null"
+                         width="64"
+                         height="64" 
+                         alt="64x64" />
+                     <img class="media-object" 
+                         src="http://placehold.it/64x64"
+                         ng-show="team.logo === null" 
+                         width="64"
+                         height="64"
+                         alt="64x64" />
                   </a>
                 </div>
                   <div class="media-body">
@@ -303,8 +339,12 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content panel-success">
 	  		<div class="modal-header panel-heading">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
+				<button type="button" 
+				        class="close" 
+				        data-dismiss="modal" 
+				        aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
 				<div ng-switch on="teamModalView">
 					<div ng-switch-when="create">
 						<div ng-switch on="teamView">
@@ -356,18 +396,30 @@
           <div class="col col-lg-7 col-md-7 col-sm-7">
             <div class="input-group">
               <span class="input-group-btn">
-                <button class="btn btn-success">
+                <a class="btn btn-success" type="button" role="button" href="javascript:void(0)">
                   <i class="glyphicon glyphicon-picture"></i>
                   Pick Image 
+                  <!-- Create -->
                   <input type="file"
                          class="form-control"
                          id="team-file-input"
+                         ng-show="teamModalView === 'create'"
                          image-file-input
                          ng-model="teamLogo"
-                         preview-container="preview-image"
+                         preview-container="preview-image-create"
                          file-name="fileName"
                          error="imageUploadError" />
-                </button>
+                  <!-- Edit -->
+                  <input type="file"
+                         class="form-control"
+                         id="team-file-input"
+                         ng-show="teamModalView === 'edit'"
+                         image-file-input
+                         ng-model="teamLogo"
+                         preview-container="preview-image-edit"
+                         file-name="fileName"
+                         error="imageUploadError" />
+                </a>
               </span>
               <input class="form-control" type="text" value="{{fileName}}" readonly />
             </div>
@@ -377,11 +429,18 @@
 				  <div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 				  </div>
 				  <div class="col col-lg-7 col-md-7 col-sm-7">
-				    <img src="http://placehold.it/200x300" 
-				         id="preview-image" 
+				    <img ng-show="teamModalView === 'create'"
+                 src="http://placehold.it/300x200"
+				         id="preview-image-create" 
 				         width="300" 
 				         height="200" 
 				         alt="Image preview..." />
+            <img ng-show="teamModalView === 'edit'" 
+                 src="{{teamThumbnail}}"
+                 id="preview-image-edit" 
+                 width="300" 
+                 height="200"
+                 alt="Image preview..." />
 				  </div>
 				</div>
 				<br />
