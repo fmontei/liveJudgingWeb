@@ -37,7 +37,12 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 				$scope.$watch(function() {
 						return CurrentUserService.hasLoginError;
 				 }, function(newValue) {
-						$scope.error = (newValue) ? 'Error logging in.' : undefined;
+            if (newValue) {
+              $scope.loginError = 'Error logging in.';
+              $scope.success = undefined;
+            } else {
+              $scope.loginError = undefined;
+            }
 				 });
 
         $scope.register = function(user) {
@@ -51,6 +56,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 						console.log('User registered.');
 						$scope.tabs = [{active: true}, {active: false}];
 						$scope.success = 'Successfully registered.';
+            $scope.loginError = undefined;
 					});
         };
 

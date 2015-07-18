@@ -3,9 +3,9 @@
 
     <tabset>
         <tab heading="Login" class="login-tab" active="tabs[0].active">
-            <div ng-switch on="error">
+            <div ng-switch on="loginError">
               <div ng-switch-default>
-                <p class="alert alert-danger" ng-bind="error"></p>
+                <p class="alert alert-danger" ng-bind="loginError"></p>
               </div>
               <div ng-switch-when="undefined">
               </div>
@@ -54,6 +54,8 @@
                 <input type="password"
                        ng-model="newUser.password"
                        class="form-control login-input"
+                       pattern=".{6,20}"
+                       title="Password must be between 6 - 20 characters long."
                        required>
 
                 <label>Confirm Password</label>
