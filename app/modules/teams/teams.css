@@ -55,3 +55,8 @@
 .btn-delete {
 	float: left;
 }
+
+.image-file-input {
+  width: 400px;
+  margin-left: 278px;
+}

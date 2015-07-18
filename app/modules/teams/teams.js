@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login', 'angularFileUpload'])
+angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/teams', {
@@ -114,7 +114,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login', '
 	}
 }])
 
-.factory('ScopeInitService', function(sessionStorage, TeamImageUploadService) {
+.factory('ScopeInitService', function(sessionStorage) {
 	return function($scope, sessionStorage) {
 		var initService = {};
 
@@ -150,43 +150,12 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login', '
 			}, true);
 
 			$scope.selectedEvent = sessionStorage.getObject('selected_event');
-      
-      TeamImageUploadService($scope, sessionStorage);
+      $scope.imageUploadError = null;
 		}
 
 		return initService;
 	}
 })
-
-.factory('TeamImageUploadService', ['FileUploader', function( FileUploader) {
-  return function($scope, sessionStorage) {
-    var service = {};
-
-    $scope.imageUploadError = null;
-    
-    $scope.imageUploader = new FileUploader({
-      filters: [{
-        name: 'isImageFilter',
-        fn: function(item) {
-          var fileType = item.type;
-          return (fileType.indexOf('image') > -1);
-        }
-      }]
-    });
-
-    $scope.imageUploader.onAfterAddingFile = function(item) {
-      $scope.image = item;
-      //$scope.imageUploader.clearQueue();
-      $scope.imageUploadError = null;
-    }
-
-    $scope.imageUploader.onWhenAddingFileFailed = function(item, filter, options) {
-      $scope.imageUploadError = 'Unsupported file type. Please select an image file.'
-    }
-
-    return service;
-  }
-}])
 
 .factory('TeamManagementService', ['$log', '$q', 'CategoryManagementService', 'CurrentUserService', 'TeamInitService', 'TeamRESTService', 'sessionStorage',
 	function($log, $q, CategoryManagementService, CurrentUserService, TeamInitService, TeamRESTService, sessionStorage) {
@@ -521,4 +490,28 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login', '
 			});
 		}
 	}
+})
+
+.directive('imageFileInput', function() {
+  return {
+    restrict: 'A',
+    scope: {
+      forceClass: '@',
+      errorContainer: '@'
+    },
+    link: function(scope, elem, attrs) {
+      elem.fileinput({
+        allowedFileTypes: ['image'],
+        allowedFileExtensions: ['bmp', 'jpg', 'jpeg', 'png'],
+        elErrorContainer: scope.errorContainer,
+        showUpload: false,
+        maxFileCount: 1,
+        mainClass: scope.forceClass,
+        previewClass: scope.forceClass
+      }); 
+      elem.on('fileloaded', function(event, file, previewId, index, reader) {
+        alert('File added: ' + file);
+      });
+    }
+  }
 });

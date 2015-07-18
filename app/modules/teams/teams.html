@@ -121,7 +121,9 @@
                          ng-click="changeTeamModalView('edit', team)">
                     </div>
                   </h4>
-                  <div class="media-text" cng-wrap-word word="{{team.name}}"
+                  <div class="media-text" 
+                       cng-wrap-word 
+                       word="{{team.name}}"
                        line-width="18"
                        total-width="36">
                   </div>
@@ -147,7 +149,9 @@
                          ng-click="changeTeamModalView('edit', team)">
                     </div>
                   </h4>
-                  <div class="media-text" cng-wrap-word word="{{team.name}}"
+                  <div class="media-text" 
+                       cng-wrap-word 
+                       word="{{team.name}}"
                        line-width="18"
                        total-width="36">
                   </div>
@@ -283,8 +287,12 @@
 </div> <!--Container-Fluid-->
 
 <!-- Team Modal -->
-<div class="modal fade" id="team-modal" tabindex="-1" role="dialog" aria-labelledby="team-modal" aria-hidden="true">
-	<div class="modal-dialog">
+<div class="modal fade" 
+     id="team-modal" 
+     tabindex="-1" role="dialog" 
+     aria-labelledby="team-modal" 
+     aria-hidden="true">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content panel-success">
 	  		<div class="modal-header panel-heading">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -336,35 +344,13 @@
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 						<label>Logo:</label>
 					</div>
-					<div class="col col-lg-2 col-md-2 col-sm-2">
-            <img class="media-object" 
-                 alt="64x64" />
-					</div>
-					<div class="col col-lg-5 col-md-5 col-sm-5" style="margin-left: -20px">
-						<div class="row">
-							<div class="col col-lg-12 col-md-12 col-sm-12">
-				
-								    <input class="btn btn-sm btn-default"
-										        type="file" 
-                            nv-file-select 
-                            uploader="imageUploader"
-                            queueLimit="1"
-                            filters="isImageFilter" />
 					
-					         
-							</div>
-						</div>
-						
-						<div class="row" style="margin-top: 4px">
-							<div class="col col-lg-12 col-md-12 col-sm-12">
-						
-                <button type="button" class="btn btn-success btn-xs" ng-click="createImagePreview()">
-                    <span class="glyphicon glyphicon-upload"></span> Upload
-                </button>
-							
-							</div>
-						</div>
-					</div>
+          <input type="file"
+                 class="file"
+                 ng-model="mememe"
+                 image-file-input
+                 error-container="#image-error-container"
+                 force-class="image-file-input" />
 				</div><br />
 
 				<div class="row">
@@ -383,16 +369,7 @@
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 					</div>
-					<div class="col col-lg-9 col-md-9 col-sm-9 modal-col">
-						<div ng-switch on="teamModalError">
-							<div ng-switch-when="undefined">
-							</div>
-							<div ng-switch-default>
-								<div class="alert alert-danger modal-alert">
-									{{teamModalError}}
-								</div>
-							</div>
-						</div>
+					<div class="col col-lg-9 col-md-9 col-sm-9 modal-col" id="image-error-container">
 					</div>
 				</div>
 				
