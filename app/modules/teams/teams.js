@@ -261,7 +261,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			};
 			var teamReq = {
 				name: newTeam.name,
-				logo: newTeam.logo
+				logo_base64: newTeam.logo
 			};
 			createTeamOnServer(newTeam, teamReq);
 		}
@@ -269,6 +269,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		var createTeamOnServer = function(newTeam, teamReq) {
 			var eventId = sessionStorage.getObject('selected_event').id;
 			var connection = TeamRESTService(authHeader);
+      console.log(JSON.stringify(teamReq));
 			connection.teams.create({event_id: eventId}, teamReq).$promise.then(function(resp) {
 
 				// Add new team to uncategorized (or to the selected category if there is one).
@@ -310,7 +311,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			};
 			// Server returns a 500 if a null logo is passed in.
 			if (updatedTeam.logo) {
-				req.logo = updatedTeam.logo;
+				req.logo_base64 = updatedTeam.logo;
 			}
 			var connection = TeamRESTService(authHeader);
 			connection.team.update({id: updatedTeam.id}, req).$promise.then(function(resp) {
@@ -434,7 +435,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		}
 
 		var isEmpty = function(str) {
-		return (!str || 0 === str.length);
+		  return (!str || 0 === str.length);
 		}
 
 		return teamManagement;
@@ -557,10 +558,11 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
       });
       
       function isCorrectFileFormat(file) { 
+        if (!file)
+          return false;
         if (!isImage(file)) {
           scope.error = 'Unsupported file type. Supported: |jpg|png|jpeg|bmp|gif|';
           scope.$apply();
-          console.log(scope.error);
           return false;
         }
         scope.error = null;
@@ -574,20 +576,20 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
       function getBase64Image(img) {
           // Create an empty canvas element
-          var canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
+          var canvas = document.createElement('canvas');
+          canvas.width = 64;
+          canvas.height = 64;
 
           // Copy the image contents to the canvas
-          var ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0);
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 64, 64);
 
           // Get the data-URL formatted image
           // Firefox supports PNG and JPEG. You could check img.src to
           // guess the original format, but be aware that using "image/jpg"
           // will re-encode the image.
-          var dataURL = canvas.toDataURL("image/png");
-          return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+          var dataURL = canvas.toDataURL('image/png');
+          return dataURL;
       }
     }
   }
