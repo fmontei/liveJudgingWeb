@@ -345,14 +345,38 @@
 						<label>Logo:</label>
 					</div>
 					
-          <input type="file"
-                 class="file"
-                 ng-model="mememe"
-                 image-file-input
-                 error-container="#image-error-container"
-                 main-class="image-file-input"
-                 preview-class="image-file-input" />
-				</div><br />
+          <div class="col col-lg-7 col-md-7 col-sm-7">
+            <div class="input-group">
+              <span class="input-group-btn">
+                <button class="btn btn-success">
+                  <i class="glyphicon glyphicon-picture"></i>
+                  Pick Image 
+                  <input type="file"
+                         class="form-control"
+                         id="team-file-input"
+                         image-file-input
+                         ng-model="teamLogo"
+                         preview-container="preview-image"
+                         file-name="fileName"
+                         error="imageUploadError" />
+                </button>
+              </span>
+              <input class="form-control" type="text" value="{{fileName}}" readonly />
+            </div>
+          </div>
+				</div>
+				<div class="row">
+				  <div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
+				  </div>
+				  <div class="col col-lg-7 col-md-7 col-sm-7">
+				    <img src="http://placehold.it/200x300" 
+				         id="preview-image" 
+				         height="200" 
+				         width="300" 
+				         alt="Image preview..." />
+				  </div>
+				</div>
+				<br />
 
 				<div class="row">
 					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
@@ -366,18 +390,11 @@
 						</textarea>
 					</div>
 				</div><br />
-
-				<div class="row">
-					<div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
-					</div>
-					<div class="col col-lg-9 col-md-9 col-sm-9 modal-col" id="image-error-container">
-					</div>
-				</div>
 				
 				<div class="row">
           <div class="col col-lg-3 col-md-3 col-sm-3 modal-col">
 					</div>
-				  <div class="col col-sm-9 col-md-9 col-lg-9 modal-col">
+				  <div class="col col-sm-7 col-md-7 col-lg-7">
                <div class="alert alert-danger" 
                     style="display: inline-block"
                     ng-show="imageUploadError !== null">

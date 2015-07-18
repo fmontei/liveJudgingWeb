@@ -495,34 +495,64 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 .directive('imageFileInput', function() {
   return {
     restrict: 'A',
+    require: 'ngModel',
     scope: {
-      mainClass: '@',
-      previewClass: '@',
-      errorContainer: '@'
+      previewContainer: '@',
+      fileName: '=',
+      error: '='
     },
-    link: function(scope, elem, attrs) {
-      elem.fileinput({
-        allowedFileTypes: ['image'],
-        allowedFileExtensions: ['bmp', 'jpg', 'jpeg', 'png'],
-        elErrorContainer: scope.errorContainer,
-        showUpload: false,
-        maxFileCount: 1,
-        mainClass: scope.mainClass,
-        previewClass: scope.previewClass
-      }); 
-      elem.on('fileloaded', function(event, file, previewId, index, reader) {
-        //console.log('File added: ' + file);
+    link: function(scope, elem, attrs, ngModel) {
+      elem.change(function() {
+        var file = elem.context.files[0];
+        var preview = document.getElementById(scope.previewContainer);
+        var previewInfo = elem.find('#' + scope.previewInfoContainer);
+                              
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onloadend = function () {
+          if (!isCorrectFileFormat(file))
+            return;
+          
+          scope.fileName = file.name;
+          preview.style.display = 'block';
+          preview.src = reader.result;
+          var imageData = getBase64Image(preview);
+          ngModel.$setViewValue(imageData);
+        }
       });
-      elem.on('filereset', function(event) {
-        //console.log("filereset");
-      });
-      elem.on('fileerror', function(event, data) {
-         /*console.log(data.id);
-         console.log(data.index);
-         console.log(data.file);
-         console.log(data.reader);
-         console.log(data.files);*/
-      });
+      
+      function isCorrectFileFormat(file) { 
+        if (!isImage(file)) {
+          scope.error = 'Unsupported file type. Please select an image.';
+          return false;
+        }
+        scope.error = null;
+        return true;
+      }
+      
+      function isImage(file) {
+        var type =  '|' + file.type.slice(file.type.lastIndexOf('/') + 1) + '|';
+        return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+      }
+
+      function getBase64Image(img) {
+          // Create an empty canvas element
+          var canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Copy the image contents to the canvas
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+
+          // Get the data-URL formatted image
+          // Firefox supports PNG and JPEG. You could check img.src to
+          // guess the original format, but be aware that using "image/jpg"
+          // will re-encode the image.
+          var dataURL = canvas.toDataURL("image/png");
+          return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+      }
     }
   }
 });

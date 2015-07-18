@@ -56,7 +56,24 @@
 	float: left;
 }
 
-.image-file-input {
-  width: 400px;
-  margin-left: 278px;
+#team-file-input {
+  position:absolute;
+  z-index:2;
+  top:0;
+  left:0;
+  filter: alpha(opacity=0);
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  opacity:0;
+  background-color:transparent;
+  color:transparent;  
+}
+
+#preview-image {
+  background-color: #f3f3f3;
+  -webkit-box-shadow: 3px 3px 3px 0 #e3e3e3;
+  -moz-box-shadow: 3px 3px 3px 0 #e3e3e3;
+  box-shadow: 3px 3px 3px 0 #e3e3e3;
+  border: 1px solid #c3c3c3;
+  margin: 6px 0 0 6px; 
+  display: none;
 }
