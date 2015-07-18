@@ -540,14 +540,14 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
         var file = elem.context.files[0];
         var preview = document.getElementById(scope.previewContainer);
         var previewInfo = elem.find('#' + scope.previewInfoContainer);
+        
+        if (!isCorrectFileFormat(file))
+          return;
                               
         var reader = new FileReader();
         reader.readAsDataURL(file);
 
         reader.onloadend = function () {
-          if (!isCorrectFileFormat(file))
-            return;
-          
           scope.fileName = file.name;
           preview.style.display = 'block';
           preview.src = reader.result;
@@ -558,7 +558,9 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
       
       function isCorrectFileFormat(file) { 
         if (!isImage(file)) {
-          scope.error = 'Unsupported file type. Please select an image.';
+          scope.error = 'Unsupported file type. Supported: |jpg|png|jpeg|bmp|gif|';
+          scope.$apply();
+          console.log(scope.error);
           return false;
         }
         scope.error = null;
