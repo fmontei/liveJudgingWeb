@@ -294,9 +294,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
     rubricManagement.confirmRubricTransfer = function(category, rubric) {
       var defer = $q.defer();
       
-      var oldRubric = undefined;
-      if (category.rubric_categories.length !== 0) 
-        oldRubric = category.rubric_categories[0].rubric;
+      var oldRubric = category.rubric;
       var rubricTransfer = {
         categoryName: category.label,
         rubric: rubric,
