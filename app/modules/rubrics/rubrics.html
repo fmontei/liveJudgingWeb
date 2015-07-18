@@ -164,8 +164,18 @@
       </div>
     
       <div class="modal-body">
-        <h1><s>{{rubricTransfer.oldRubric.name}}</s></h1>
-        <h1>{{rubricTransfer.rubric.name}} &rarr; {{rubricTransfer.categoryName}}</h1>
+        <h1>
+          <label class="label label-success">
+            {{rubricTransfer.rubric.name}} &rarr; {{rubricTransfer.categoryName}}
+          </label>
+        </h1>
+
+        <h1>
+          <label class="label label-danger">
+            <s>{{rubricTransfer.oldRubric.name}}</s>
+          </label>
+        </h1>
+        
         <p>Transfer rubric <u>{{rubricTransfer.rubric.name}}</u> to category <u>{{rubricTransfer.categoryName}}</u>?</p>
         <br />
         <small>Summary view for new rubric:</small>
