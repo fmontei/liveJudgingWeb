@@ -69,7 +69,10 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 	$scope.editRubric = function() {
 		var rubricReq = {name: $scope.rubricForm.name};
-		rubricManagementService.editRubric($scope.rubricId, rubricReq, $scope.modalCriteria, $scope.criteriaToRemove).then(function() {
+		rubricManagementService.editRubric($scope.rubricId, 
+                                       rubricReq, 
+                                       $scope.modalCriteria, 
+                                       $scope.criteriaToRemove).then(function() {
 			rubricManagementService.getRubrics();
 		});
 		$scope.closeRubricModal();
@@ -95,6 +98,14 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		$scope.rubricId = null;
 		$('#rubric-modal').modal('hide');
 	}
+  
+  $scope.commitRubricTransfer = function() {
+    $scope.$broadcast('commitRubricTransfer', true);
+  }
+  
+  $scope.cancelRubricTransfer = function() {
+    $scope.$broadcast('cancelRubricTransfer', true);
+  }
 
 	$scope.changeView = function(view) {
 		rubricManagementService.changeView(view);
@@ -104,7 +115,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		return $scope.rubricRating;
 	}, function(newValue) {
 		$scope.updateRubricRating(newValue);
-	})
+	});
 }])
 
 .factory('RubricManagementService', function($q, CurrentUserService, RubricRESTService) {
@@ -115,6 +126,14 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		rubricManagement.changeView = function(view) {
 			sessionStorage.put('rubricView', view);
 		}
+    
+    rubricManagement.getRubricById = function(rubricId) {
+      for (var i = 0; i < $scope.rubrics.length; i++) {
+        if (rubricId == $scope.rubrics[i].id)
+          return $scope.rubrics[i];
+      }
+      return null;
+    }
 
 		rubricManagement.getRubrics = function() {
 			var eventId = sessionStorage.getObject('selected_event').id;
@@ -271,7 +290,39 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 
 			return defer.promise;
 		}
-
+    
+    rubricManagement.confirmRubricTransfer = function(category, rubric) {
+      var defer = $q.defer();
+      
+      var oldRubric = undefined;
+      if (category.rubric_categories.length !== 0) 
+        oldRubric = category.rubric_categories[0].rubric;
+      var rubricTransfer = {
+        categoryName: category.label,
+        rubric: rubric,
+        oldRubric: oldRubric
+      };
+      sessionStorage.putObject('rubricTransfer', rubricTransfer);
+      $scope.$apply();
+      $('#rubric-transfer-modal').modal('show');  
+      
+      $scope.$on('commitRubricTransfer', function() {
+        $('#rubric-transfer-modal').modal('hide'); 
+        if (oldRubric !== undefined) {
+          defer.resolve();
+        } else
+          defer.resolve();
+      });
+      
+      $scope.$on('cancelRubricTransfer', function() {
+        sessionStorage.putObject('rubricTrasnfer', undefined);  
+        $('#rubric-transfer-modal').modal('hide'); 
+        defer.reject();
+      });
+      
+      return defer.promise;
+    }
+  
 		return rubricManagement;
 	}
 })
@@ -364,6 +415,12 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 			}, function(newValue) {
 				$scope.rubrics = newValue;
 			}, true);
+      
+      $scope.$watch(function() {
+        return sessionStorage.getObject('rubricTransfer');
+      }, function(newValue) {
+        $scope.rubricTransfer = newValue;
+      }, true);
 		}
 
 		return service;

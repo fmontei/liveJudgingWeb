@@ -175,11 +175,13 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 }])
 
-.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService', 'RubricRESTService', 'TeamRESTService',
-    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService, RubricRESTService, TeamRESTService) {
+.factory('CategoryManagementService', ['sessionStorage', '$log', '$q', 'CategoryRESTService', 'CurrentUserService', 'RubricRESTService', 'RubricManagementService', 'TeamRESTService',
+    function(sessionStorage, $log, $q, CategoryRESTService, CurrentUserService, RubricRESTService, 
+              RubricManagementService, TeamRESTService) {
     return function($scope) {
         var authHeader = CurrentUserService.getAuthHeader();
         var eventId = sessionStorage.getObject('selected_event').id;
+        var rubricManagement = RubricManagementService($scope, sessionStorage);
 
         var categoryManagement = {};
 
@@ -378,7 +380,9 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             var req = {category_id: categoryId};
             connection.team_categories.add_team({team_id: teamId}, req).$promise.then(function(resp) {
                 if (sessionStorage.getObject('uncategorized').id != categoryId) {
-                    categoryManagement.isTeamAlreadyInCategory(teamId, sessionStorage.getObject('uncategorized').id).then(function(resp) {
+                    categoryManagement.isTeamAlreadyInCategory(teamId,
+                                                               sessionStorage.getObject('uncategorized').id)
+                      .then(function(resp) {
                         if (resp) {
                             categoryManagement.removeTeamFromUncategorized(teamId);
                         }
@@ -408,14 +412,30 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
 
         categoryManagement.transferRubricToCategory = function(categoryId, rubricId) {
             var rubricRESTService = RubricRESTService(authHeader);
-            var req = {category_id: categoryId};
-            CategoryRESTService(authHeader).rubrics.addToCat({rubric_id: rubricId}, {category_id: categoryId}).$promise.then(function(resp) {
-                categoryManagement.getCategories();
-                console.log(resp);
-                console.log('Successfully transferred rubric to category');
-            }).catch(function() {
-                console.log('Error transferring rubric to category');
+            confirmRubricTransfer(categoryId, rubricId).then(function() {
+              CategoryRESTService(authHeader).rubrics.addToCat({rubric_id: rubricId}, 
+                                                                 {category_id: categoryId})
+                  .$promise.then(function(resp) {
+                    categoryManagement.getCategories();
+                    console.log('Successfully transferred rubric to category');
+                }).catch(function() {
+                    console.log('Error transferring rubric to category');
+                });
             });
+        }
+        
+        var confirmRubricTransfer = function(categoryId, rubricId) {
+          var defer = $q.defer();
+          
+          var category = categoryManagement.getCategoryById(categoryId);
+          var rubric = rubricManagement.getRubricById(rubricId);
+          rubricManagement.confirmRubricTransfer(category, rubric).then(function() {
+            defer.resolve();
+          }).catch(function() {
+            defer.reject();
+          });
+          
+          return defer.promise;
         }
 
         categoryManagement.removeTeamFromUncategorized = function(teamId) {
@@ -573,6 +593,12 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             }, {
                 addToCat: {
                     method: 'POST',
+                    headers: authHeader
+                },
+                removeFromCat: {
+                    url: 'http://api.stevedolan.me/rubrics/:rubric_id/categories/:id',
+                    params: {rubric_id: '@rubric_id', id: '@category_id'},
+                    method: 'DELETE',
                     headers: authHeader
                 }
             })

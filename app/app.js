@@ -204,7 +204,7 @@ angular.module('liveJudgingAdmin', [
             });
 
             var cog = elem.find(scope.cog);
-            var timeout = undefined;
+            var timeout = null;
           
             elem.bind('mouseenter', function() {
               cog.show();
@@ -219,7 +219,7 @@ angular.module('liveJudgingAdmin', [
             elem.on('changeDragged', function() {
               if (!elem.data('isDragged'))
                 timeout = setTimeout(function() {elem.goBack()}, 3000);
-              else if (elem.data('isDragged') && timeout !== undefined)
+              else if (elem.data('isDragged') && timeout !== null)
                 clearTimeout(timeout);
             });
 

@@ -8,7 +8,8 @@
               <h1 custom-popover
                   popover-content="{{hints['mainHeading'].content}}" 
                   popover-placement="{{hints['mainHeading'].placement}}"
-                  popover-toggle="{{hints['mainHeading'].enabled}}">Rubrics <span class="label label-default">{{rubrics.length}}</span>
+                  popover-toggle="{{hints['mainHeading'].enabled}}">Rubrics 
+                  <span class="label label-default">{{rubrics.length}}</span>
               </h1>
             </div>
             <div class="col col-sm-5 col-md-5 col-lg-5 general-error-message-col">
@@ -144,6 +145,72 @@
 	</div> <!-- ./col-sm-4 col-md-4 col-lg-4 -->
 </div> <!-- ./container-fluid -->
 
+
+<!-- Confirm Rubric Transfer Modal -->
+<div class="modal fade" 
+     data-backdrop="static" 
+     data-keyboard="false" 
+     id="rubric-transfer-modal" 
+     tabindex="-1" role="dialog" 
+     aria-labelledby="rubric-modal" 
+     aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content panel-success">
+			<div class="modal-header panel-heading">
+				<button type="button" class="close" ng-click="cancelRubricTransfer()" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Confirm Rubric Transfer (One rubric per category)</h4>
+      </div>
+    
+      <div class="modal-body">
+        <h1><s>{{rubricTransfer.oldRubric.name}}</s></h1>
+        <h1>{{rubricTransfer.rubric.name}} &rarr; {{rubricTransfer.categoryName}}</h1>
+        <p>Transfer rubric <u>{{rubricTransfer.rubric.name}}</u> to category <u>{{rubricTransfer.categoryName}}</u>?</p>
+        <br />
+        <small>Summary view for new rubric:</small>
+        <table class="table table-striped" style="table-layout: fixed">
+          <thead>
+            <tr>
+              <th style="width: 40%;">Name</th>
+              <th style="width: 30%;">Rating</th>
+              <th style="width: 15%;">Min</th>
+              <th style="width: 15%;">Max</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="criterion in rubricTransfer.rubric.criteria">
+              <td style="overflow: hidden; white-space: nowrap;">{{criterion.label}}</td>
+              <td>
+                <rating ng-model="criterion.max_score" max="criterion.max_score" readonly></rating>
+              </td>
+              <td>{{criterion.min_score}}</td>
+              <td>{{criterion.max_score}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div> <!-- ./modal-body -->
+      
+      <div class="modal-footer">
+				<div class="row">
+					<span class="col col-sm-5">
+            <button class="btn btn-success"
+                    ng-click="commitRubricTransfer()">Confirm</button>
+          </span>
+          <span class="col col-sm-2">
+          </span>
+          <span class="col col-sm-5">
+            <button class="btn btn-failure pull-left"
+                    ng-click="cancelRubricTransfer()">Cancel</button>
+          </span>
+        </div>
+      </div>
+      
+    </div> <!-- ./modal-content -->
+  </div> <!-- ./modal-dialog -->
+</div> <!-- ./modal fade -->
+
+<!-- Create/Edit Rubric Modal -->
 <div class="modal fade" id="rubric-modal" tabindex="-1" role="dialog" aria-labelledby="rubric-modal" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content panel-success">
@@ -262,41 +329,6 @@
 									</div>
 								</div accordion-group>
 							</div>
-							
-							<!-- Preview Rubric View -->
-							<div accordion-group is-open="preview.open" class="panel-info" ng-show="modalCriteria.length > 0">
-                <div accordion-heading class="panel-heading rubric-accordion-heading">
-                  <div class="rubric-accordion-heading-content">
-                    Preview
-                    <i class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': preview.open, 'glyphicon-chevron-right': !preview.open}">
-                    </i>
-                  </div>
-                </div accordion-heading>
-
-                <label>Rubric name:</label>&nbsp;&nbsp;<u>{{rubricForm.name}}</u><br />
-                <p>Criteria are listed below. Teams in categories with this rubric will be judged according to the following:</p>
-                <table class="table table-striped" style="table-layout: fixed">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Rating</th>
-                      <th>Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr ng-repeat="criterion in modalCriteria">
-                      <td style="overflow: hidden; white-space:nowrap;">{{criterion.label}}</td>
-                      <td ng-if="rubricModalView === 'create'">
-                        <span ng-if="criterion.ratingType === 'Inherited'">{{rubricRating}}/10</span>
-                        <span ng-if="criterion.ratingType === 'Custom'">{{criterion.rating}}/10</span>
-                      </td>
-                      <td ng-if="rubricModalView === 'edit'">{{criterion.max_score}}/10</td>
-                      <td style="overflow: hidden; white-space:nowrap;">{{criterion.description}} (TODO)</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div accordion-group>
 						</div accordion>
 
 					</div>
@@ -323,7 +355,9 @@
 						</button>
 					</span>
 					<span class="col col-sm-2"></span>
-					<span class="col col-sm-5"><button type="button" class="btn btn-failure pull-left" data-dismiss="modal">Cancel</button></span>
+					<span class="col col-sm-5">
+					  <button type="button" class="btn btn-failure pull-left" data-dismiss="modal">Cancel</button>
+					</span>
 				</div>
 			</div> <!-- ./modal-footer -->
 		</div>
