@@ -15,13 +15,17 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     });
 }])
 
-.run(['sessionStorage', function(sessionStorage) {
-    sessionStorage.put("event_view", undefined);
+.run(['EventUtilService', 'sessionStorage', function(EventUtilService, sessionStorage) {
+    if (EventUtilService.isEventRunning(sessionStorage.getObject('selected_event'))) {
+        sessionStorage.put('event_view', EventUtilService.views.EVENT_IN_PROGRESS_VIEW);
+    } else {
+        sessionStorage.put('event_view', EventUtilService.views.EVENT_READY_VIEW);
+    }
 }])
 
-.controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function(sessionStorage, $location, $scope, CurrentUserService, EventService, EventUtilService) {
-        EventService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
+.controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
+    function(sessionStorage, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
+        EventRESTService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
             console.log('Successfully retrieved events from server.');
             $scope.eventList = resp;
         }).catch(function(error) {
@@ -47,8 +51,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService',
-    function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventService, EventUtilService) {
+.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
+    function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
         $scope.isCreation = sessionStorage.getObject('selected_event') ? false : true;
 
         $scope.datePicker = {
@@ -72,7 +76,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             }
 
             if ($scope.isCreation) {
-                EventService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
+                EventRESTService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
                     sessionStorage.putObject('selected_event', resp);
                     EventUtilService.setEventView(EventUtilService.views.EVENT_READY_VIEW);
                     $location.path('/event');
@@ -82,7 +86,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 });
             } else {
                 var eventId = sessionStorage.getObject('selected_event').id;
-                EventService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq).$promise.then(function(resp) {
+                EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq).$promise.then(function(resp) {
                     sessionStorage.putObject('selected_event', resp);
                     $location.path('/event');
                 }).catch(function() {
@@ -169,8 +173,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 ])
 
-.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
-    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventService, EventUtilService,
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
+    function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventRESTService, EventUtilService,
 						 TeamRESTService, TeamStandingService) {
 
 		var teamStandingService = TeamStandingService($scope);
@@ -190,15 +194,37 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
             return sessionStorage.getObject('selected_event');
         };
 
+        $scope.isEventRunning = function() {
+            return EventUtilService.isEventRunning();
+        };
+
         $scope.editEvent = function() {
             $location.path('/eventEdit');
         };
 
         $scope.beginEvent = function() {
-            var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
-            sessionStorage.put('event_view', view);
-            $scope.event.current_view = view;
-            console.log("Event started.");
+            var curEvent = sessionStorage.getObject('selected_event');
+            var eventId = curEvent.id;
+            var eventDuration = Date.parse(curEvent.end_time) - Date.parse(curEvent.start_time);
+            var newStartTime = Date.now();
+            var newEndTime = newStartTime + eventDuration;
+
+            var updatedEvent = {
+                    name: curEvent.name,
+                    start_time: $filter('date')(newStartTime, 'yyyy-MM-dd HH:mm:ss'),
+                    end_time: $filter('date')(newEndTime, 'yyyy-MM-dd HH:mm:ss'),
+                    location: curEvent.location
+            };
+            EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, updatedEvent).$promise.then(function(resp) {
+                console.log(resp);
+                sessionStorage.putObject('selected_event', resp);
+                var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
+                sessionStorage.put('event_view', view);
+                $scope.event.current_view = view;
+                console.log("Event started.");
+            }).catch(function() {
+                console.log('Error updating event times');
+            });
         };
 
         $scope.reveal_event_desc = function(desc) {
@@ -238,20 +264,46 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
           }
         }
 
-        // Decides whether an event is in progress or not whenever /event is hit.
-        if (EventUtilService.isEventRunning($scope.getSelectedEvent())) {
-            var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
-        } else {
-            var view = EventUtilService.views.EVENT_READY_VIEW;
-        }
-        sessionStorage.put('event_view', view);
-        $scope.event.current_view = view;
+        $scope.$on('$locationChangeStart', function(event, next, current) {
+            if ($location.path() !== '/event') {
+                // Decides whether an event is in progress or not whenever /event is hit.
+                if (EventUtilService.isEventRunning(sessionStorage.getObject('selected_event'))) {
+                    var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
+                } else {
+                    var view = EventUtilService.views.EVENT_READY_VIEW;
+                }
+                sessionStorage.put('event_view', view);
+                $scope.event.current_view = view;
+            }
+        });
 
         /** DASHBOARD RELATED **/
         $scope.judgeOrderReverse = true;
+        $scope.judgeAssignmentCount = 0;
+        $scope.judgeCompletedCount = 0;
 
         $scope.orderByCompletion = function(judgeJudgment) {
             return parseInt(judgeJudgment.completion);
+        }
+
+        $scope.determineOverallJudgeProgress = function(judgeJudgments) {
+            if (!judgeJudgments) {
+                return [null, null, null];
+            }
+            var teamCount = 0;
+            var completedTeamCount = 0;
+            for (var i = 0; i < judgeJudgments.length; i++) {
+                for (var j = 0; j < judgeJudgments[i].judgments.length; j++) {
+                    if (judgeJudgments[i].judgments[j].completed) {
+                        completedTeamCount++;
+                    }
+                }
+                teamCount += judgeJudgments[i].judgments.length;
+                teamCount += judgeJudgments[i].theUnjudged.length;
+            }
+            $scope.judgeAssignmentCount = teamCount;
+            $scope.judgeCompletedCount = completedTeamCount;
+            return [completedTeamCount, teamCount, Math.floor(completedTeamCount/teamCount * 100)];
         }
     }
 ])
@@ -516,9 +568,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         setEventView: function(view) {
             sessionStorage.put('event_view', view);
         },
-        isEventRunning: function(event) {
-            var startDateTime = new Date(Date.parse(event.start_time));
-            if (startDateTime <= Date()) {
+        isEventRunning: function() {
+            var event = sessionStorage.getObject('selected_event');
+            var startDateTime = Date.parse(event.start_time);
+            var endDateTime = Date.parse(event.end_time);
+            if (startDateTime <= Date.now() && endDateTime >= Date.now()) {
                 sessionStorage.put("event" + event.id + "_running", "true");
                 return true;
             } else {
@@ -530,7 +584,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     return service;
 })
 
-.factory('EventService', function($resource, CurrentUserService) {
+.factory('EventRESTService', function($resource, CurrentUserService) {
     return function(authHeader) {
         return {
             events: $resource('http://api.stevedolan.me/events', {}, {
@@ -540,7 +594,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
                 },
                 get: {
                     method: 'GET',
-										isArray: true,
+					isArray: true,
                     headers: authHeader
                 }
             }),
