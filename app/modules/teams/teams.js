@@ -148,15 +148,10 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login', '
 			}, function(newValue) {
 				$scope.categories = newValue;
 			}, true);
-      
-      $scope.$watch(function() {
-        return TeamImageUploadService.imageUploadError;
-      }, function(newValue) {
-        $scope.imageUploadError = newValue;
-      });
 
 			$scope.selectedEvent = sessionStorage.getObject('selected_event');
-      $scope.imageUploader = TeamImageUploadService.imageUploader;
+      
+      TeamImageUploadService($scope, sessionStorage);
 		}
 
 		return initService;
@@ -164,31 +159,33 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login', '
 })
 
 .factory('TeamImageUploadService', ['FileUploader', function( FileUploader) {
-  var service = {};
-  
-  service.imageUploadError = null;
-  
-  service.imageUploader = new FileUploader({
-    filters: [{
-      name: 'isImageFilter',
-      fn: function(item) {
-        var fileType = item.type;
-        return (fileType.indexOf('image') > -1);
-      }
-    }]
-  });
-  
-  service.imageUploader.onAfterAddingFile = function(item) {
-    service.image = item;
-    service.imageUploader.clearQueue();
-    service.imageUploadError = null;
+  return function($scope, sessionStorage) {
+    var service = {};
+
+    $scope.imageUploadError = null;
+    
+    $scope.imageUploader = new FileUploader({
+      filters: [{
+        name: 'isImageFilter',
+        fn: function(item) {
+          var fileType = item.type;
+          return (fileType.indexOf('image') > -1);
+        }
+      }]
+    });
+
+    $scope.imageUploader.onAfterAddingFile = function(item) {
+      $scope.image = item;
+      //$scope.imageUploader.clearQueue();
+      $scope.imageUploadError = null;
+    }
+
+    $scope.imageUploader.onWhenAddingFileFailed = function(item, filter, options) {
+      $scope.imageUploadError = 'Unsupported file type. Please select an image file.'
+    }
+
+    return service;
   }
-  
-  service.imageUploader.onWhenAddingFileFailed = function(item, filter, options) {
-    service.imageUploadError = 'Unsupported file type. Please select an image file.'
-  }
-  
-  return service;
 }])
 
 .factory('TeamManagementService', ['$log', '$q', 'CategoryManagementService', 'CurrentUserService', 'TeamInitService', 'TeamRESTService', 'sessionStorage',
