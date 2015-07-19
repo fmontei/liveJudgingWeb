@@ -49,13 +49,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			} else {
 				EventUtilService.setEventView(EventUtilService.views.EVENT_READY_VIEW);
 			}
-      $location.path('/eventLoading');
+	  $location.path('/eventLoading');
 		};
 	}
 ])
 
-.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService',   
-                              'EventUtilService',
+.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService',
+							  'EventUtilService',
 	function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
 		$scope.isCreation = sessionStorage.getObject('selected_event') ? false : true;
 
@@ -67,11 +67,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		$scope.eventForm = {
 			startTime: new Date(0, 0, 0, 12, 0),
 			endTime: new Date(0, 0, 0, 12, 0),
-      minDate: Date.now()
+			minDate: Date.now()
 		};
-    
-    $scope.eventForm.isMultiDay = false;
-    
+
+		$scope.eventForm.isMultiDay = false;
+
 		$scope.saveEvent = function(eventForm) {
 			addDateTimesToEvent(eventForm);
 
@@ -94,7 +94,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			} else {
 				var eventId = sessionStorage.getObject('selected_event').id;
 				EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, eventReq)
-          .$promise.then(function(resp) {
+		  		.$promise.then(function(resp) {
 					sessionStorage.putObject('selected_event', resp);
 					$location.path('/event');
 				}).catch(function() {
@@ -117,7 +117,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			$scope.eventForm = {
 				startTime: new Date(0, 0, 0, 12, 0),
 				endTime: new Date(0, 0, 0, 12, 0),
-        minDate: Date.now()
+		minDate: Date.now()
 			};
 		};
 
@@ -125,7 +125,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			$scope.eventForm = {
 				name: event.name,
 				location: event.location,
-        minDate: Date.now()
+		minDate: Date.now()
 			};
 			addDateTimesToForm(event);
 		};
@@ -138,7 +138,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 			$scope.eventForm.startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
 			$scope.eventForm.endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-      $scope.eventForm.isMultiDay = false;
+			$scope.eventForm.isMultiDay = false;
 			$scope.eventForm.startTime = new Date(0, 0, 0, start.getHours(), start.getMinutes(), 0);
 			$scope.eventForm.endTime = new Date(0, 0, 0, end.getHours(), end.getMinutes(), 0);
 		};
@@ -176,99 +176,106 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		} else {
 			loadEventForm(sessionStorage.getObject('selected_event'));
 		}
-    
-    $scope.$watch(function() {
-      return $scope.eventForm.startDate;
-    }, function(startDate) {
-      if (startDate > $scope.eventForm.endDate || $scope.eventForm.endDate === undefined)
-        $scope.eventForm.endDate = startDate;
-      if ($scope.isMultiDay)
-        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
-                                   $scope.eventForm.endTime);
-      else
-        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
-                                   $scope.eventForm.endTime);
-    });
 
-    $scope.$watch(function() {
-      return $scope.eventForm.endDate;
-    }, function(endDate) {
-      if (endDate < $scope.eventForm.startDate) 
-        $scope.eventForm.startDate = endDate;
-      if ($scope.isMultiDay)
-        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
-                                   $scope.eventForm.endTime);
-      else
-        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
-                                   $scope.eventForm.endTime);
-    });
+		$scope.$watch(function() {
+		  return $scope.eventForm.startDate;
+		}, function(startDate) {
+		  if (startDate > $scope.eventForm.endDate || $scope.eventForm.endDate === undefined)
+			$scope.eventForm.endDate = startDate;
+		  if ($scope.isMultiDay)
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.endDate,
+									   $scope.eventForm.endTime);
+		  else
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.startDate,
+									   $scope.eventForm.endTime);
+		});
 
-    $scope.$watch(function() {
-      return $scope.eventForm.startTime;
-    }, function(startTime) {
-      if (startTime > $scope.eventForm.endTime) 
-        $scope.eventForm.endTime = startTime;
-      if ($scope.isMultiDay)
-        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
-                                   $scope.eventForm.endTime);
-      else
-        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
-                                   $scope.eventForm.endTime);
-    });
+		$scope.$watch(function() {
+		  return $scope.eventForm.endDate;
+		}, function(endDate) {
+		  if (endDate < $scope.eventForm.startDate) 
+			$scope.eventForm.startDate = endDate;
+		  if ($scope.isMultiDay)
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.endDate, 
+									   $scope.eventForm.endTime);
+		  else
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.startDate, 
+									   $scope.eventForm.endTime);
+		});
 
-    $scope.$watch(function() {
-      return $scope.eventForm.endTime;
-    }, function(endTime) {
-      if (endTime < $scope.eventForm.startTime) 
-        $scope.eventForm.startTime = endTime;
-      if ($scope.isMultiDay)
-        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
-                                   $scope.eventForm.endTime);
-      else
-        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
-                                   $scope.eventForm.endTime);
-    });
+		$scope.$watch(function() {
+		  return $scope.eventForm.startTime;
+		}, function(startTime) {
+		  if (startTime > $scope.eventForm.endTime) 
+			$scope.eventForm.endTime = startTime;
+		  if ($scope.isMultiDay)
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.endDate, 
+									   $scope.eventForm.endTime);
+		  else
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.startDate, 
+									   $scope.eventForm.endTime);
+		});
 
-    var compareEndTimeAndDateToNow = function(endDate, endTime) {
-      if (!endDate || !endTime) {
-        $scope.invalidDateTime = true;
-        return;
-      }
-      var endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(),
-                                 endTime.getHours(), endTime.getMinutes(), endTime.getSeconds()); 
-      if (Date.now() > endDateTime) 
-        $scope.invalidDateTime = true;
-      else
-        $scope.invalidDateTime = false;
-    }
+		$scope.$watch(function() {
+		  return $scope.eventForm.endTime;
+		}, function(endTime) {
+		  if (endTime < $scope.eventForm.startTime) 
+			$scope.eventForm.startTime = endTime;
+		  if ($scope.isMultiDay)
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.endDate, 
+									   $scope.eventForm.endTime);
+		  else
+			$scope.compareEndTimeAndDateToNow($scope.eventForm.startDate, 
+									   $scope.eventForm.endTime);
+		});
+
+		$scope.compareEndTimeAndDateToNow = function(endDate, endTime) {
+			if (!endTime) {
+				return true;
+			}
+			if (!endDate) {
+				endDate = $scope.eventForm.startDate;
+				if (!endDate) {
+					return true;
+				}
+			}
+			var endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(),
+									 endTime.getHours(), endTime.getMinutes(), endTime.getSeconds());
+			if (Date.now() > endDateTime)
+				return true;
+		  	if (!$scope.eventForm.startDate || !$scope.eventForm.startTime || !$scope.eventForm.endTime || !$scope.eventForm.name || !$scope.eventForm.location) {
+		  		return true;
+		  	}
+		  	return false;
+		}
 	}
 ])
 
 .controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 'JudgeManagementService', 
-                                 'TeamManagementService', 'TeamStandingService',
+								 'TeamManagementService', 'TeamStandingService',
 	function($q, $scope, $location, $timeout, sessionStorage, JudgeManagementService, 
-            TeamManagmentService, TeamStandingService) {
+			TeamManagmentService, TeamStandingService) {
   
-    var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-    var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-    var teamStandingService = TeamStandingService($scope);
+	var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+	var teamStandingService = TeamStandingService($scope);
 
-    $scope.getEverything = function() {
-      var masterDefer = $q.defer();
-      
-      $timeout(function() {
-        masterDefer.reject();
-        //TODO: raise alert if loading timeout occurs--something went wrong
-      }, 60000);
-      
-      teamStandingService.getDashboardInfo().then(function() {
-        masterDefer.resolve();
-      }).catch(function(error) {
-        masterDefer.reject();
-      });
+	$scope.getEverything = function() {
+	  var masterDefer = $q.defer();
+	  
+	  $timeout(function() {
+		masterDefer.reject();
+		//TODO: raise alert if loading timeout occurs--something went wrong
+	  }, 60000);
+	  
+	  teamStandingService.getDashboardInfo().then(function() {
+		masterDefer.resolve();
+	  }).catch(function(error) {
+		masterDefer.reject();
+	  });
 
-      return masterDefer.promise;
-    }
+	  return masterDefer.promise;
+	}
   
     $scope.getEverything().then(function() {
       $location.path('/event');
@@ -279,9 +286,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 }])
 
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 
-                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', 'JudgmentRESTService',
+                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', 
 	function(sessionStorage, $filter, $location, $interval, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
-						 TeamRESTService, TeamStandingService, JudgmentRESTService) {
+						 TeamRESTService, TeamStandingService) {
     
 		var teamStandingService = TeamStandingService($scope);
 		teamStandingService.init();
@@ -300,10 +307,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			current_view: sessionStorage.get('event_view')
 		};
 
-    $scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
-                        {name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
-                        {name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
-    
+	$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
+						{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
+						{name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
+	
 		$scope.getSelectedEvent = function() {
 			return sessionStorage.getObject('selected_event');
 		};
@@ -329,10 +336,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					end_time: $filter('date')(newEndTime, 'yyyy-MM-dd HH:mm:ss'),
 					location: curEvent.location
 			};
-      
+	  
 			EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, 
-                                                                        updatedEvent)
-        .$promise.then(function(resp) {
+																		updatedEvent)
+		.$promise.then(function(resp) {
 				sessionStorage.putObject('selected_event', resp);
 				var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
 				sessionStorage.put('event_view', view);
@@ -437,21 +444,21 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 ])
 
 .factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService',
-                                 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService',
-                                 'TeamManagementService', 'TeamRESTService', '$location',
+								 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService',
+								 'TeamManagementService', 'TeamRESTService', '$location',
 	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService,
-            JudgmentRESTService, RubricRESTService, TeamManagmentService, TeamRESTService, $location) {
+			JudgmentRESTService, RubricRESTService, TeamManagmentService, TeamRESTService, $location) {
 	return function($scope) {
-    
+	
 		var authHeader = CurrentUserService.getAuthHeader();
-    var eventId = sessionStorage.getObject('selected_event').id;
+	var eventId = sessionStorage.getObject('selected_event').id;
 
-    var categoryManagementService = CategoryManagementService($scope);
-    categoryManagementService.getCategories();
+	var categoryManagementService = CategoryManagementService($scope);
+	categoryManagementService.getCategories();
 
-    var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-    var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-    
+	var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+	
 		var service = {};
     
     service.getDashboardInfo = function() {
@@ -569,7 +576,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				}
 			}
 			sessionStorage.putObject('teamStanding', teamStanding);
-      console.log('Done computing team standing.');
+	  console.log('Done computing team standing.');
 		}
 
 		service.getJudgmentsByAllJudges = function() {
@@ -583,12 +590,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			}
 
 			$q.all(promises).then(function(resp) {
-        console.log('Judgments successfully retrieved from server.');
+		console.log('Judgments successfully retrieved from server.');
 				defer.resolve(resp);
 			}).catch(function() {
 				defer.reject();
-        var error = 'Error getting judgments by judge Ids.';
-        sessionStorage.put('generalErrorMessage', error);
+		var error = 'Error getting judgments by judge Ids.';
+		sessionStorage.put('generalErrorMessage', error);
 				console.log('Error getting judgments by judge ids.');
 			});
 
@@ -873,7 +880,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					return false;
 				}
 			}
-      return false;
+	  return false;
 		}
 	};
 
@@ -1061,19 +1068,19 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					}
 		}, true);
 			
-    scope.$on('firstRecipientsAdded', function (event, data) {
-      if (data) {
-        if ($.isArray(data)) {
-          angular.forEach(data, function(entry) {
-          create_new_judge_notification_object(entry); 
-          });
-        } else if (typeof data === 'string') {
-          create_new_judge_notification_object(data); 
-        }
-      }
+	scope.$on('firstRecipientsAdded', function (event, data) {
+	  if (data) {
+		if ($.isArray(data)) {
+		  angular.forEach(data, function(entry) {
+		  create_new_judge_notification_object(entry); 
+		  });
+		} else if (typeof data === 'string') {
+		  create_new_judge_notification_object(data); 
+		}
+	  }
 		});
 
-    /*
+	/*
 		 * Initialize the Autocomplete Object for the Notification Modal
 		 */
 		var updateAutoComplete = function() {

@@ -9,7 +9,7 @@
       <form class="edit-event-form">
         <div class="row">
           <div class="col col-lg-2 col-md-2 col-sm-2">
-            <label>Event Name:</label>
+            <label>*Event Name:</label>
           </div>
           <div class="col col-lg-3 col-md-3 col-sm-3">
             <input class="form-control"
@@ -23,7 +23,7 @@
 
         <div class="row">
           <div class="col col-lg-2 col-md-2 col-sm-2">
-            <label>Location:</label>
+            <label>*Location:</label>
           </div>
           <div class="col col-lg-3 col-md-3 col-sm-3">
             <input class="form-control"
@@ -37,7 +37,7 @@
 
         <div class="row">
             <div class="col col-lg-2 col-md-2 col-sm-2">
-              <label>Start Date:</label>
+              <label>*Start Date:</label>
             </div>
             <div class="col col-lg-10 col-md-10 col-sm-10">
               <div class="row">
@@ -109,7 +109,7 @@
         
         <div class="row">
           <div class="col col-lg-2 col-md-2 col-sm-2">
-            <label>Start Time:</label>
+            <label>*Start Time:</label>
           </div>
           <div class="col col-lg-10 col-md-10 col-sm-10">
             <div class="row">
@@ -124,7 +124,7 @@
         
         <div class="row">
           <div class="col col-lg-2 col-md-2 col-sm-2">
-            <label>End Time:</label>
+            <label>*End Time:</label>
           </div>
           <div class="col col-lg-10 col-md-10 col-sm-10">
             <div class="row">
@@ -143,7 +143,7 @@
           <div class="col col-lg-4 col-md-4 col-sm-4">
             <button class="btn btn-lg btn-primary"
                     ng-click="saveEvent(eventForm)"
-                    ng-disabled="invalidDateTime()">
+                    ng-disabled="compareEndTimeAndDateToNow(eventForm.endDate, eventForm.endTime)">
               Save
             </button>
 
