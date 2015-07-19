@@ -297,7 +297,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       teamStandingService.getDashboardInfo();
       console.log('Updating dashboard.');
     }, 90000);
-    teamStandingService.getDashboardInfo();
 
 		var categoryManagementService = CategoryManagementService($scope);
 
