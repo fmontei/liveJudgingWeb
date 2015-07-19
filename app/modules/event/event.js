@@ -509,32 +509,45 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		   Luv, Christina K */
 
 		service.determineTeamStanding = function(jJudgments) {
+			console.log(jJudgments);
 			// jJudgments refers to all the team-category assignments
-			// for all judges, whether they are completed or not.
+			// for all judges, whether they are completed, in progress, or unstarted.
 			var teamStanding = [];
-			var seenTeamCats = [];
+			var seenCats = [];
 			for (var i = 0; i < jJudgments.length; i++) {
 				for (var j = 0; j < jJudgments[i].teamCats.length; j++) {
 					var judgment = jJudgments[i].teamCats[j];
-					if (judgment.judged && seenTeamCats.indexOf(judgment.team_category_id) == -1) {
-						seenTeamCats.push(judgment.team_category_id);
+					// If there's at least submitted criteria, take the 'judgment' into account
+					if (judgment.submitedCriteria && seenCats.indexOf(judgment.category.id) == -1) {
+						seenCats.push(judgment.category.id);
 						teamStanding.push({
 							category: judgment.category,
 							teams: []
 						});
-						teamStanding[teamStanding.length - 1]
-							.teams.push({team: judgment.team,
-										teamPercentScore: judgment.percentScore,
-										teamJudgmentsCount: 1});
-					} else { // We've seen this team-category pairing before, combine it.
+						teamStanding[teamStanding.length - 1].teams.push({
+							team: judgment.team,
+							teamPercentScore: judgment.percentScore,
+							teamJudgmentsCount: 1
+						});
+					// Just to be explicit:
+					} else if (judgment.submitedCriteria &&  seenCats.indexOf(judgment.category.id) != -1) { // We've seen this team-category pairing before, combine it.
 						var help = 'me';
+						var foundTeam;
 						for (var k = 0; k < teamStanding.length; k++) {
+							foundTeam = false;
 							if (teamStanding[k].category.id == judgment.category.id) {
 								for (var l = 0; l < teamStanding[k].teams.length; l++) {
 									if (teamStanding[k].teams[l].team.id == judgment.team.id) {
+										foundTeam = true;
 										teamStanding[k].teams[l].teamPercentScore += judgment.percentScore;
 										teamStanding[k].teams[l].teamJudgmentsCount++;
 									}
+								}
+								if (!foundTeam) {
+									teamStanding[k].teams.push({
+										team: judgment.team,
+										teamPercentScore: judgment.percentScore,
+										teamJudgmentsCount: 1});
 								}
 							}
 						}
