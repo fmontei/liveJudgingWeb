@@ -402,6 +402,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			return parseInt(judgeJudgment.completion);
 		}
 
+		$scope.prettyPercent = function(uglyPercent) {
+			uglyPercent *= 100;
+			return +uglyPercent.toFixed(2);
+		}
+
 		$scope.determineOverallJudgeProgress = function(judgeJudgments) {
 			if (!judgeJudgments || judgeJudgments.length === 0) {
 				return [0, 0, 0];
