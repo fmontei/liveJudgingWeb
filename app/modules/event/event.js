@@ -384,10 +384,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
-.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 
+.factory('TeamStandingService', ['$q', '$interval', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 
                                  'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService', 
                                  'TeamManagementService',
-	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService, 
+	function($q, $interval, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService, 
             JudgmentRESTService, RubricRESTService, TeamManagmentService) {
 	return function($scope) {
 		var authHeader = CurrentUserService.getAuthHeader();
@@ -404,18 +404,22 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				var teamManagmentService = TeamManagmentService($scope, sessionStorage);
 				var judgeManagementService = JudgeManagementService($scope, sessionStorage);
 
-				// So many promises
-				teamManagmentService.getTeams().then(function(resp) {
-					teamManagmentService.getTeamsCategories(resp).then(function() {
-						service.getJudgmentsOfAllTeams();
-						judgeManagementService.getJudges().then(function() {
-							service.getJudgmentsByAllJudges().then(function(resp) {
-									sessionStorage.putObject('judgeJudgments', resp);
-									service.determineTeamStanding(resp);
+				function getDashboardInfo() {
+					// So many promises
+					teamManagmentService.getTeams().then(function(resp) {
+						teamManagmentService.getTeamsCategories(resp).then(function() {
+							service.getJudgmentsOfAllTeams();
+							judgeManagementService.getJudges().then(function() {
+								service.getJudgmentsByAllJudges().then(function(resp) {
+										sessionStorage.putObject('judgeJudgments', resp);
+										service.determineTeamStanding(resp);
+								});
 							});
 						});
 					});
-				});
+				}
+				getDashboardInfo();
+				$interval(getDashboardInfo, 60000);
 
 				$scope.$watch(function() {
 					return sessionStorage.getObject('categories');
@@ -610,7 +614,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 		service.determineCompletedTeamsByJudge = function(id, judgments) {
 			// IMPORTANT: Here, 'judgment' refers to an overall judgment
-			// of a team (all criteria considered)
+			// of a team (all criteria considered).
 			var defer = $q.defer();
 
 			if (judgments.length == 0) {
