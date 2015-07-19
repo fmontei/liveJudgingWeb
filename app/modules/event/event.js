@@ -241,12 +241,14 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
-.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
-	function(sessionStorage, $filter, $location, $rootScope, $scope, CurrentUserService, EventRESTService, EventUtilService,
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
+	function(sessionStorage, $filter, $location, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
 						 TeamRESTService, TeamStandingService) {
 
 		var teamStandingService = TeamStandingService($scope);
 		teamStandingService.init();
+
+		var categoryManagementService = CategoryManagementService($scope);
 
 		$scope.event = {
 			EVENT_READY_VIEW: EventUtilService.views.EVENT_READY_VIEW,
@@ -303,7 +305,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 				$scope.rankNext3Categories = function() {
 					var categoryInc = parseInt(sessionStorage.get('categoryInc')) + 3;
-					var numCategories = $scope.categories.length;
+					var numCategories = $scope.teamStanding.length;
 					if (categoryInc > numCategories)
 						sessionStorage.put('categoryInc', 0);
 					else
@@ -375,6 +377,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			$scope.judgeCompletedCount = completedTeamCount;
 			return [completedTeamCount, teamCount, Math.floor(completedTeamCount/teamCount * 100)];
 		}
+
+		$scope.convertColorToHex = function(decimalColor) {
+			return categoryManagementService.convertColorToHex(decimalColor);
+		}
 	}
 ])
 
@@ -441,6 +447,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 						$scope.judgeJudgments = newValue;
 				}, true);
 
+				$scope.$watch(function() {
+						return sessionStorage.getObject('teamStanding');
+				}, function(newValue) {
+						$scope.teamStanding = newValue;
+				}, true);
+
 				sessionStorage.put('categoryInc', '0');
 		}
 
@@ -451,8 +463,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		   Luv, Christina K */
 
 		service.determineTeamStanding = function(jJudgments) {
-			var defer = $q.defer();
-
 			var teamStanding = [];
 			var seenCats = [];
 			for (var i = 0; i < jJudgments.length; i++) {
@@ -497,7 +507,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					teamStanding[i].teams[j].teamPercentScore = teamStanding[i].teams[j].teamPercentScore / teamStanding[i].teams[j].teamJudgmentsCount;
 				}
 			}
-			console.log(teamStanding);
+			sessionStorage.putObject('teamStanding', teamStanding);
 		}
 
 		service.getJudgmentsByAllJudges = function() {

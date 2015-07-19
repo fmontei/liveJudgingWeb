@@ -196,7 +196,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                         category.color = '#BBBBBB';
                         sessionStorage.putObject('uncategorized', category);
                     }
-                    category.color = convertColorToHex(category.color);
+                    category.color = categoryManagement.convertColorToHex(category.color);
                     filterColorFromList(filteredColorList, category.color);
                 });
                 sessionStorage.putObject('categories', resp);
@@ -241,7 +241,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             connection.new_category.create({event_id: eventId}, categoryReq).$promise.then(function(resp) {
                 var returnedCategoryID = resp.id;
                 newCategory.id = returnedCategoryID;
-                resp.color = convertColorToHex(resp.color);
+                resp.color = categoryManagment.convertColorToHex(resp.color);
                 // Save category objects in session storage.
                 var currentCats = sessionStorage.getObject('categories');
                 if (currentCats) {
@@ -498,7 +498,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             return parseInt(hexColor, 16);
         }
 
-        var convertColorToHex = function(decimalColor) {
+        categoryManagement.convertColorToHex = function(decimalColor) {
             var hexColor = decimalColor.toString(16);
             var lengthDiff = 6 - hexColor.length;
             var prefix = '#';

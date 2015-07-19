@@ -501,13 +501,13 @@
 							<div class="row" ng-init="filterType=''">
 								<div ng-switch on="filterRanking">
 									<div ng-switch-default>
-										<div ng-repeat="category in categories"
+										<div ng-repeat="catTeamGroup in teamStanding"
 												 ng-include="'/app/modules/event/teamStandingTemplate.html'">
 											<!-- HTML provided by template -->
 										</div>
 									</div> <!-- ng-switch-default -->
 									<div ng-switch-when="custom">
-										<div ng-repeat="category in categories | filter3Categories"
+										<div ng-repeat="catTeamGroup in teamStanding | filter3Categories"
 												 ng-include="'/app/modules/event/teamStandingTemplate.html'">
 											<!-- HTML provided by template -->
 										</div>
