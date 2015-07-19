@@ -63,9 +63,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 		$scope.eventForm = {
 			startTime: new Date(0, 0, 0, 12, 0),
-			endTime: new Date(0, 0, 0, 12, 0)
+			endTime: new Date(0, 0, 0, 12, 0),
+      minDate: Date.now()
 		};
-
+    
+    $scope.eventForm.isMultiDay = false;
+    
 		$scope.saveEvent = function(eventForm) {
 			addDateTimesToEvent(eventForm);
 
@@ -110,7 +113,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			$scope.eventForm = null;
 			$scope.eventForm = {
 				startTime: new Date(0, 0, 0, 12, 0),
-				endTime: new Date(0, 0, 0, 12, 0)
+				endTime: new Date(0, 0, 0, 12, 0),
+        minDate: Date.now()
 			};
 		};
 
@@ -118,6 +122,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			$scope.eventForm = {
 				name: event.name,
 				location: event.location,
+        minDate: Date.now()
 			};
 			addDateTimesToForm(event);
 		};
@@ -130,11 +135,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 			$scope.eventForm.startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
 			$scope.eventForm.endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-
-			if ($scope.eventForm.startDate != $scope.eventForm.endDate) {
-				$scope.eventForm.isMultiDay = true;
-			}
-
+      $scope.eventForm.isMultiDay = false;
 			$scope.eventForm.startTime = new Date(0, 0, 0, start.getHours(), start.getMinutes(), 0);
 			$scope.eventForm.endTime = new Date(0, 0, 0, end.getHours(), end.getMinutes(), 0);
 		};
@@ -172,6 +173,71 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		} else {
 			loadEventForm(sessionStorage.getObject('selected_event'));
 		}
+    
+    $scope.$watch(function() {
+      return $scope.eventForm.startDate;
+    }, function(startDate) {
+      if (startDate > $scope.eventForm.endDate || $scope.eventForm.endDate === undefined)
+        $scope.eventForm.endDate = startDate;
+      if ($scope.isMultiDay)
+        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
+                                   $scope.eventForm.endTime);
+      else
+        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
+                                   $scope.eventForm.endTime);
+    });
+
+    $scope.$watch(function() {
+      return $scope.eventForm.endDate;
+    }, function(endDate) {
+      if (endDate < $scope.eventForm.startDate) 
+        $scope.eventForm.startDate = endDate;
+      if ($scope.isMultiDay)
+        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
+                                   $scope.eventForm.endTime);
+      else
+        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
+                                   $scope.eventForm.endTime);
+    });
+
+    $scope.$watch(function() {
+      return $scope.eventForm.startTime;
+    }, function(startTime) {
+      if (startTime > $scope.eventForm.endTime) 
+        $scope.eventForm.endTime = startTime;
+      if ($scope.isMultiDay)
+        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
+                                   $scope.eventForm.endTime);
+      else
+        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
+                                   $scope.eventForm.endTime);
+    });
+
+    $scope.$watch(function() {
+      return $scope.eventForm.endTime;
+    }, function(endTime) {
+      if (endTime < $scope.eventForm.startTime) 
+        $scope.eventForm.startTime = endTime;
+      if ($scope.isMultiDay)
+        compareEndTimeAndDateToNow($scope.eventForm.endDate, 
+                                   $scope.eventForm.endTime);
+      else
+        compareEndTimeAndDateToNow($scope.eventForm.startDate, 
+                                   $scope.eventForm.endTime);
+    });
+
+    var compareEndTimeAndDateToNow = function(endDate, endTime) {
+      if (!endDate || !endTime) {
+        $scope.invalidDateTime = true;
+        return;
+      }
+      var endDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(),
+                                 endTime.getHours(), endTime.getMinutes(), endTime.getSeconds()); 
+      if (Date.now() > endDateTime) 
+        $scope.invalidDateTime = true;
+      else
+        $scope.invalidDateTime = false;
+    }
 	}
 ])
 
@@ -312,8 +378,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
-.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService', 'TeamManagementService',
-	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService, JudgmentRESTService, RubricRESTService, TeamManagmentService) {
+.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 
+                                 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService', 
+                                 'TeamManagementService',
+	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService, 
+            JudgmentRESTService, RubricRESTService, TeamManagmentService) {
 	return function($scope) {
 		var authHeader = CurrentUserService.getAuthHeader();
 
@@ -809,19 +878,19 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					}
 		}, true);
 			
-				scope.$on('firstRecipientsAdded', function (event, data) {
-					if (data) {
-			if ($.isArray(data)) {
-			  angular.forEach(data, function(entry) {
-				create_new_judge_notification_object(entry); 
-			  });
-			} else if (typeof data === 'string') {
-			  create_new_judge_notification_object(data); 
-			}
-		  }
+    scope.$on('firstRecipientsAdded', function (event, data) {
+      if (data) {
+        if ($.isArray(data)) {
+          angular.forEach(data, function(entry) {
+          create_new_judge_notification_object(entry); 
+          });
+        } else if (typeof data === 'string') {
+          create_new_judge_notification_object(data); 
+        }
+      }
 		});
 
-				/*
+    /*
 		 * Initialize the Autocomplete Object for the Notification Modal
 		 */
 		var updateAutoComplete = function() {

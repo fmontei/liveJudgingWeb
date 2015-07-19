@@ -48,6 +48,7 @@
                            datepicker-popup
                            ng-model="eventForm.startDate"
                            is-open="datePicker.startOpened"
+                           min-date="eventForm.minDate"
                            required
                            close-text="Close" />
                     <span class="input-group-btn">
@@ -62,7 +63,12 @@
                 <div class="col col-lg-4 col-md-4 col-sm-4">
                   <multi-day-event-widget>
                     <div class="checkbox">
-                      <label><input type="checkbox" id="multi-day-event-checkbox" ng-model="eventForm.isMultiDay">Multi-day event?</label>
+                      <label><input 
+                              type="checkbox" 
+                              id="multi-day-event-checkbox" 
+                              ng-model="eventForm.isMultiDay" />
+                              Multi-day event?
+                      </label>
                     </div>
                   <multi-day-event-widget>
                 </div>
@@ -84,6 +90,7 @@
                              datepicker-popup
                              ng-model="eventForm.endDate"
                              is-open="datePicker.endOpened"
+                             min-date="eventForm.minDate"
                              required
                              close-text="Close" />
                       <span class="input-group-btn">
@@ -135,11 +142,12 @@
           </div>
           <div class="col col-lg-4 col-md-4 col-sm-4">
             <button class="btn btn-lg btn-primary"
-                    ng-click="saveEvent(eventForm)">
+                    ng-click="saveEvent(eventForm)"
+                    ng-disabled="invalidDateTime">
               Save
             </button>
 
-            <button class="btn btn-lg btn-default"
+            <button class="btn btn-lg btn-failure"
                     ng-click="cancel()">
               Cancel
             </button>
