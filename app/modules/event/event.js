@@ -3,7 +3,10 @@
 angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-	$routeProvider.when('/event', {
+	$routeProvider.when('/eventLoading', {
+		templateUrl: 'modules/event/eventLoading.html',
+		controller: 'EventLoadingCtrl'
+	}).when('/event', {
 		templateUrl: 'modules/event/event.html',
 		controller: 'EventCtrl'
 	}).when('/eventSelect', {
@@ -26,7 +29,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 .controller('EventSelectCtrl', ['sessionStorage', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
 	function(sessionStorage, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
 		EventRESTService(CurrentUserService.getAuthHeader()).events.get().$promise.then(function(resp) {
-			console.log('Successfully retrieved events from server.');
+			console.log('Events successfully retrieved from server.');
 			$scope.eventList = resp;
 		}).catch(function(error) {
 			sessionStorage.putObject('generalErrorMessage', 'Error getting events from server.');
@@ -46,7 +49,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			} else {
 				EventUtilService.setEventView(EventUtilService.views.EVENT_READY_VIEW);
 			}
-			$location.path('/event');
+      $location.path('/eventLoading');
 		};
 	}
 ])
@@ -244,7 +247,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService',
 	function(sessionStorage, $filter, $location, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
 						 TeamRESTService, TeamStandingService) {
-
 		var teamStandingService = TeamStandingService($scope);
 		teamStandingService.init();
 
@@ -384,11 +386,54 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
+.controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 'JudgeManagementService', 
+                                 'TeamManagementService', 'TeamStandingService',
+	function($q, $scope, $location, $timeout, sessionStorage, JudgeManagementService, 
+            TeamManagmentService, TeamStandingService) {
+  
+    var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+    var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+    var teamStandingService = TeamStandingService($scope);
+
+    $scope.getEverything = function() {
+      var masterDefer = $q.defer();
+      
+      $timeout(function() {
+        masterDefer.reject();
+        //TODO: raise alert if loading timeout occurs--something went wrong
+      }, 60000);
+      
+      teamManagmentService.getTeams().then(function(resp) {
+        teamManagmentService.getTeamsCategories(resp).then(function() {
+          teamStandingService.getJudgmentsOfAllTeams();
+          judgeManagementService.getJudges().then(function() {
+            teamStandingService.getJudgmentsByAllJudges().then(function(resp) {
+                sessionStorage.putObject('judgeJudgments', resp);
+                teamStandingService.determineTeamStanding(resp);
+                masterDefer.resolve();
+            });
+          });
+        });
+      }).catch(function(error) {
+        masterDefer.reject();
+      });
+
+      return masterDefer.promise;
+    }
+  
+    $scope.getEverything().then(function() {
+      $location.path('/event');
+    }).catch(function(error) {
+      $location.path('/eventSelect');
+    });
+}])
+
+
 .factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 
                                  'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService', 
-                                 'TeamManagementService',
+                                 'TeamManagementService', '$location',
 	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService, 
-            JudgmentRESTService, RubricRESTService, TeamManagmentService) {
+            JudgmentRESTService, RubricRESTService, TeamManagmentService, $location) {
 	return function($scope) {
 		var authHeader = CurrentUserService.getAuthHeader();
 
@@ -403,19 +448,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 				var teamManagmentService = TeamManagmentService($scope, sessionStorage);
 				var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-
-				// So many promises
-				teamManagmentService.getTeams().then(function(resp) {
-					teamManagmentService.getTeamsCategories(resp).then(function() {
-						service.getJudgmentsOfAllTeams();
-						judgeManagementService.getJudges().then(function() {
-							service.getJudgmentsByAllJudges().then(function(resp) {
-									sessionStorage.putObject('judgeJudgments', resp);
-									service.determineTeamStanding(resp);
-							});
-						});
-					});
-				});
 
 				$scope.$watch(function() {
 					return sessionStorage.getObject('categories');
@@ -525,7 +557,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				defer.resolve(resp);
 			}).catch(function() {
 				defer.reject();
-				console.log('Error getting judgments by judge ids');
+        var error = 'Error getting judgments by judge Ids.';
+        sessionStorage.put('generalErrorMessage', error);
+				console.log('Error getting judgments by judge ids.');
 			});
 
 			return defer.promise;
