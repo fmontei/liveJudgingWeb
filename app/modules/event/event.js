@@ -526,7 +526,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 										teamPercentScore: judgment.percentScore,
 										teamJudgmentsCount: 1});
 					} else {
-						var help = 'me';
 						var foundTeam;
 						for (var k = 0; k < teamStanding.length; k++) {
 							foundTeam = false;
