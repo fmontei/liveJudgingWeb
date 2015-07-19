@@ -273,6 +273,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     $scope.getEverything().then(function() {
       $location.path('/event');
     }).catch(function(error) {
+      $scope.eventTimeoutError = 'Connection to the server timed out.';
       $location.path('/eventSelect');
     });
 }])
@@ -402,8 +403,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		}
 
 		$scope.determineOverallJudgeProgress = function(judgeJudgments) {
-			if (!judgeJudgments) {
-				return [null, null, null];
+			if (!judgeJudgments || judgeJudgments.length === 0) {
+				return [0, 0, 0];
 			}
 			var teamCatCount = 0;
 			var completedTeamCatCount = 0;
@@ -448,7 +449,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       var defer = $q.defer();
       
       teamManagmentService.getTeams().then(function(resp) {
-        teamManagmentService.getTeamsCategories(resp).then(function() {
+        teamManagmentService.getTeamsCategories(resp).then(function(teamsCategories) {
           service.getJudgmentsOfAllTeams();
           judgeManagementService.getJudges().then(function() {
             service.getJudgmentsByAllJudges().then(function(resp) {
@@ -826,6 +827,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 		service.getJudgmentsOfTeam = function(eventId, teamId) {
 			var defer = $q.defer();
+      
 			JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId}).$promise.then(function(resp) {
 				defer.resolve(resp);
 			}).catch(function() {

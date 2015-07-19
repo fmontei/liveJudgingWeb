@@ -199,11 +199,10 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			$q.all(promises).then(function(resp) {
 				sessionStorage.putObject('teamsCategories', resp);
 				defer.resolve(resp);
+        console.log('Successfully retrieved team categories.');
 			}).catch(function() {
 				defer.reject();
-			});
-
-			return defer.promise;
+			});	
 
 			function getTeamCategories(teamId) {
 				var defer = $q.defer();
@@ -216,7 +215,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 				return defer.promise;
 			}
-
+      
+      return defer.promise;
 		}
 
 		var getCategoriesForEachTeam = function(eventTeams) {

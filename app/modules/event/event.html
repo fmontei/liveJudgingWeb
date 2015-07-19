@@ -89,14 +89,20 @@
                       </div>
                     </div> -->
                     <progressbar max="100"
-                                value="determineOverallJudgeProgress(judgeJudgments)[2]"
-                                class="progress-striped"
-                                type="success">
-                    <span>{{determineOverallJudgeProgress(judgeJudgments)[2]}}%</span>
+                                 ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0"
+                                 value="determineOverallJudgeProgress(judgeJudgments)[2]"
+                                 class="progress-striped"
+                                 type="success">
+                    <span ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0">
+                      {{determineOverallJudgeProgress(judgeJudgments)[2]}}%
+                    </span>
                   </progressbar>
                   </span>
                   <span class="col col-sm-6 col-md-6 col-lg-6">
-                    <span style="float: left">{{determineOverallJudgeProgress(judgeJudgments)[0]}}/{{determineOverallJudgeProgress(judgeJudgments)[1]}} team assignments completed</span>
+                    <span class="pull-left">
+                      {{determineOverallJudgeProgress(judgeJudgments)[0]}}/{{determineOverallJudgeProgress(judgeJudgments)[1]}}&nbsp; 
+                      team assignments completed
+                    </span>
                   </span>
                 </div>
               </div>
@@ -219,7 +225,7 @@
                           <!--List of judge's completed teams-->
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
-                              <h4>Completed or in progress (click teams for details):</h4>
+                              <h4>Completed or in progress (click teams for rating details):</h4>
                             </div>
                           </div>
                           <div class="row">
@@ -231,7 +237,7 @@
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
                                     <img class="media-object"
-                                         src="{{teamCat.team.logo}}"
+                                         ng-src="{{teamCat.team.logo}}"
                                          ng-show="teamCat.team.logo !== null"
                                          width="64"
                                          height="64" 
@@ -271,7 +277,7 @@
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
                                     <img class="media-object" 
-                                         src="{{unjudgment.logo}}"
+                                         ng-src="{{unjudgment.logo}}"
                                          ng-show="unjudgment.logo !== null"
                                          width="64"
                                          height="64" 
@@ -405,7 +411,7 @@
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
                                     <img class="media-object" 
-                                         src="{{judgment.team.logo}}"
+                                         ng-src="{{judgment.team.logo}}"
                                          ng-show="judgment.team.logo !== null"
                                          width="64"
                                          height="64" 
@@ -444,7 +450,7 @@
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
                                     <img class="media-object" 
-                                         src="{{unjudgment.logo}}"
+                                         ng-src="{{unjudgment.logo}}"
                                          ng-show="unjudgment.logo !== null"
                                          width="64"
                                          height="64" 
@@ -617,7 +623,7 @@
               <div class="media-left">
                 <a href="javascript:void(0)" class="team-pic">
                   <img class="media-object" 
-                       src="{{team.logo}}"
+                       ng-src="{{team.logo}}"
                        ng-show="team.logo !== null"
                        width="64"
                        height="64" 
