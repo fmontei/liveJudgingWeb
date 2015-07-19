@@ -848,6 +848,23 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 })
 
+.factory('MessageRESTService', function($resource) {
+	return function(authHeader) {
+		return {
+			messages: $resource('http://api.stevedolan.me/messages', {
+				recipient_id: '@recipientId',
+				subject: '@subject',
+				body: '@body'
+			}, {
+				send: {
+					method: 'POST',
+					headers: authHeader
+				}
+			})
+		}
+	}
+})
+
 .filter('formatTab', function() {
 	return function(tab) {
 		var tabParts = tab.split('-');
