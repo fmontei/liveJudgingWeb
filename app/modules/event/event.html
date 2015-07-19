@@ -227,6 +227,7 @@
                               <div class="media judgedTeam active"
                                     data-toggle="modal"
                                     data-target="#completed-team-modal"
+                                    ng-click="populateCompletedTeamModal(teamCat)"
                                     ng-repeat="teamCat in judgeJudgment.teamCats">
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
@@ -401,6 +402,7 @@
                               <div class="media judgedTeam active"
                                     data-toggle="modal"
                                     data-target="#completed-team-modal"
+                                    ng-click="populateCompletedTeamModal(judgeJudgment)"
                                     ng-repeat="judgment in judgeJudgment.judgments"> 
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">

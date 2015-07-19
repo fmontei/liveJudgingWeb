@@ -278,10 +278,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     });
 }])
 
-.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 
-                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', '$interval',
-	function(sessionStorage, $filter, $location, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
-						 TeamRESTService, TeamStandingService, $interval) {
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 
+                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', 'JudgmentRESTService',
+	function(sessionStorage, $filter, $location, $interval, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
+						 TeamRESTService, TeamStandingService, JudgmentRESTService) {
     
 		var teamStandingService = TeamStandingService($scope);
 		teamStandingService.init();
@@ -289,7 +289,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     $interval(function() {
       teamStandingService.getDashboardInfo();
       console.log('Updating dashboard.');
-    }, 60000);
+    }, 90000);
     teamStandingService.getDashboardInfo();
 
 		var categoryManagementService = CategoryManagementService($scope);
@@ -337,7 +337,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
 				sessionStorage.put('event_view', view);
 				$scope.event.current_view = view;
-				console.log("Event started.");
+				console.log('Event started.');
 			}).catch(function() {
 				console.log('Error updating event times.');
 			});
@@ -429,6 +429,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		$scope.convertColorToHex = function(decimalColor) {
 			return categoryManagementService.convertColorToHex(decimalColor);
 		}
+    
+    $scope.populateCompletedTeamModal= function(team) {
+      //TODO
+    }
 	}
 ])
 
@@ -537,7 +541,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 						});
 					// Just to be explicit:
 					} else if (judgment.submitedCriteria &&  seenCats.indexOf(judgment.category.id) != -1) { // We've seen this team-category pairing before, combine it.
-						var help = 'me';
 						var foundTeam;
 						for (var k = 0; k < teamStanding.length; k++) {
 							foundTeam = false;
@@ -730,7 +733,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					for (var i = 0; i < teamCatJudgments.length; i++) {
 						teamCatJudgments[i].percentScore = teamCatJudgments[i].percentScore / teamCatJudgments[i].submitedCriteria;
 					}
-					//console.log(teamCatJudgments);
 					defer.resolve(teamCatJudgments);
 				});
 			}
