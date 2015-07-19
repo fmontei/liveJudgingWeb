@@ -110,6 +110,10 @@ a.accordion-toggle:hover {
   background: #EEEEEE;
 }
 
+.dashboard-media-body {
+  line-height: 100%;
+}
+
 a.team-pic span.completed {
   display: inline-block;
   font-size: 35px;
@@ -220,6 +224,7 @@ h4.modal-title {
  /*
   * Event In Progress View
   */
+
 /* Truncate overly long names */
 .truncate { 
   width: 150%;

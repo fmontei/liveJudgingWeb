@@ -404,20 +404,19 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			if (!judgeJudgments) {
 				return [null, null, null];
 			}
-			var teamCount = 0;
-			var completedTeamCount = 0;
+			var teamCatCount = 0;
+			var completedTeamCatCount = 0;
 			for (var i = 0; i < judgeJudgments.length; i++) {
-				for (var j = 0; j < judgeJudgments[i].judgments.length; j++) {
-					if (judgeJudgments[i].judgments[j].completed) {
-						completedTeamCount++;
+				for (var j = 0; j < judgeJudgments[i].teamCats.length; j++) {
+					if (judgeJudgments[i].teamCats[j].completed) {
+						completedTeamCatCount++;
 					}
 				}
-				teamCount += judgeJudgments[i].judgments.length;
-				teamCount += judgeJudgments[i].theUnjudged.length;
+				teamCatCount += judgeJudgments[i].teamCats.length;
 			}
-			$scope.judgeAssignmentCount = teamCount;
-			$scope.judgeCompletedCount = completedTeamCount;
-			return [completedTeamCount, teamCount, Math.floor(completedTeamCount/teamCount * 100)];
+			$scope.judgeAssignmentCount = teamCatCount;
+			$scope.judgeCompletedCount = completedTeamCatCount;
+			return [completedTeamCatCount, teamCatCount, Math.floor(completedTeamCatCount/teamCatCount * 100)];
 		}
 
 		$scope.convertColorToHex = function(decimalColor) {
@@ -426,11 +425,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
-.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService', 
-                                 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService', 
-                                 'TeamManagementService', '$location',
-	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService, 
-            JudgmentRESTService, RubricRESTService, TeamManagmentService, $location) {
+.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService',
+                                 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService',
+                                 'TeamManagementService', 'TeamRESTService', '$location',
+	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService,
+            JudgmentRESTService, RubricRESTService, TeamManagmentService, TeamRESTService, $location) {
 	return function($scope) {
     
 		var authHeader = CurrentUserService.getAuthHeader();
@@ -510,22 +509,28 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		   Luv, Christina K */
 
 		service.determineTeamStanding = function(jJudgments) {
+			// jJudgments refers to all the team-category assignments
+			// for all judges, whether they are completed, in progress, or unstarted.
 			var teamStanding = [];
 			var seenCats = [];
 			for (var i = 0; i < jJudgments.length; i++) {
-				for (var j = 0; j < jJudgments[i].judgments.length; j++) {
-					var judgment = jJudgments[i].judgments[j];
-					if (seenCats.indexOf(judgment.category.id) == -1) {
+				for (var j = 0; j < jJudgments[i].teamCats.length; j++) {
+					var judgment = jJudgments[i].teamCats[j];
+					// If there's at least submitted criteria, take the 'judgment' into account
+					if (judgment.submitedCriteria && seenCats.indexOf(judgment.category.id) == -1) {
 						seenCats.push(judgment.category.id);
 						teamStanding.push({
 							category: judgment.category,
 							teams: []
 						});
-						teamStanding[teamStanding.length - 1]
-							.teams.push({team: judgment.team,
-										teamPercentScore: judgment.percentScore,
-										teamJudgmentsCount: 1});
-					} else {
+						teamStanding[teamStanding.length - 1].teams.push({
+							team: judgment.team,
+							teamPercentScore: judgment.percentScore,
+							teamJudgmentsCount: 1
+						});
+					// Just to be explicit:
+					} else if (judgment.submitedCriteria &&  seenCats.indexOf(judgment.category.id) != -1) { // We've seen this team-category pairing before, combine it.
+						var help = 'me';
 						var foundTeam;
 						for (var k = 0; k < teamStanding.length; k++) {
 							foundTeam = false;
@@ -538,10 +543,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 									}
 								}
 								if (!foundTeam) {
-									teamStanding[k].teams
-										.push({team: judgment.team,
-												teamPercentScore: judgment.percentScore,
-												teamJudgmentsCount: 1});
+									teamStanding[k].teams.push({
+										team: judgment.team,
+										teamPercentScore: judgment.percentScore,
+										teamJudgmentsCount: 1});
 								}
 							}
 						}
@@ -554,6 +559,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				}
 			}
 			sessionStorage.putObject('teamStanding', teamStanding);
+      console.log('Done computing team standing.');
 		}
 
 		service.getJudgmentsByAllJudges = function() {
@@ -567,7 +573,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			}
 
 			$q.all(promises).then(function(resp) {
-				console.log(resp);
+        console.log('Judgments successfully retrieved from server.');
 				defer.resolve(resp);
 			}).catch(function() {
 				defer.reject();
@@ -586,20 +592,19 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					service.determineCompletedTeamsByJudge(judgeObj.id, resp2).then(function(resp3) { //great variable naming skills
 						service.determineUnstartedTeamsByJudge(judgeObj.id, resp3).then(function(resp4) {
 							var completedTeamCount = 0;
-							for (var i = 0; i < resp3.length; i++) {
-								if (resp3[i].completed) {
+							for (var i = 0; i < resp4.length; i++) {
+								if (resp4[i].completed) {
 									completedTeamCount++;
 								}
 							}
-							var assignedTeamsCount = resp3.length + resp4.length;
+							var assignedTeamsCount = resp4.length;
 							var percentCompleted = Math.floor((completedTeamCount / assignedTeamsCount) * 100);
 							var judgeJudgments = {
-								judge: judgeObj.judge,
-								judgments: resp3,
-								theUnjudged: resp4,
-								completion: isNaN(percentCompleted) ? 0 : percentCompleted,
-								numCompletedTeams: completedTeamCount,
-								numAssignedTeams: assignedTeamsCount
+									judge: judgeObj.judge,
+									teamCats: resp4,
+									completion: isNaN(percentCompleted) ? 0 : percentCompleted,
+									numCompletedTeams: completedTeamCount,
+									numAssignedTeams: assignedTeamsCount
 							};
 							defer.resolve(judgeJudgments);
 						})
@@ -657,8 +662,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		}
 
 		service.determineCompletedTeamsByJudge = function(id, judgments) {
-			// IMPORTANT: Here, 'judgment' refers to an overall judgment
-			// of a team (all criteria considered).
 			var defer = $q.defer();
 
 			if (judgments.length == 0) {
@@ -678,43 +681,50 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				}
 
 				$q.all(promises).then(function(rubricNumCriteriaMapping) {
-					var judgedTeams = [];
-					var seenTeams = [];
+					var teamCatJudgments = [];
+					var encounteredTeamCats = [];
 					for (var i = 0; i < judgments.length; i++) {
-						var index = seenTeams.indexOf(judgments[i].team.id);
-						if (index != -1) { // Counting the number of judged criteria, & checking if it equals the total.
-							for (var j = 0; j < judgedTeams.length; j++) {
-								if (judgedTeams[j].team.id == judgments[i].team.id) {
-									judgedTeams[j].submitedCriteria++;
-									judgedTeams[j].percentScore = (judgedTeams[j].percentScore + (judgments[i].value/judgments[i].criterion.max_score));
-									if (judgedTeams[j].submitedCriteria == judgedTeams[j].totalCriteria) {
-										judgedTeams[j].completed = true;
-									}
-								}
-							}
-						} else {
-							seenTeams.push(judgments[i].team.id);
-							var numCriteria;
+						// Building criteria into complete team-category judgments.
+						var index = encounteredTeamCats.indexOf(judgments[i].team_category.id);
+						if (index == -1) { // If we haven't seen this team-category pair before, initalize the object for it.
+							encounteredTeamCats.push(judgments[i].team_category.id);
+							var numCriteria = 0; // Determine the number of criteria in the rubric
 							for (var j = 0; j < rubricNumCriteriaMapping.length; j++) {
 								if (judgments[i].rubric.id == rubricNumCriteriaMapping[j].rubricId) {
 									numCriteria = rubricNumCriteriaMapping[j].numCriteria;
 								}
 							}
-							judgedTeams.push({
+							teamCatJudgments.push({
 								completed: false,
 								submitedCriteria: 1,
 								totalCriteria: numCriteria,
 								percentScore: judgments[i].value/judgments[i].criterion.max_score,
 								team: judgments[i].team,
 								category: judgments[i].category,
+								team_category_id: judgments[i].team_category.id,
 								judgeId: judgments[i].judge.id
 							});
+						} else { // We've seen this team-category pairing before, add this criterion judgment to the aggregate judgment.
+							for (var j = 0; j < teamCatJudgments.length; j++) { // First, find the index of the team-cat this criterion judgment belongs to.
+								if (teamCatJudgments[j].team_category_id == judgments[i].team_category.id) { // Once it's found, and criterion judgment data to it
+									teamCatJudgments[j].submitedCriteria++;
+									if (teamCatJudgments[j].submitedCriteria == teamCatJudgments[j].totalCriteria) { // If true, this all the criterion for the rubric have been traversed
+										teamCatJudgments[j].completed = true;
+									}
+									// Adding scores as percentages. This means that every criterion is weighted evenly, regardless of how many stars it's out of.
+									teamCatJudgments[j].percentScore = (teamCatJudgments[j].percentScore + (judgments[i].value/judgments[i].criterion.max_score));
+								}
+							}
 						}
 					}
-					for (var i = 0; i < judgedTeams.length; i++) {
-						judgedTeams[i].percentScore = judgedTeams[i].percentScore / judgedTeams[i].submitedCriteria;
+					// This takes the added percent scores and divides each by the number that were added together
+					// to get the equally weighted average: represents a particular judge's overall score for a particular
+					// team in a particular category.
+					for (var i = 0; i < teamCatJudgments.length; i++) {
+						teamCatJudgments[i].percentScore = teamCatJudgments[i].percentScore / teamCatJudgments[i].submitedCriteria;
 					}
-					defer.resolve(judgedTeams);
+					//console.log(teamCatJudgments);
+					defer.resolve(teamCatJudgments);
 				});
 			}
 
@@ -731,44 +741,66 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 				return defer.promise;
 			}
-
-			/**/
 		}
 
-		service.determineUnstartedTeamsByJudge = function(judgeId, judgeJudgments) {
+		service.determineUnstartedTeamsByJudge = function(judgeId, judgments) {
+			// This just loops through the judge's assigned teams and the
+			// judgments of the teams
 			var defer = $q.defer();
 
-			var judges = sessionStorage.getObject('judges');
-			for (var i = 0; i < judges.length; i++) {
-				if (judges[i].id == judgeId) {
-					var judge = judges[i];
-					break;
+			JudgeRESTService(authHeader).judgeTeams.get({judge_id: judgeId}).$promise.then(function(judgeTeams) {
+				var promises = [];
+
+				for (var i = 0; i < judgeTeams.length; i++) {
+					promises.push(getTeamCategoriesByTeam(judgeTeams[i].team.id));
 				}
-			}
-			JudgeRESTService(authHeader).judgeTeams.get({judge_id: judgeId}).$promise.then(function(resp) {
-				var assignedTeams = [];
-				for (var i = 0; i < resp.length; i++) {
-					assignedTeams.push(resp[i].team);
-				}
-				if (judgeJudgments.length == 0) {
-					defer.resolve(assignedTeams);
-				} else {
-					for (var i = 0; i < judgeJudgments.length; i++) {
-						for (var j = 0; j < assignedTeams.length; j++) {
-							if (judgeJudgments[i].team.id == assignedTeams[j].id) {
-								assignedTeams.splice(j, 1);
+
+				$q.all(promises).then(function(teamCats) {
+					var flattenedTeamCats = [];
+					for (var i = 0; i < teamCats.length; i++) {
+						for (var j = 0; j < teamCats[i].length; j++) {
+							teamCats[i][j].judgeId = judgeId;
+							teamCats[i][j].team_category_id = teamCats[i][j].id;
+							delete teamCats[i][j].id;
+							flattenedTeamCats.push(teamCats[i][j]);
+						}
+					}
+					var finalTeamCats = [];
+					for (var i = 0; i < flattenedTeamCats.length; i++) {
+						for (var j = 0; j < judgments.length; j++) {
+							if (flattenedTeamCats[i].team_category_id == judgments[j].team_category_id) {
+								flattenedTeamCats[i].judged = true;
 							}
 						}
 					}
-					var theUnjudged = [];
-					for (var i = 0; i < assignedTeams.length; i++) {
-						theUnjudged.push(assignedTeams[i]);
+					for (var i = 0; i < flattenedTeamCats.length; i++) {
+						if (!flattenedTeamCats[i].judged) {
+							finalTeamCats.push(flattenedTeamCats[i]);
+						}
 					}
-					defer.resolve(theUnjudged);
-				}
+					for (var i = 0; i < judgments.length; i++) {
+						finalTeamCats.push(judgments[i]);
+					}
+					//console.log(finalTeamCats);
+					defer.resolve(finalTeamCats);
+				});
+			}).catch(function() {
+				defer.reject();
 			});
 
 			return defer.promise;
+
+			function getTeamCategoriesByTeam(teamId) {
+				var defer = $q.defer();
+
+				TeamRESTService(authHeader).team_categories.get({team_id: teamId}).$promise.then(function(teamCatsResp) {
+					defer.resolve(teamCatsResp);
+				}).catch(function() {
+					defer.reject();
+				});
+
+				return defer.promise;
+			}
 		}
 
 		service.getJudgmentsOfAllTeams = function() {

@@ -227,36 +227,37 @@
                               <div class="media judgedTeam active"
                                     data-toggle="modal"
                                     data-target="#completed-team-modal"
-                                    ng-repeat="judgment in judgeJudgment.judgments"> <!--beautiful-->
+                                    ng-repeat="teamCat in judgeJudgment.teamCats">
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
-                                    <img class="media-object" 
-                                         src="{{judgment.team.logo}}"
-                                         ng-show="judgment.team.logo !== null"
+                                    <img class="media-object"
+                                         src="{{teamCat.team.logo}}"
+                                         ng-show="teamCat.team.logo !== null"
                                          width="64"
                                          height="64" 
                                          alt="64x64" />
                                     <img class="media-object" 
                                          src="http://placehold.it/64x64"
-                                         ng-show="judgment.team.logo === null" 
+                                         ng-show="teamCat.team.logo === null" 
                                          width="64"
                                          height="64"
                                          alt="64x64" />
-                                    <span ng-if="judgment.completed" class="completed">
+                                    <span ng-if="teamCat.completed" class="completed">
                                       <span class="glyphicon glyphicon-ok"></span>
                                     </span>
                                   </a>
                                 </div>
-                                <div class="media-body">
-                                  <h4 class="media-heading">#{{judgment.team.id}}</h4>
-                                  <span>{{judgment.team.name}}</span><br />
-                                  <!--Number of filled in stars-->
-                                  <span class="glyphicon glyphicon-star"></span>
-                                  <span class="glyphicon glyphicon-star"></span>
-                                  <span class="glyphicon glyphicon-star"></span>
-                                  <!--Number of unfilled stars-->
-                                  <span class="glyphicon glyphicon-star-empty"></span>
-                                  <span class="glyphicon glyphicon-star-empty"></span>
+                                <div class="media-body dashboard-media-body">
+                                  <span title="Name: {{teamCat.team.name}} | Category: {{teamCat.category.label}}">
+                                    <small cng-wrap-word word="<b>#{{teamCat.team.id}}</b> {{teamCat.team.name}}"
+                                           line-width="25"
+                                           total-width="50">
+                                    </small><br />
+                                    <small cng-wrap-word word="<u>{{teamCat.category.label}}</u>"
+                                         line-width="20"
+                                         total-width="20">
+                                    </small>
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -283,9 +284,13 @@
                                          alt="64x64" />
                                   </a>
                                 </div>
-                                <div class="media-body">
-                                  <h4 class="media-heading">#{{unjudgment.id}}</h4>
-                                  <span>{{unjudgment.name}}</span><br />
+                                <div class="media-body dashboard-media-body">
+                                  <span title="Name: {{unjudgment.name}}">
+                                    <small cng-wrap-word word="<b>#{{unjudgment.id}}</b> {{unjudgment.name}}"
+                                           line-width="25"
+                                           total-width="50">
+                                    </small><br />
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -452,9 +457,13 @@
                                          alt="64x64" />
                                   </a>
                                 </div>
-                                <div class="media-body">
-                                  <h4 class="media-heading">#{{unjudgment.id}}</h4>
-                                  <span>{{unjudgment.name}}</span><br />
+                                <div class="media-body dashboard-media-body">
+                                  <span title="Name: {{unjudgment.name}}">
+                                    <small cng-wrap-word word="<b>#{{unjudgment.id}}</b> {{unjudgment.name}}"
+                                           line-width="25"
+                                           total-width="50">
+                                    </small><br />
+                                  </span>
                                 </div>
                               </div>
                             </div>
