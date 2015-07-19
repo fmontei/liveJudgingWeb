@@ -112,7 +112,7 @@
                 <div class="media-left">
                   <a href="javascript:void(0)">
                     <img class="media-object" 
-                         src="{{team.logo}}"
+                         ng-src="{{team.logo}}"
                          ng-show="team.logo !== null" 
                          width="64"
                          height="64"
@@ -151,7 +151,7 @@
                 <div class="media-left">
                   <a href="javascript:void(0)">
                     <img class="media-object" 
-                         src="{{team.logo}}"
+                         ng-src="{{team.logo}}"
                          ng-show="team.logo !== null" 
                          width="64"
                          height="64"
@@ -222,7 +222,7 @@
                               <div class="media-left">
                                 <a href="javascript:void(0)">
                                   <img class="media-object" 
-                                       src="{{team.logo}}"
+                                       ng-src="{{team.logo}}"
                                        ng-show="team.logo !== null" 
                                        width="64"
                                        height="64"
@@ -289,7 +289,7 @@
                 <div class="media-left">
                   <a href="javascript:void(0)">
                     <img class="media-object" 
-                         src="{{team.logo}}"
+                         ng-src="{{team.logo}}"
                          ng-show="team.logo !== null"
                          width="64"
                          height="64" 
@@ -421,7 +421,7 @@
                          error="imageUploadError" />
                 </a>
               </span>
-              <input class="form-control" type="text" value="{{fileName}}" readonly />
+              <input class="form-control" id="file-name-text" type="text" value="{{fileName}}" readonly />
             </div>
           </div>
 				</div>
@@ -436,7 +436,7 @@
 				         height="200" 
 				         alt="Image preview..." />
             <img ng-show="teamModalView === 'edit'" 
-                 src="{{teamThumbnail}}"
+                 ng-src="{{teamThumbnail}}"
                  id="preview-image-edit" 
                  width="300" 
                  height="200"
@@ -477,7 +477,7 @@
 					<div class="modal-footer">
             <div class="row">
               <span class="col col-sm-4">
-                <button type="button" class="btn btn-success" ng-click="createNewTeam()">Create</button>
+                <button type="button" class="btn btn-success" id="create-team-modal-btn"  ng-click="createNewTeam()">Create</button>
               </span>
               <span class="col col-sm-2"></span>
               <span class="col col-sm-4">
@@ -491,7 +491,7 @@
 					<div class="modal-footer">
 					  <div class="row">
               <span class="col col-sm-4">
-                <button type="button" class="btn btn-success" ng-click="editSelectedTeam()">Update</button>
+                <button type="button" class="btn btn-success" id="create-team-modal-btn" ng-click="editSelectedTeam()">Update</button>
               </span>
               <span class="col col-sm-2"></span>
               <span class="col col-sm-4">

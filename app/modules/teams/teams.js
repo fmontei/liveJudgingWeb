@@ -68,11 +68,11 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 		$scope.changeTeamModalView = function(view, team) {
 			$scope.teamModalView = view;
-			$scope.openTeamModal();
 			if (view === 'edit') {
 				$scope.populateTeamModal(team);
 				sessionStorage.putObject('selectedTeam', team);
 			}
+      $scope.openTeamModal();
 		}
 
 		$scope.populateTeamModal = function(team) {
@@ -94,6 +94,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			$scope.teamLogo = '';
 			$scope.teamDesc = '';
 			$('#team-modal').modal('hide');
+      $('#preview-image-create').hide();
+      $('#file-name-text').val('');
 			sessionStorage.remove('selectedTeam');
 		}
 
