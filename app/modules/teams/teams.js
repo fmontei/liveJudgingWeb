@@ -272,9 +272,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		var createTeamOnServer = function(newTeam, teamReq) {
 			var eventId = sessionStorage.getObject('selected_event').id;
 			var connection = TeamRESTService(authHeader);
-      console.log(JSON.stringify(teamReq));
+      
 			connection.teams.create({event_id: eventId}, teamReq).$promise.then(function(resp) {
-
 				// Add new team to uncategorized (or to the selected category if there is one).
 				var returnedTeamID = resp.id;
 				var catId;

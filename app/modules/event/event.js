@@ -441,7 +441,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		}
     
     $scope.populateCompletedTeamModal = function(team, judge) {
-      console.log(JSON.stringify(team));
       var team_category_id = team.team_category_id;
       var authHeader = CurrentUserService.getAuthHeader();
       var eventId = sessionStorage.getObject('selected_event').id;
@@ -479,23 +478,85 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
           if (judgeJudgments[i].team_category.id === team_category_id) {
             var criterion = { 
               name: judgeJudgments[i].criterion.label,
-              total_stars: judgeJudgments[i].criterion.max_score,
-              filled_stars: judgeJudgments[i].value
+              denominator: judgeJudgments[i].criterion.max_score,
+              numerator: judgeJudgments[i].value
             };
             criteria.push(criterion);
-            if (judgeJudgments[i].criterion.max_score !== 0)
-              overall_numerator += judgeJudgments[i].value;
-              overall_denominator += judgeJudgments[i].criterion.max_score;
+            overall_numerator += judgeJudgments[i].value;
+            overall_denominator += judgeJudgments[i].criterion.max_score;
           }
         }
-        var overall_score = overall_numerator / overall_denominator;
-        return [criteria, overall_score.toFixed(4)];
+        var overall_score = (overall_denominator !== 0) ? overall_numerator / overall_denominator : 0;
+        return [criteria, overall_score];
       }
     }
     
     $scope.closeCompletedTeamModal = function() {
       $scope.completedTeamModal = {};
       $('#completed-team-modal').modal('hide');
+    }
+    
+    $scope.populateTeamStandingModal = function(teamObj, category) {
+      var authHeader = CurrentUserService.getAuthHeader(),
+          eventId = sessionStorage.getObject('selected_event').id,
+          teamId = teamObj.team.id,
+          team_category_id = teamObj.team_category_id;
+      
+      $scope.teamStandingModal = {};
+      $scope.teamStandingModal.completed = teamObj.team.completed;
+      $scope.teamStandingModal.loading = true;
+      $scope.teamStandingModal.team = teamObj.team;
+      $scope.teamStandingModal.categoryName = category.label;
+      $scope.teamStandingModal.categoryColor = $scope.convertColorToHex(category.color);
+      $('#team-standing-modal').modal('show');
+      
+      JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId}).$promise.then(function(resp) {    
+        var filter = filterOutJudgmentsForThisTeam(resp, team_category_id);
+        $scope.teamStandingModal.criteria = filter[0];
+        $scope.teamStandingModal.overall_score = filter[1];
+        $scope.teamStandingModal.loading = false;
+        if (isNaN($scope.teamStandingModal.overall_score))
+          $scope.teamStandingModal.overall_score = 'Unavaibale';
+      }).catch(function() {
+        $scope.teamStandingModal.loading = false;
+      });
+      
+      // Because multiple judges are judging, criteria repeat
+      function filterOutJudgmentsForThisTeam(judgeJudgments, team_category_id) {
+        var criteria = [], overall_numerator = 0, overall_denominator = 0;
+        var already_seen = []; // Already seen criteria
+        for (var i = 0; i < judgeJudgments.length; i++) {
+          if (judgeJudgments[i].team_category.id === team_category_id) {
+            var criterion = { 
+              name: judgeJudgments[i].criterion.label,
+              denominator: judgeJudgments[i].criterion.max_score,
+              numerator: judgeJudgments[i].value,
+              score_count: 1
+            };
+            var index = already_seen.indexOf(criterion.name);
+            if (index === -1) {
+              already_seen.push(criterion.name);
+              criteria.push(criterion);
+            } else {
+              criteria[index].numerator += judgeJudgments[i].value, 
+              criteria[index].score_count += 1
+            }
+            overall_numerator += judgeJudgments[i].value;
+            overall_denominator += judgeJudgments[i].criterion.max_score;
+          }
+        }
+        for (var i = 0; i < criteria.length; i++) {
+          criteria[i].numerator /= criteria[i].score_count; 
+          criteria[i].numerator = criteria[i].numerator.toFixed(3);
+        }
+        var overall_score = (overall_denominator !== 0) ? overall_numerator / overall_denominator : 0;
+        return [criteria, overall_score];
+      }
+    }
+    
+    $scope.closeTeamStandingModal = function() {
+      $scope.teamStandingModal = {};
+      $('#team-standing-modal').modal('hide');
     }
 	}
 ])
@@ -508,13 +569,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	return function($scope) {
 	
 		var authHeader = CurrentUserService.getAuthHeader();
-	var eventId = sessionStorage.getObject('selected_event').id;
+    var eventId = sessionStorage.getObject('selected_event').id;
 
-	var categoryManagementService = CategoryManagementService($scope);
-	categoryManagementService.getCategories();
+    var categoryManagementService = CategoryManagementService($scope);
+    categoryManagementService.getCategories();
 
-	var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+    var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+    var judgeManagementService = JudgeManagementService($scope, sessionStorage);
 	
 		var service = {};
     
@@ -596,10 +657,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 						seenCats.push(judgment.category.id);
 						teamStanding.push({
 							category: judgment.category,
+              team_category_id: judgment.team_category_id,
 							teams: []
 						});
 						teamStanding[teamStanding.length - 1].teams.push({
 							team: judgment.team,
+              team_category_id: judgment.team_category_id,
 							teamPercentScore: judgment.percentScore,
 							teamJudgmentsCount: 1
 						});
@@ -619,8 +682,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 								if (!foundTeam) {
 									teamStanding[k].teams.push({
 										team: judgment.team,
+                    team_category_id: judgment.team_category_id,
 										teamPercentScore: judgment.percentScore,
-										teamJudgmentsCount: 1});
+										teamJudgmentsCount: 1
+                  });
 								}
 							}
 						}
@@ -633,7 +698,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				}
 			}
 			sessionStorage.putObject('teamStanding', teamStanding);
-	  console.log('Done computing team standing.');
+	    console.log('Done computing team standing.');
 		}
 
 		service.getJudgmentsByAllJudges = function() {
