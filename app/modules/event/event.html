@@ -75,7 +75,9 @@
                     Time Range: {{selectedEvent.start_time}} - {{selectedEvent.end_time}}
                   </div>
                 </div>
-                <div class="row" style="margin-bottom: -15px">
+                <div class="row" 
+                     style="margin-bottom: -15px"
+                     ng-show="isEventRunning()">
                   <div class="col col-sm-12 col-md-12 col-lg-12">
                       <div id="fadingBarsG" >
                         <div id="fadingBarsG_1" class="fadingBarsG">
@@ -634,70 +636,7 @@
 </div> <!--Event Ctrl-->
 
 <!--Judge Notification Modal-->
-<div notification-modal recipient-list="recipientList">
-  <div class="modal fade" 
-       id="notification-modal" 
-       tabindex="-1" 
-       role="dialog" 
-       aria-labelledby="notification-modal" 
-       aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content panel-primary">
-        <div class="modal-header panel-heading">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title" id="notification-modal-label">Send Notification</h4>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col col-sm-3">
-              Recipients:
-            </div>
-            <div class="col col-sm-9">
-              <!--Recipient List-->
-              <div class="row" id="recipients-div" style="margin-bottom: 8px"></div>
-              <div class="row">
-                <input type="text" class="form-control" id="judge-search" placeholder="Search by name..." style="width: 50%">
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col col-sm-3"></div>
-            <div class="col col-sm-9">
-              <div class="checkbox" style="margin-left: -12px">
-                <label style="margin-right: 12px"><input id="send-all-checkbox" type="checkbox" value="">Send to all judges</label>
-                <label><input id="clear-all-checkbox" type="checkbox" value="">Clear</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col col-sm-12">
-              <div class="form-group" style="margin-left: 10%; margin-right: 10%">
-                <label for="comment">Comment:</label>
-                <textarea class="form-control" rows="5" id="message-to-judge"></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <div class="row">
-            <span class="col col-sm-5"><button type="button" class="btn btn-primary" style="float: right">Send</button></span>
-            <span class="col col-sm-2"></span>
-            <span class="col col-sm-5">
-            	<button id="cancel-notification-btn"
-           						type="button" 
-            					class="btn btn-failure pull-left"
-            					data-dismiss="modal">
-            		Cancel
-							</button>
-						</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<div ng-include="'modules/notifications/notifications.html'"></div>
 
 <!--Judge Completed Scoring Team Modal-->
 <div class="modal fade" 
