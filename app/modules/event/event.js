@@ -459,6 +459,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       $scope.completedTeamModal.loading = true;
       $scope.completedTeamModal.team = team.team;
       $scope.completedTeamModal.categoryName = team.category.label;
+      $scope.completedTeamModal.overall_score = 0; // Display while loading data
       $('#completed-team-modal').modal('show');
       
       JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeId}).$promise.then(function(resp) {
@@ -467,7 +468,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.completedTeamModal.overall_score = filter[1];
         $scope.completedTeamModal.loading = false;
         if (isNaN($scope.completedTeamModal.overall_score))
-          $scope.completedTeamModal.overall_score = 'Unavaibale';
+          $scope.completedTeamModal.overall_score = 0;
       }).catch(function() {
         $scope.completedTeamModal.loading = false;
       });
@@ -508,6 +509,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       $scope.teamStandingModal.team = teamObj.team;
       $scope.teamStandingModal.categoryName = category.label;
       $scope.teamStandingModal.categoryColor = $scope.convertColorToHex(category.color);
+      $scope.teamStandingModal.overall_score = 0; // Display while loading data
       $('#team-standing-modal').modal('show');
       
       JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId}).$promise.then(function(resp) {    
@@ -516,7 +518,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         $scope.teamStandingModal.overall_score = filter[1];
         $scope.teamStandingModal.loading = false;
         if (isNaN($scope.teamStandingModal.overall_score))
-          $scope.teamStandingModal.overall_score = 'Unavaibale';
+          $scope.teamStandingModal.overall_score = 0;
       }).catch(function() {
         $scope.teamStandingModal.loading = false;
       });
