@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.event', ['ngRoute'])
+angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 
 .config(['$routeProvider', function($routeProvider) {
 	$routeProvider.when('/eventLoading', {
@@ -117,7 +117,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			$scope.eventForm = {
 				startTime: new Date(0, 0, 0, 12, 0),
 				endTime: new Date(0, 0, 0, 12, 0),
-		minDate: Date.now()
+		    minDate: Date.now()
 			};
 		};
 
@@ -125,7 +125,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			$scope.eventForm = {
 				name: event.name,
 				location: event.location,
-		minDate: Date.now()
+		    minDate: Date.now()
 			};
 			addDateTimesToForm(event);
 		};
@@ -252,9 +252,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 ])
 
 .controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 'JudgeManagementService', 
-								 'TeamManagementService', 'TeamStandingService',
+								 'TeamManagementService', 'TeamStandingService', 'ngProgressFactory',
 	function($q, $scope, $location, $timeout, sessionStorage, JudgeManagementService, 
-			TeamManagmentService, TeamStandingService) {
+			TeamManagmentService, TeamStandingService, ngProgressFactory) {
   
 	var teamManagmentService = TeamManagmentService($scope, sessionStorage);
 	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
@@ -262,27 +262,33 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 	$scope.getEverything = function() {
 	  var masterDefer = $q.defer();
+    
+    $scope.progressbar = ngProgressFactory.createInstance();
+    $scope.progressbar.setHeight('20px');
+    $scope.progressbar.setColor('#3498db');
+    $scope.progressbar.start();
 	  
 	  $timeout(function() {
-		masterDefer.reject();
-		//TODO: raise alert if loading timeout occurs--something went wrong
+		  masterDefer.reject();
+		  //TODO: raise alert if loading timeout occurs--something went wrong
 	  }, 60000);
 	  
 	  teamStandingService.getDashboardInfo().then(function() {
-		masterDefer.resolve();
+		  masterDefer.resolve();
+      $scope.progressbar.complete();
 	  }).catch(function(error) {
-		masterDefer.reject();
+		  masterDefer.reject();
 	  });
 
 	  return masterDefer.promise;
 	}
   
-    $scope.getEverything().then(function() {
-      $location.path('/event');
-    }).catch(function(error) {
-      $scope.eventTimeoutError = 'Connection to the server timed out.';
-      $location.path('/eventSelect');
-    });
+  $scope.getEverything().then(function() {
+    $location.path('/event');
+  }).catch(function(error) {
+    $scope.eventTimeoutError = 'Connection to the server timed out.';
+    $location.path('/eventSelect');
+  });
 }])
 
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 

@@ -13,7 +13,7 @@ angular.module('liveJudgingAdmin', [
   'liveJudgingAdmin.rubrics',
   'liveJudgingAdmin.categories',
   'liveJudgingAdmin.settings',
-  'liveJudgingAdmin.notifications'
+  'liveJudgingAdmin.messages'
 ])
 
 .config(['$routeProvider', function($routeProvider) {
