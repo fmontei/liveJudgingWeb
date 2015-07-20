@@ -70,10 +70,33 @@
           <div class="col-md-12">
             <div style="font-size: 16px">
               <p>
-                <i>In progress</i>
-                <span class="glyphicon glyphicon-repeat rotate"></span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                Time Range: {{selectedEvent.start_time}} - {{selectedEvent.end_time}}
+                <div class="row">
+                  <div class="col col-sm-12 col-md-12 col-lg-12">
+                    Time Range: {{selectedEvent.start_time}} - {{selectedEvent.end_time}}
+                  </div>
+                </div>
+                <div class="row" style="margin-bottom: -15px">
+                  <div class="col col-sm-12 col-md-12 col-lg-12">
+                      <div id="fadingBarsG" >
+                        <div id="fadingBarsG_1" class="fadingBarsG">
+                        </div>
+                        <div id="fadingBarsG_2" class="fadingBarsG">
+                        </div>
+                        <div id="fadingBarsG_3" class="fadingBarsG">
+                        </div>
+                        <div id="fadingBarsG_4" class="fadingBarsG">
+                        </div>
+                        <div id="fadingBarsG_5" class="fadingBarsG">
+                        </div>
+                        <div id="fadingBarsG_6" class="fadingBarsG">
+                        </div>
+                        <div id="fadingBarsG_7" class="fadingBarsG">
+                        </div>
+                        <div id="fadingBarsG_8" class="fadingBarsG">
+                        </div>
+                      </div>
+                  </div>
+                </div>
               </p>
             </div>
 
@@ -85,7 +108,7 @@
                     <progressbar max="100"
                                  ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0"
                                  value="determineOverallJudgeProgress(judgeJudgments)[2]"
-                                 class="progress-striped"
+                                 class="progress-striped active"
                                  type="success">
                     <span ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0">
                       {{determineOverallJudgeProgress(judgeJudgments)[2]}}%
