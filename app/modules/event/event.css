@@ -158,49 +158,6 @@ a.team-pic span.completed {
 }
 
 /*
- * Team Completion Modal
- */
-h4.modal-title {
-  max-height: 68px;
-}
-.table.table-modal thead tr {
-  background: rgb(200, 200, 200);
-  border-top: 1px solid #000;
-}
-.table.table-modal {
-  border: none;
-}
-.table.table-modal td {
-  border-left: 1px solid #000;
-  border-right: 1px solid #000;
-}
-.table.table-modal tbody tr:last-child {
-  border-bottom: 1px solid #000;
-  background-color: #337AB7;
-  color: white;
-}
-
-/*
- * Notification Modal
- */
-.recipient {
-  background: #EEEEEE;
-  padding: 5px;
-  display: inline-block;
-  margin-right: 2px;
-}
-.recipient .glyphicon.glyphicon-remove:hover {
-  cursor: pointer;
-  color: #337AB7;
-}
-.ui-autocomplete {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1510 !important;
-}
-
-/*
  * Event Creation View
  */ 
 #calendar-icon {
@@ -221,17 +178,9 @@ h4.modal-title {
 	margin-top: 30px;
  }
 
- /*
-  * Event In Progress View
-  */
-
-/* Truncate overly long names */
-.truncate { 
-  width: 150%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/*
+ * Event In Progress View
+ */
 
 .edit-event-form {
   margin-left: 10%;
@@ -262,4 +211,67 @@ h4.modal-title {
 
 .judgedTeam.active {
  cursor: pointer; 
+}
+
+/*
+ * Notification Modal
+ */
+.recipient {
+  background: #EEEEEE;
+  padding: 5px;
+  display: inline-block;
+  margin-right: 2px;
+}
+
+.recipient .glyphicon.glyphicon-remove:hover {
+  cursor: pointer;
+  color: #337AB7;
+}
+
+.ui-autocomplete {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1510 !important;
+}
+
+/*
+ * Team Completion Modal
+ */
+#completed-team-modal .modal-header {
+  background-color: #339494;
+  color: white;
+}
+
+#completed-team-modal-loading {
+  color: #339494;  
+}
+
+#completed-team-modal .btn-primary {
+  background-color: #339494;
+  color: white;
+}
+
+h4.modal-title {
+  max-height: 68px;
+}
+
+.table.table-modal thead tr {
+  background: rgb(200, 200, 200);
+  border-top: 1px solid #000;
+}
+
+.table.table-modal {
+  border: none;
+}
+
+.table.table-modal td {
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+
+.table.table-modal tbody tr:last-child {
+  border-bottom: 1px solid #000;
+  background-color: #339494;
+  color: white;
 }

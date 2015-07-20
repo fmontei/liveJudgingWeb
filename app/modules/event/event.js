@@ -286,17 +286,21 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 }])
 
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 
-                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', 
+                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', 'JudgmentRESTService',
 	function(sessionStorage, $filter, $location, $interval, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
-						 TeamRESTService, TeamStandingService) {
+						 TeamRESTService, TeamStandingService, JudgmentRESTService) {
     
 		var teamStandingService = TeamStandingService($scope);
 		teamStandingService.init();
-    //TODO: cancel this operation if the controller is left
-    $interval(function() {
+
+    var updateDashboardInterval = $interval(function() {
       teamStandingService.getDashboardInfo();
       console.log('Updating dashboard.');
     }, 90000);
+    
+    $scope.$on("$destroy", function() {
+      $interval.cancel(updateDashboardInterval);
+    });
 
 		var categoryManagementService = CategoryManagementService($scope);
 
@@ -436,8 +440,60 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			return categoryManagementService.convertColorToHex(decimalColor);
 		}
     
-    $scope.populateCompletedTeamModal= function(team) {
-      //TODO
+    $scope.populateCompletedTeamModal = function(team, judge) {
+      var team_category_id = team.team_category_id;
+      var authHeader = CurrentUserService.getAuthHeader();
+      var eventId = sessionStorage.getObject('selected_event').id;
+      
+      // The judge Id is not judge.id...must look elsewhere in the string for the actual id
+      var judgeString = JSON.stringify(judge);
+      var firstIndex = judgeString.indexOf('"judgeId":') + '"judgeId":'.length;
+      var firstPart = judgeString.substring(firstIndex);
+      var judgeId = firstPart.substring(0, firstPart.indexOf(','));
+      
+      if (!judgeId || isNaN(judgeId)) 
+        return;
+      
+      $scope.completedTeamModal = {};
+      $scope.completedTeamModal.completed = team.completed;
+      $scope.completedTeamModal.loading = true;
+      $scope.completedTeamModal.team = team.team;
+      $('#completed-team-modal').modal('show');
+      
+      JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeId}).$promise.then(function(resp) {
+        var filter = filterOutJudgmentsForThisTeam(resp, team_category_id);
+        $scope.completedTeamModal.criteria = filter[0];
+        $scope.completedTeamModal.overall_score = filter[1];
+        $scope.completedTeamModal.loading = false;
+        if (isNaN($scope.completedTeamModal.overall_score))
+          $scope.completedTeamModal.overall_score = 'Unavaibale';
+      }).catch(function() {
+        //Do nothing
+      });
+      
+      function filterOutJudgmentsForThisTeam(judgeJudgments, team_category_id) {
+        var criteria = [], overall_numerator = 0, overall_denominator = 0;
+        for (var i = 0; i < judgeJudgments.length; i++) {
+          if (judgeJudgments[i].team_category.id === team_category_id) {
+            var criterion = { 
+              name: judgeJudgments[i].criterion.label,
+              total_stars: judgeJudgments[i].criterion.max_score,
+              filled_stars: judgeJudgments[i].value
+            };
+            criteria.push(criterion);
+            if (judgeJudgments[i].criterion.max_score !== 0)
+              overall_numerator += judgeJudgments[i].value;
+              overall_denominator += judgeJudgments[i].criterion.max_score;
+          }
+        }
+        var overall_score = overall_numerator / overall_denominator;
+        return [criteria, overall_score.toFixed(4)];
+      }
+    }
+    
+    $scope.closeCompletedTeamModal = function() {
+      $scope.completedTeamModal = {};
+      $('#completed-team-modal').modal('hide');
     }
 	}
 ])
