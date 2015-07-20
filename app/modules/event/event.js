@@ -441,6 +441,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		}
     
     $scope.populateCompletedTeamModal = function(team, judge) {
+      console.log(JSON.stringify(team));
       var team_category_id = team.team_category_id;
       var authHeader = CurrentUserService.getAuthHeader();
       var eventId = sessionStorage.getObject('selected_event').id;
@@ -458,6 +459,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       $scope.completedTeamModal.completed = team.completed;
       $scope.completedTeamModal.loading = true;
       $scope.completedTeamModal.team = team.team;
+      $scope.completedTeamModal.categoryName = team.category.label;
       $('#completed-team-modal').modal('show');
       
       JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeId}).$promise.then(function(resp) {

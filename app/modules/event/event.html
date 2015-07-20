@@ -734,12 +734,15 @@
               <div class="media-body">
                 <h4 class="media-heading">
                   <div class="row" style="font-size: 24px;">
-                    <span class="col col-sm-3">#{{completedTeamModal.team.id}}</span>
-                    <span class="col col-sm-9">{{completedTeamModal.overall_score}}
+                    <span class="col col-sm-4">#{{completedTeamModal.team.id}}</span>
+                    <span class="col col-sm-6">{{completedTeamModal.overall_score}}
                   </div>
                   <div class="row" style="font-size: 16px">
-                    <span class="col col-sm-3">{{completedTeamModal.team.name}}</span>
-                    <span class="col col-sm-9">Overall Score (Approximation)</span>
+                    <span class="col col-sm-4" style="overflow: hidden">{{completedTeamModal.team.name}}</span>
+                    <span class="col col-sm-6">Overall Score (Appx.)</span>
+                  </div>
+                  <div class="row" style="font-size: 16px">
+                    <span class="col col-sm-12"><u>{{completedTeamModal.categoryName}}</u></span>
                   </div>
                 </h4>
               </div>
