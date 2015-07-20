@@ -470,7 +470,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         if (isNaN($scope.completedTeamModal.overall_score))
           $scope.completedTeamModal.overall_score = 'Unavaibale';
       }).catch(function() {
-        //Do nothing
+        $scope.completedTeamModal.loading = false;
       });
       
       function filterOutJudgmentsForThisTeam(judgeJudgments, team_category_id) {
