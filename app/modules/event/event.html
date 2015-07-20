@@ -849,7 +849,7 @@
           <tbody>
             <tr ng-repeat="criterion in teamStandingModal.criteria">
               <td>{{criterion.name}}</td>
-              <td>{{criterion.numerator}}/{{criterion.denominator}}</td>
+              <td>{{criterion.numerator.toFixed(3)}}/{{criterion.denominator}}</td>
               <td>{{prettyPercent(criterion.numerator / criterion.denominator)}}%</td>
               <td>{{criterion.score_count}}</td>
             </tr>

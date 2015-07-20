@@ -547,7 +547,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         }
         for (var i = 0; i < criteria.length; i++) {
           criteria[i].numerator /= criteria[i].score_count; 
-          criteria[i].numerator = criteria[i].numerator.toFixed(3);
         }
         var overall_score = (overall_denominator !== 0) ? overall_numerator / overall_denominator : 0;
         return [criteria, overall_score];
