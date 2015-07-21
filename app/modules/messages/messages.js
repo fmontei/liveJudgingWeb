@@ -17,7 +17,7 @@ angular.module('liveJudgingAdmin.messages', [function() {
   };
   
   $scope.sendMessage = function(message) {
-    messageRESTService.messages.send({message})
+    messageRESTService.messages.send(message)
       .$promise.then(function(resp) {
       
     }).catch(function(error) {
