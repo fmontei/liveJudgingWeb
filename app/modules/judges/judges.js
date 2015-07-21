@@ -798,5 +798,33 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			})
 		}
 	}
+})
+
+.factory('JudgmentRESTService', function($resource) {
+	return function(authHeader) {
+		return {
+			judgments: $resource('http://api.stevedolan.me/events/:event_id/judgments', {
+				event_id: '@id'
+			}, {
+				get: {
+					method: 'GET',
+					isArray: true,
+					headers: authHeader
+				},
+				getByJudge: {
+					method: 'GET',
+					params: {judge_id: '@judgeId'},
+					isArray: true,
+					headers: authHeader
+				},
+				getByTeam: {
+					method: 'GET',
+					params: {team_id: '@teamId'},
+					isArray: true,
+					headers: authHeader
+				}
+			})
+		}
+	}
 });
 

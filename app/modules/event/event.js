@@ -256,13 +256,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 ])
 
 .controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 'JudgeManagementService', 
-								 'TeamManagementService', 'TeamStandingService', 'ngProgressFactory',
+								 'TeamManagementService', 'EventDashboardService', 'ngProgressFactory',
 	function($q, $scope, $location, $timeout, sessionStorage, JudgeManagementService, 
-			TeamManagmentService, TeamStandingService, ngProgressFactory) {
+			TeamManagmentService, EventDashboardService, ngProgressFactory) {
   
 	var teamManagmentService = TeamManagmentService($scope, sessionStorage);
 	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-	var teamStandingService = TeamStandingService($scope);
+	var eventDashboardService = EventDashboardService($scope);
 
 	$scope.getEverything = function() {
 	  var masterDefer = $q.defer();
@@ -277,7 +277,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 		  //TODO: raise alert if loading timeout occurs--something went wrong
 	  }, 60000);
 	  
-	  teamStandingService.getDashboardInfo().then(function() {
+	  eventDashboardService.getDashboardInfo().then(function() {
 		  masterDefer.resolve();
       $scope.progressbar.complete();
 	  }).catch(function(error) {
@@ -296,15 +296,15 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 }])
 
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 
-                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', 'JudgmentRESTService',
+                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'EventDashboardService', 'JudgmentRESTService',
 	function(sessionStorage, $filter, $location, $interval, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
-						 TeamRESTService, TeamStandingService, JudgmentRESTService) {
+						 TeamRESTService, EventDashboardService, JudgmentRESTService) {
     
-		var teamStandingService = TeamStandingService($scope);
-		teamStandingService.init();
+		var eventDashboardService = EventDashboardService($scope);
+		eventDashboardService.init();
 
     var updateDashboardInterval = $interval(function() {
-      teamStandingService.getDashboardInfo();
+      eventDashboardService.getDashboardInfo();
       console.log('Updating dashboard.');
     }, 9000000);
     
@@ -592,34 +592,64 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
   }
 }])
 
-.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService',
-								 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService',
-								 'TeamManagementService', 'TeamRESTService', '$location', 'JudgmentManagementService',
-	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService,
-			JudgmentRESTService, RubricRESTService, TeamManagmentService, TeamRESTService, $location, JudgmentManagementService) {
+.factory('EventDashboardService', ['$q', 'sessionStorage', 'CurrentUserService',
+				 'JudgeManagementService', 'RubricRESTService', 'TeamManagementService', 'JudgmentManagementService',
+	function($q, sessionStorage, CurrentUserService, JudgeManagementService,
+           RubricRESTService, TeamManagmentService, JudgmentManagementService) {
 	return function($scope) {
 	
-		var authHeader = CurrentUserService.getAuthHeader();
-    var eventId = sessionStorage.getObject('selected_event').id;
-
-    var categoryManagementService = CategoryManagementService($scope);
-    categoryManagementService.getCategories();
-
-    var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-    var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-    var judgmentManagementService = JudgmentManagementService($scope, sessionStorage);
-	
 		var service = {};
+    
+    service.init =  function() {
+      $scope.$watch(function() {
+        return sessionStorage.getObject('categories');
+      }, function(newValue) {
+        $scope.categories = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('teams');
+      }, function(newValue) {
+          $scope.teams = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('judges');
+      }, function(newValue) {
+          $scope.judges = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('selected_event');
+      }, function(newValue) {
+          $scope.selectedEvent = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('judgeJudgments');
+      }, function(newValue) {
+          $scope.judgeJudgments = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('teamStanding');
+      }, function(newValue) {
+          $scope.teamStanding = newValue;
+      }, true);
+
+      sessionStorage.put('categoryInc', '0');
+		}
     
     service.getDashboardInfo = function() {
       var defer = $q.defer();
       
       getAllEventDashboardData().then(function(allData) {
-        console.log('~~~~~~~~~~READY TO MERGE~~~~~~~~~~~~~');
+        console.log('Generating dashboard...'); 
         mergeAllEventDashboardData(allData['judges'],
                                    allData['judgments'],
                                    allData['rubrics'],
                                    allData['teams']);
+        console.log('Successfully generated dashboard.'); 
         defer.resolve();
       });
       
@@ -628,6 +658,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
     }
     
     var getAllEventDashboardData = function() {
+      var authHeader = CurrentUserService.getAuthHeader();
+      var eventId = sessionStorage.getObject('selected_event').id;
+
+      var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+      var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+      var judgmentManagementService = JudgmentManagementService($scope, sessionStorage);
+      
       var defer = $q.defer(), promises = [], allData = {};
       
       var teamPromise = teamManagmentService.getTeams()
@@ -716,7 +753,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
     
       /* Process in progress judgments */
       for (var i = 0; i < mergedJudgeData.length; i++) {
-      
         var allTeamCategories = mergedJudgeData[i].judgments.all;
         var judgeTrue = 0, judgeFalse = 0;
         for (var j = 0; j < allTeamCategories.length; j++) {
@@ -738,7 +774,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
                 score = score + (thisValue / thisCriterion.max_score);
                 criteria.push(newCriterion);
               } 
-              var allRubricData = getObjectById(allRubrics, rubric.id);
+              var allRubricData = getRubricById(allRubrics, rubric.id);
               newTeamCategory.criteria = criteria;
               newTeamCategory.rubric = rubric;
               newTeamCategory.submittedCriteria = criteria.length;
@@ -770,7 +806,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
       service.determineTeamStanding(mergedJudgeData);
       
-      function getObjectById(objects, id) {
+      function getRubricById(objects, id) {
         for (var i = 0; i < objects.length; i++) {
           if (objects[i].id === id)
             return objects[i];
@@ -800,46 +836,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
         return results;
       }
     }
-
-		service.init =  function() {
-      $scope.$watch(function() {
-        return sessionStorage.getObject('categories');
-      }, function(newValue) {
-        $scope.categories = newValue;
-      }, true);
-
-      $scope.$watch(function() {
-          return sessionStorage.getObject('teams');
-      }, function(newValue) {
-          $scope.teams = newValue;
-      }, true);
-
-      $scope.$watch(function() {
-          return sessionStorage.getObject('judges');
-      }, function(newValue) {
-          $scope.judges = newValue;
-      }, true);
-
-      $scope.$watch(function() {
-          return sessionStorage.getObject('selected_event');
-      }, function(newValue) {
-          $scope.selectedEvent = newValue;
-      }, true);
-
-      $scope.$watch(function() {
-          return sessionStorage.getObject('judgeJudgments');
-      }, function(newValue) {
-          $scope.judgeJudgments = newValue;
-      }, true);
-
-      $scope.$watch(function() {
-          return sessionStorage.getObject('teamStanding');
-      }, function(newValue) {
-          $scope.teamStanding = newValue;
-      }, true);
-
-      sessionStorage.put('categoryInc', '0');
-		}
 
 		service.determineTeamStanding = function(jJudgments) {
       // jJudgments refers to all the team-category assignments
@@ -892,11 +888,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 			}
 			for (var i = 0; i < teamStanding.length; i++) {
 				for (var j = 0; j < teamStanding[i].teams.length; j++) {
-					teamStanding[i].teams[j].teamPercentScore = teamStanding[i].teams[j].teamPercentScore / teamStanding[i].teams[j].teamJudgmentsCount;
+					teamStanding[i].teams[j].teamPercentScore = 
+            teamStanding[i].teams[j].teamPercentScore / teamStanding[i].teams[j].teamJudgmentsCount;
 				}
 			}
 			sessionStorage.putObject('teamStanding', teamStanding);
-	    console.log('Done computing team standing.');
 		}
     
     return service;
@@ -958,51 +954,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 				},
 				update: {
 					method: 'PUT',
-					headers: authHeader
-				}
-			})
-		}
-	}
-})
-
-.factory('JudgmentRESTService', function($resource) {
-	return function(authHeader) {
-		return {
-			judgments: $resource('http://api.stevedolan.me/events/:event_id/judgments', {
-				event_id: '@id'
-			}, {
-				get: {
-					method: 'GET',
-					isArray: true,
-					headers: authHeader
-				},
-				getByJudge: {
-					method: 'GET',
-					params: {judge_id: '@judgeId'},
-					isArray: true,
-					headers: authHeader
-				},
-				getByTeam: {
-					method: 'GET',
-					params: {team_id: '@teamId'},
-					isArray: true,
-					headers: authHeader
-				}
-			})
-		}
-	}
-})
-
-.factory('MessageRESTService', function($resource) {
-	return function(authHeader) {
-		return {
-			messages: $resource('http://api.stevedolan.me/messages', {
-				recipient_id: '@recipientId',
-				subject: '@subject',
-				body: '@body'
-			}, {
-				send: {
-					method: 'POST',
 					headers: authHeader
 				}
 			})
