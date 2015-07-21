@@ -415,7 +415,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 		$scope.judgeCompletedCount = 0;
 
 		$scope.orderByCompletion = function(judgeJudgment) {
-			return parseInt(judgeJudgment.completion);
+			return parseInt(judgeJudgment.judge_completion);
 		}
 
 		$scope.prettyPercent = function(uglyPercent) {
