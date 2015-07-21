@@ -244,18 +244,17 @@
                               <div class="media judgedTeam active"
                                     ng-click="populateCompletedTeamModal(teamCat, judgeJudgment)"
                                     ng-repeat="teamCat in judgeJudgment.judgments.in_progress">
-                   
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
                                     <img class="media-object"
-                                         ng-src="{{teamCat.team_category.team.logo}}"
-                                         ng-show="teamCat.team_category.team.logo !== null"
+                                         ng-src="{{teamCat.team.logo}}"
+                                         ng-show="teamCat.team.logo !== null"
                                          width="64"
                                          height="64" 
                                          alt="64x64" />
                                     <img class="media-object" 
                                          src="http://placehold.it/64x64"
-                                         ng-show="teamCat.team_category.team.logo === null" 
+                                         ng-show="teamCat.team.logo === null" 
                                          width="64"
                                          height="64"
                                          alt="64x64" />
@@ -265,12 +264,12 @@
                                   </a>
                                 </div>
                                 <div class="media-body dashboard-media-body">
-                                  <span title="Name: {{teamCat.team_category.team.name}} | Category: {{teamCat.team_category.category.label}}">
-                                    <small cng-wrap-word word="<b>#{{teamCat.team_category.team.id}}</b> {{teamCat.team_category.team.name}}"
+                                  <span title="Name: {{teamCat.team.name}} | Category: {{teamCat.category.label}}">
+                                    <small cng-wrap-word word="<b>#{{teamCat.team.id}}</b> {{teamCat.team.name}}"
                                            line-width="25"
                                            total-width="50">
                                     </small><br />
-                                    <small cng-wrap-word word="<u>{{teamCat.team_category.category.label}}</u>"
+                                    <small cng-wrap-word word="<u>{{teamCat.category.label}}</u>"
                                          line-width="20"
                                          total-width="20">
                                     </small>

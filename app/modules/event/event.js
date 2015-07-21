@@ -759,23 +759,47 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
             var theseJudgments = getJudgmentsByTeamCategoryIdAndJudgeId(allJudgments, 
                                                                         teamCategoryId,
                                                                         mergedJudgeData[i].id);
+            var newTeamCategory = jQuery.extend(true, {}, thisTeamCategory[k]);
             if (theseJudgments.length > 0) {
               var rubric = theseJudgments[0].rubric;
               var criteria = [];
               for (var l = 0; l < theseJudgments.length; l++) {
                 var thisCriterion = theseJudgments[l].criterion;
-                var thisValue = theseJudgments[l].value;
+                var thisValue = theseJudgments[l].value; 
                 var newCriterion = jQuery.extend(true, {}, thisCriterion);
-                newCriterion.value = value;
+                newCriterion.judgment = thisValue;
                 criteria.push(newCriterion);
               }
-                  
+              var allRubricData = getObjectById(allRubrics, rubric.id);
+              
+              
+              newTeamCategory.criteria = criteria;
+              newTeamCategory.rubric = rubric;
+              newTeamCategory.submittedCriteria = criteria.length;
+              newTeamCategory.totalCriteria = allRubricData.criteria.length;
+              if (newTeamCategory.submittedCriteria == newTeamCategory.totalCriteria)
+                newTeamCategory.completed = true;
+              else
+                newTeamCategory.completed = false;
+              
+              /*console.log(mergedJudgeData[i].judge.name + ' ' + thisTeamCategory[k].submittedCriteria + ' ' + thisTeamCategory[k].totalCriteria + ' ' +
+                          (thisTeamCategory[k].submittedCriteria == thisTeamCategory[k].totalCriteria) + ' ' +
+                          thisTeamCategory[k].completed);*/
+              
+              mergedJudgeData[i].judgments.in_progress.push(newTeamCategory);
+            } else {
+              // No judgments from this judge for this team category: mark as 'not_started'
+              newTeamCategory.completed = false;
+              mergedJudgeData[i].judgments.not_started.push(newTeamCategory);
             }
-            console.log(JSON.stringify(thisTeamCategory[k]) + ' ' + JSON.stringify(theseJudgments));  
+            //console.log(JSON.stringify(thisTeamCategory[k]) + ' ' + JSON.stringify(theseJudgments));  
           }
         }
+        delete mergedJudgeData[i].judgments.all;
       }
       
+      console.log('merged judge data ' + JSON.stringify(mergedJudgeData));
+      sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
       return;
       
       /* Merge judges and judgments together */
