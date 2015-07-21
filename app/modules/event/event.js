@@ -719,8 +719,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
                                               allJudgments, 
                                               allTeamCategories,
                                               allRubrics) {
-      
-      console.log(JSON.stringify(allJudges));
+
+      var mergedJudgeData = [];
       
       /* Merge judges and judgments together */
       for (var i = 0; i < allJudges.length; i++) {
@@ -746,37 +746,37 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
               judgeJudgments.all.push(formattedJudgment);
           }
         }
-        judge.judgments = judgeJudgments;
-        delete judge.event;
-        delete judge.teams;
+        var newJudge = jQuery.extend(true, {}, judge);
+        newJudge.judgments = judgeJudgments;
+        delete newJudge.event;
+        delete newJudge.teams;
+        mergedJudgeData.push(newJudge);
       }
       
       /* Process in progress judgments */
-      for (var i = 0; i < allJudges.length; i++) {
-        var judge = allJudges[i];
+      for (var i = 0; i < mergedJudgeData.length; i++) {
+        var judge = mergedJudgeData[i];
         var judgeId = judge.id;   
         judge.judgments.all.sort(function(a, b) {return a.team_category.id - b.team_category.id});
         var all = judge.judgments.all;
-        var previousTeamCatId, submissionCount = 1;
+        var previousTeamCatId = all[0].team_category.id, submissionCount = 0;
         for (var j = 0; j < all.length; j++) {
-          if (previousTeamCatId !== undefined) {
-            if (previousTeamCatId === all[j].team_category.id) {
-              submissionCount += 1;
-            } else {
-              all[j].submittedCriteria = submissionCount;
-              if (all[j].totalCriteria === undefined) {
-                var thisRubric = getObjectById(allRubrics, all[j].rubric.id);
-                var totalCriteria = thisRubric.criteria.length;
-                all[j].totalCriteria = totalCriteria;
-                if (submissionCount === totalCriteria)
-                  all[j].completed = true;
-                else
-                  all[j].completed = false;
-              }
-              judge.judgments.in_progress.push(all[j]);
-              submissionCount = 1;
+          if (previousTeamCatId === all[j].team_category.id) {
+            submissionCount += 1;
+          } else { 
+            all[j].submittedCriteria = submissionCount;
+            if (all[j].totalCriteria === undefined) {
+              var thisRubric = getObjectById(allRubrics, all[j].rubric.id);
+              var totalCriteria = thisRubric.criteria.length;
+              all[j].totalCriteria = totalCriteria;
+              if (submissionCount === totalCriteria)
+                all[j].completed = true;
+              else
+                all[j].completed = false;
             }
-          }
+            judge.judgments.in_progress.push(all[j]);
+            submissionCount = 0;
+        }
           previousTeamCatId = all[j].team_category.id;
         }
         delete judge.judgments.all;
@@ -789,8 +789,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
           var judgeTeam = judgeTeamCollection[j];  
           var firstJudgeId = judgeTeam.judge.id;
           var firstTeamId = judgeTeam.team.id;     
-          for (var k = 0; k < allJudges.length; k++) {
-            var judge = allJudges[k];
+          for (var k = 0; k < mergedJudgeData.length; k++) {
+            var judge = mergedJudgeData[k];
             var thisJudgeId = judge.judge.id;
             if (thisJudgeId === firstJudgeId) {
               var found = false;
@@ -805,26 +805,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
             }
           }
         }
-        
-          /*for (var j = 0; j < allJudges.length; j++) {
-            var judge = allJudges[j];
-            var found = false;
-            for (var k = 0; k < judge.judgments.in_progress; k++) {
-              var judgment = judge.judgments.in_progress[k];
-              var otherTeamId = judgment.team.id;
-              if (firstTeamId !== otherTeamId)
-                console.log('yes');
-              else
-                console.log('no');
-            }
-          }*/
       }
       
-      
-      console.log(JSON.stringify(allJudgeTeams));
+      //console.log(JSON.stringify(allJudgeTeams));
       sessionStorage.putObject('judgeJudgments', allJudges); 
-     
-      return;
       
       function getObjectById(objects, id) {
         for (var i = 0; i < objects.length; i++) {
