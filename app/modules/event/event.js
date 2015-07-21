@@ -415,7 +415,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 		$scope.judgeCompletedCount = 0;
 
 		$scope.orderByCompletion = function(judgeJudgment) {
-			return parseInt(judgeJudgment.judge_completion);
+			return judgeJudgment.judge_completion;
 		}
 
 		$scope.prettyPercent = function(uglyPercent) {
@@ -618,7 +618,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       getAllEventDashboardData().then(function(allData) {
         console.log('~~~~~~~~~~READY TO MERGE~~~~~~~~~~~~~');
         mergeAllEventDashboardData(allData['judges'],
-                                   allData['judgeTeams'],
                                    allData['judgments'],
                                    allData['rubrics'],
                                    allData['teams']);
@@ -657,16 +656,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       promises.push(judgmentPromise);
       
       $q.all(promises).then(function() {
-        var thesePromises = [];
         var teamCategoryPromise = getTeamCategories(allData['judgments']).then(function(teamCategories) {
-          allData['teamCategories'] = teamCategories;   
-        });
-        var judgeTeamPromise = getJudgeTeams(allData['judges']).then(function(judgeTeams) {
-          allData['judgeTeams'] = judgeTeams;       
-        });
-        thesePromises.push(teamCategoryPromise);
-        thesePromises.push(judgeTeamPromise);
-        $q.all(thesePromises).then(function() {
+          allData['teamCategories'] = teamCategories;
           defer.resolve(allData);
         });
       });
@@ -693,38 +684,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
         return defer.promise;
       };
       
-      function getJudgeTeams(judges) {
-        var defer = $q.defer();
-        
-        var judgeTeamPromises = [], judgeTeams = [];
-        angular.forEach(judges, function(judge) {
-          var promise = JudgeRESTService(authHeader).judgeTeams.get({judge_id: judge.id})
-            .$promise.then(function(judgeTeam) {
-            judgeTeams.push(judgeTeam);                       
-          });
-          judgeTeamPromises.push(promise);
-        });
-        
-        $q.all(judgeTeamPromises).then(function() {
-          defer.resolve(judgeTeams);
-        });
-        
-        return defer.promise;
-      };
-      
       return defer.promise;
     };
     
     var mergeAllEventDashboardData = function(allJudges,
-                                              allJudgeTeams,
                                               allJudgments, 
                                               allRubrics,
                                               allTeamCategories) {
 
       var mergedJudgeData = [];
-      
-      //console.log('~~~~~~~~~~allJudgments~~~~~~~~~~' + JSON.stringify(allJudgments));
-      //console.log('~~~~~~~~~~allTeams~~~~~~~~~~' + JSON.stringify(allTeams));
+
       for (var i = 0; i < allJudges.length; i++) {
         var judge = allJudges[i];
         var judgeId = judge.id;
@@ -745,8 +714,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
         delete newJudge.teams;
         mergedJudgeData.push(newJudge);
       }
-    
-      //console.log('~~~~~~~~~~mergedJudgeData~~~~~~~~~~' + JSON.stringify(mergedJudgeData));
     
       /* Process in progress judgments */
       for (var i = 0; i < mergedJudgeData.length; i++) {
@@ -777,10 +744,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
               newTeamCategory.rubric = rubric;
               newTeamCategory.submittedCriteria = criteria.length;
               newTeamCategory.totalCriteria = allRubricData.criteria.length;
-              
               var percentScore = (score / theseJudgments.length);
               newTeamCategory.percentScore = percentScore;
-              console.log(newTeamCategory.percentScore);
               if (newTeamCategory.submittedCriteria == newTeamCategory.totalCriteria) {
                 newTeamCategory.completed = true;
                 judgeTrue++;
@@ -797,7 +762,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
             }
           } 
         }
-        mergedJudgeData[i].judge_completion = prettyPercent(judgeTrue / (judgeTrue + judgeFalse));
+        mergedJudgeData[i].judge_completion = judgeTrue / (judgeTrue + judgeFalse);
         mergedJudgeData[i].numCompletedTeams = judgeTrue;
         mergedJudgeData[i].numAssignedTeams = (judgeTrue + judgeFalse);
         delete mergedJudgeData[i].judgments.all;
@@ -835,12 +800,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
         }
         return results;
       }
-      
-      function prettyPercent(uglyPercent) {
-		    uglyPercent *= 100;
-		    return +uglyPercent.toFixed(2);
-		  }
-    };
+    }
 
 		service.init =  function() {
 				$scope.$watch(function() {
