@@ -620,8 +620,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
         mergeAllEventDashboardData(allData['judges'],
                                    allData['judgeTeams'],
                                    allData['judgments'],
-                                   allData['teamCategories'],
-                                   allData['rubrics']);
+                                   allData['rubrics'],
+                                   allData['teams']);
         defer.resolve();
       });
       
@@ -633,7 +633,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       var defer = $q.defer(), promises = [], allData = {};
       
       var teamPromise = teamManagmentService.getTeams()
-        .then(function() {
+        .then(function(teams) {
+        allData['teams'] = teams;
       });
       
       var judgePromise = judgeManagementService.getJudges()
@@ -717,13 +718,68 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
     var mergeAllEventDashboardData = function(allJudges,
                                               allJudgeTeams,
                                               allJudgments, 
-                                              allTeamCategories,
-                                              allRubrics) {
+                                              allRubrics,
+                                              allTeamCategories) {
 
       var mergedJudgeData = [];
       
-      /* Merge judges and judgments together */
+      //console.log('~~~~~~~~~~allJudgments~~~~~~~~~~' + JSON.stringify(allJudgments));
+      //console.log('~~~~~~~~~~allTeams~~~~~~~~~~' + JSON.stringify(allTeams));
       for (var i = 0; i < allJudges.length; i++) {
+        var judge = allJudges[i];
+        var judgeId = judge.id;
+        var judgeJudgments = {
+          in_progress: [],
+          not_started: [],
+          all: []
+        }
+        for (var j = 0; j < judge.teams.length; j++) {
+          var thisTeam = judge.teams[j];
+          var thisTeamId = thisTeam.team.id;
+          var theseTeamCategories = getAllTeamCategoriesById(allTeamCategories, thisTeamId);
+          judgeJudgments.all.push(theseTeamCategories);
+        }
+        var newJudge = jQuery.extend(true, {}, judge);
+        newJudge.judgments = judgeJudgments;
+        delete newJudge.event;
+        delete newJudge.teams;
+        mergedJudgeData.push(newJudge);
+      }
+    
+      //console.log('~~~~~~~~~~mergedJudgeData~~~~~~~~~~' + JSON.stringify(mergedJudgeData));
+    
+      /* Process in progress judgments */
+      for (var i = 0; i < mergedJudgeData.length; i++) {
+      
+        var allTeamCategories = mergedJudgeData[i].judgments.all;
+        for (var j = 0; j < allTeamCategories.length; j++) {
+          var thisTeamCategory = allTeamCategories[j];
+          for (var k = 0; k < thisTeamCategory.length; k++) {
+            var teamCategoryId = thisTeamCategory[k].id;
+            var theseJudgments = getJudgmentsByTeamCategoryIdAndJudgeId(allJudgments, 
+                                                                        teamCategoryId,
+                                                                        mergedJudgeData[i].id);
+            if (theseJudgments.length > 0) {
+              var rubric = theseJudgments[0].rubric;
+              var criteria = [];
+              for (var l = 0; l < theseJudgments.length; l++) {
+                var thisCriterion = theseJudgments[l].criterion;
+                var thisValue = theseJudgments[l].value;
+                var newCriterion = jQuery.extend(true, {}, thisCriterion);
+                newCriterion.value = value;
+                criteria.push(newCriterion);
+              }
+                  
+            }
+            console.log(JSON.stringify(thisTeamCategory[k]) + ' ' + JSON.stringify(theseJudgments));  
+          }
+        }
+      }
+      
+      return;
+      
+      /* Merge judges and judgments together */
+      /*for (var i = 0; i < allJudges.length; i++) {
         var judge = allJudges[i];
         var judgeId = judge.id;
         var judgeJudgments = {
@@ -751,15 +807,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
         delete newJudge.event;
         delete newJudge.teams;
         mergedJudgeData.push(newJudge);
-      }
+      }*/
       
       /* Process in progress judgments */
-      for (var i = 0; i < mergedJudgeData.length; i++) {
-        var judge = mergedJudgeData[i];
+      /*for (var i = 0; i < mergedJudgeData.length; i++) {
+        var judge = mergedJudgeData[i];      
         var judgeId = judge.id;   
         judge.judgments.all.sort(function(a, b) {return a.team_category.id - b.team_category.id});
         var all = judge.judgments.all;
-        var previousTeamCatId = all[0].team_category.id, submissionCount = 0;
+        var previousTeamCatId = (all.length !== 0) ? all[0].team_category.id : null;
+        var submissionCount = 0;
         for (var j = 0; j < all.length; j++) {
           if (previousTeamCatId === all[j].team_category.id) {
             submissionCount += 1;
@@ -780,10 +837,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
           previousTeamCatId = all[j].team_category.id;
         }
         delete judge.judgments.all;
-      }
+      }*/
       
       /* Add unjudged teams to judgeJudgments */
-      for (var i = 0; i < allJudgeTeams.length; i++) {
+      /*for (var i = 0; i < allJudgeTeams.length; i++) {
         var judgeTeamCollection = allJudgeTeams[i];
         for (var j = 0; j < judgeTeamCollection.length; j++) {
           var judgeTeam = judgeTeamCollection[j];  
@@ -805,16 +862,39 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
             }
           }
         }
-      }
+      }*/
       
-      //console.log(JSON.stringify(allJudgeTeams));
-      sessionStorage.putObject('judgeJudgments', allJudges); 
+      console.log('merged judge data ' + JSON.stringify(mergedJudgeData));
+      sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
       
       function getObjectById(objects, id) {
         for (var i = 0; i < objects.length; i++) {
           if (objects[i].id === id)
             return objects[i];
         }
+      }
+      
+      function getAllTeamCategoriesById(teamCategories, id) {
+        var results = [];
+        for (var i = 0; i < teamCategories.length; i++) {
+          var thisTeamCategoryCollection = teamCategories[i];
+          for (var j = 0; j < thisTeamCategoryCollection.length; j++) {
+            if (thisTeamCategoryCollection[j].team.id === id)
+              results.push(thisTeamCategoryCollection[j]);  
+          }
+        }
+        return results;
+      }
+      
+      function getJudgmentsByTeamCategoryIdAndJudgeId(judgments, teamCategoryId, judgeId) {
+        var results = [];
+        for (var i = 0; i < judgments.length; i++) {
+          var thisJudgment = judgments[i];
+          if (thisJudgment.team_category.id === teamCategoryId && thisJudgment.judge.id === judgeId) {
+            results.push(thisJudgment);
+          }
+        }
+        return results;
       }
     };
 
