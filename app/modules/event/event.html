@@ -236,7 +236,7 @@
                           <!--List of judge's completed teams-->
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
-                              <h4>Completed or in progress (click teams for rating details):</h4>
+                              <h4>Teams completed or in progress (click teams for rating details):</h4>
                             </div>
                           </div>
                           <div class="row">
@@ -244,6 +244,52 @@
                               <div class="media judgedTeam active"
                                     ng-click="populateCompletedTeamModal(teamCat, judgeJudgment)"
                                     ng-repeat="teamCat in judgeJudgment.judgments.in_progress">
+                   
+                                <div class="media-left">
+                                  <a href="javascript:void(0)" class="team-pic">
+                                    <img class="media-object"
+                                         ng-src="{{teamCat.team_category.team.logo}}"
+                                         ng-show="teamCat.team_category.team.logo !== null"
+                                         width="64"
+                                         height="64" 
+                                         alt="64x64" />
+                                    <img class="media-object" 
+                                         src="http://placehold.it/64x64"
+                                         ng-show="teamCat.team_category.team.logo === null" 
+                                         width="64"
+                                         height="64"
+                                         alt="64x64" />
+                                    <span ng-if="teamCat.completed" class="completed">
+                                      <span class="glyphicon glyphicon-ok"></span>
+                                    </span>
+                                  </a>
+                                </div>
+                                <div class="media-body dashboard-media-body">
+                                  <span title="Name: {{teamCat.team_category.team.name}} | Category: {{teamCat.team_category.category.label}}">
+                                    <small cng-wrap-word word="<b>#{{teamCat.team_category.team.id}}</b> {{teamCat.team_category.team.name}}"
+                                           line-width="25"
+                                           total-width="50">
+                                    </small><br />
+                                    <small cng-wrap-word word="<u>{{teamCat.team_category.category.label}}</u>"
+                                         line-width="20"
+                                         total-width="20">
+                                    </small>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <h4>Teams not yet judged:</h4>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <div class="media judgedTeam active"
+                                    ng-click="populateCompletedTeamModal(teamCat, judgeJudgment)"
+                                    ng-repeat="teamCat in judgeJudgment.judgments.not_started">
                    
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
@@ -279,6 +325,7 @@
                               </div>
                             </div>
                           </div>
+                          
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
                               <div class="media judgedTeam"
