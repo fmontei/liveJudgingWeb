@@ -752,6 +752,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       for (var i = 0; i < mergedJudgeData.length; i++) {
       
         var allTeamCategories = mergedJudgeData[i].judgments.all;
+        var judgeTrue = 0, judgeFalse = 0;
         for (var j = 0; j < allTeamCategories.length; j++) {
           var thisTeamCategory = allTeamCategories[j];
           for (var k = 0; k < thisTeamCategory.length; k++) {
@@ -771,30 +772,30 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
                 criteria.push(newCriterion);
               }
               var allRubricData = getObjectById(allRubrics, rubric.id);
-              
-              
               newTeamCategory.criteria = criteria;
               newTeamCategory.rubric = rubric;
               newTeamCategory.submittedCriteria = criteria.length;
               newTeamCategory.totalCriteria = allRubricData.criteria.length;
-              if (newTeamCategory.submittedCriteria == newTeamCategory.totalCriteria)
+              if (newTeamCategory.submittedCriteria == newTeamCategory.totalCriteria) {
                 newTeamCategory.completed = true;
-              else
+                judgeTrue++;
+              } else {
                 newTeamCategory.completed = false;
-              
-              /*console.log(mergedJudgeData[i].judge.name + ' ' + thisTeamCategory[k].submittedCriteria + ' ' + thisTeamCategory[k].totalCriteria + ' ' +
-                          (thisTeamCategory[k].submittedCriteria == thisTeamCategory[k].totalCriteria) + ' ' +
-                          thisTeamCategory[k].completed);*/
-              
+                judgeFalse++;
+              }
               mergedJudgeData[i].judgments.in_progress.push(newTeamCategory);
             } else {
               // No judgments from this judge for this team category: mark as 'not_started'
               newTeamCategory.completed = false;
+              judgeFalse++;
               mergedJudgeData[i].judgments.not_started.push(newTeamCategory);
             }
-            //console.log(JSON.stringify(thisTeamCategory[k]) + ' ' + JSON.stringify(theseJudgments));  
+            
           }
+          
         }
+        console.log(mergedJudgeData[i].judge.name + ' ' + judgeTrue + ' ' + judgeFalse);
+          mergedJudgeData[i].judge_completion = prettyPercent(judgeTrue / (judgeTrue + judgeFalse));
         delete mergedJudgeData[i].judgments.all;
       }
       
@@ -920,6 +921,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
         }
         return results;
       }
+      
+      function prettyPercent(uglyPercent) {
+			 uglyPercent *= 100;
+			 return +uglyPercent.toFixed(2);
+		  }
     };
 
 		service.init =  function() {
