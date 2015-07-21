@@ -107,19 +107,11 @@
               <div class="col col-sm-7">
                 <div class="row">
                   <span class="col col-sm-6 col-lg-5">
-                    <progressbar max="100"
-                                 ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0"
-                                 value="determineOverallJudgeProgress(judgeJudgments)[2]"
-                                 class="progress-striped active"
-                                 type="success">
-                    <span ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0">
-                      {{determineOverallJudgeProgress(judgeJudgments)[2]}}%
-                    </span>
-                  </progressbar>
+               
                   </span>
                   <span class="col col-sm-6 col-md-6 col-lg-6">
                     <span class="pull-left">
-                      {{determineOverallJudgeProgress(judgeJudgments)[0]}}/{{determineOverallJudgeProgress(judgeJudgments)[1]}}&nbsp; 
+                      
                       team assignments completed
                     </span>
                   </span>
@@ -251,7 +243,8 @@
                             <div class="col col-sm-12 col-md-12 col-lg-12">
                               <div class="media judgedTeam active"
                                     ng-click="populateCompletedTeamModal(teamCat, judgeJudgment)"
-                                    ng-repeat="teamCat in judgeJudgment.teamCats">
+                                    ng-repeat="teamCat in judgeJudgment.judgments.in_progress">
+                   
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
                                     <img class="media-object"

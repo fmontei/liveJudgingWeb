@@ -568,11 +568,36 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 	}
 ])
 
+.factory('JudgmentManagementService', ['$q', 'JudgmentRESTService', function($q, JudgmentRESTService) {
+  return function($scope, sessionStorage) {
+    var service = {};
+
+    var eventId = sessionStorage.getObject('selected_event').id;
+
+    service.getAllJudgments = function(authHeader) {
+      var defer = $q.defer();
+
+      JudgmentRESTService(authHeader).judgments.get({event_id: eventId})
+        .$promise.then(function(resp) {
+        defer.resolve(resp);
+        console.log('Successfully retrieved all judgments from server.');
+      }).catch(function(error) {
+        defer.reject();
+        console.log('Error retrieving all judgments from server.');
+      });
+      
+      return defer.promise;
+    }
+
+    return service; 
+  }
+}])
+
 .factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService',
 								 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService',
-								 'TeamManagementService', 'TeamRESTService', '$location',
+								 'TeamManagementService', 'TeamRESTService', '$location', 'JudgmentManagementService',
 	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService,
-			JudgmentRESTService, RubricRESTService, TeamManagmentService, TeamRESTService, $location) {
+			JudgmentRESTService, RubricRESTService, TeamManagmentService, TeamRESTService, $location, JudgmentManagementService) {
 	return function($scope) {
 	
 		var authHeader = CurrentUserService.getAuthHeader();
@@ -583,27 +608,232 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 
     var teamManagmentService = TeamManagmentService($scope, sessionStorage);
     var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+    var judgmentManagementService = JudgmentManagementService($scope, sessionStorage);
 	
 		var service = {};
     
     service.getDashboardInfo = function() {
       var defer = $q.defer();
       
-      teamManagmentService.getTeams().then(function(resp) {
-        teamManagmentService.getTeamsCategories(resp).then(function(teamsCategories) {
-          service.getJudgmentsOfAllTeams();
-          judgeManagementService.getJudges().then(function() {
-            service.getJudgmentsByAllJudges().then(function(resp) {
-                sessionStorage.putObject('judgeJudgments', resp);
-                service.determineTeamStanding(resp);
-                defer.resolve();
-            });
-          });
-        });
+      getAllEventDashboardData().then(function(allData) {
+        console.log('~~~~~~~~~~READY TO MERGE~~~~~~~~~~~~~');
+        mergeAllEventDashboardData(allData['judges'],
+                                   allData['judgments'],
+                                   allData['teamCategories'],
+                                   allData['rubrics']);
+        defer.resolve();
       });
+      
       
       return defer.promise;
     }
+    
+    var getAllEventDashboardData = function() {
+      var defer = $q.defer(), promises = [], allData = {};
+      
+      var teamPromise = teamManagmentService.getTeams()
+        .then(function() {
+      });
+      
+      var judgePromise = judgeManagementService.getJudges()
+        .then(function(judges) {
+        allData['judges'] = judges;
+      });
+      
+      var judgmentPromise = judgmentManagementService.getAllJudgments(authHeader)
+        .then(function(judgments) {
+        allData['judgments'] = judgments;
+      });
+      
+      var rubricPromise = RubricRESTService(authHeader).rubrics.get({event_id: eventId})
+        .$promise.then(function(rubrics) {
+        allData['rubrics'] = rubrics;
+      });
+      
+      promises.push(teamPromise);
+      promises.push(judgePromise);
+      promises.push(judgmentPromise);
+      
+      $q.all(promises).then(function() {
+        getTeamCategories(allData['judgments']).then(function(teamCategories) {
+          allData['teamCategories'] = teamCategories;   
+          defer.resolve(allData);
+        });
+      });
+      
+      function getTeamCategories(judgments) {
+        var defer = $q.defer();
+        
+        var processedTeamCategoryIds = [], teamCategoryPromises = [], teamCategories = [];
+        angular.forEach(judgments, function(judgment) {
+          var team_category_id = judgment.team_category.id;
+          if (processedTeamCategoryIds.indexOf(team_category_id) === -1) {
+            processedTeamCategoryIds.push(team_category_id);
+            var promise = teamManagmentService.getTeamCategory(team_category_id).then(function(teamCategory) {
+              teamCategories.push(teamCategory);                       
+            });
+            teamCategoryPromises.push(promise);
+          }
+        });
+        
+        $q.all(teamCategoryPromises).then(function() {
+          defer.resolve(teamCategories);
+        });
+        
+        return defer.promise;
+      };
+      
+      return defer.promise;
+    };
+    
+    var mergeAllEventDashboardData = function(allJudges, 
+                                              allJudgments, 
+                                              allTeamCategories,
+                                              allRubrics) {
+      var merged = [];
+      
+  
+      /*for (var i = 0; i < allJudgments.length; i++) {
+        var judgment = allJudgments[i];
+        for (var j = 0; j < allTeamCategories.length; j++) {
+          var teamCategory = allTeamCategories[j];
+          teamCategory.in_progress = [];
+          teamCategory.not_started = [];
+          if (teamCategory.id === judgment.team_category.id) {
+            //console.log(JSON.stringify(judgment));
+          }
+        }
+      }*/
+      
+     
+      for (var i = 0; i < allJudges.length; i++) {
+        var judge = allJudges[i];
+        var judgeId = judge.id;
+        var judgeJudgments = {
+          in_progress: [],
+          not_started: [],
+          all: []
+        }
+        for (var j = 0; j < allJudgments.length; j++) {
+          var judgment = allJudgments[j];
+          if (judgeId === judgment.judge.id) {
+            var teamCat = getObjectById(allTeamCategories, judgment.team_category.id);
+            var formattedJudgment = {
+              judgment_id: judgment.id,
+              value: judgment.value,
+              team_category: teamCat,
+              rubric: judgment.rubric
+            };
+            judgment.team_category = teamCat;
+            if (judgeJudgments.all.indexOf(formattedJudgment) === -1)
+              judgeJudgments.all.push(formattedJudgment);
+          }
+        }
+        judge.judgments = judgeJudgments;
+        delete judge.event;
+        delete judge.teams;
+      }
+      
+      for (var i = 0; i < allJudges.length; i++) {
+        var judge = allJudges[i];
+        var judgeId = judge.id;   
+        judge.judgments.all.sort(function(a, b) {return a.team_category.id - b.team_category.id});
+        var all = judge.judgments.all;
+        var previousTeamCatId, submissionCount = 1;
+        for (var j = 0; j < all.length; j++) {
+          if (previousTeamCatId !== undefined) {
+            if (previousTeamCatId === all[j].team_category.id) {
+              submissionCount += 1;
+            } else {
+              all[j].submittedCriteria = submissionCount;
+              if (all[j].totalCriteria === undefined) {
+                var thisRubric = getObjectById(allRubrics, all[j].rubric.id);
+                var totalCriteria = thisRubric.criteria.length;
+                all[j].totalCriteria = totalCriteria;
+                if (submissionCount === totalCriteria)
+                  all[j].completed = true;
+                else
+                  all[j].completed = false;
+              }
+              judge.judgments.in_progress.push(all[j]);
+              submissionCount = 1;
+            }
+          }
+          previousTeamCatId = all[j].team_category.id;
+        }
+        judge.judgments.all = [];
+      }
+      
+      console.log(JSON.stringify(allJudges));
+      sessionStorage.putObject('judgeJudgments', allJudges); 
+     
+      return;
+   
+        for (var j = 0; j < allJudgments.length; j++) {
+          var judgment = allJudgments[j];
+   
+          var judge = getObjectById(allJudges, judgment.judge.id);
+          var teamCat = getObjectById(allTeamCategories, judgment.team_category.id);
+          
+          
+          console.log(teamCat.team.id + ' ' + JSON.stringify(judge.teams));
+          if (!judgeTeam) continue;
+          
+          if (judgeTeam.submittedCriteria === undefined)
+            judgeTeam.submittedCriteria = 1;
+          else
+            judgeTeam.submittedCriteria += 1;
+
+          if (judgeTeam.totalCriteria === undefined) {
+            var thisRubric = getObjectById(allRubrics, judgment.rubric.id);
+            judgeTeam.totalCriteria = thisRubric.criteria.length;
+          }
+          
+   
+        }
+      
+      
+      console.log(JSON.stringify(allJudges));
+      return;
+      
+      for (var i = 0; i < allJudges.length; i++) {
+        var judge = allJudges[i];
+        var judgeId = judge.id;
+        var judgeJudgments = [];
+        for (var j = 0; j < allJudgments.length; j++) {
+          var judgment = allJudgments[j];
+      
+          if (judgeId === judgment.judge.id) {
+            
+            console.log(JSON.stringify(judge.teams));
+            /*judgeJudgments.push({
+              id: judgment.id,
+              value: judgment.value,
+              team_category_id: judgment.team_category.id,
+              criterion: judgment.criterion,
+              rubric: judgment.rubric
+            });*/
+          }
+        }
+        var judgeObj = {
+          judge: judge.judge,
+          judgments: {
+            in_progress: [],
+            not_started: []
+          }
+        };
+        
+        //if (merged.indexOf(judgeObj) === -1)
+          //merged.push(judgeObj);
+      }
+      
+      function getObjectById(objects, id) {
+        for (var i = 0; i < objects.length; i++) {
+          if (objects[i].id === id)
+            return objects[i];
+        }
+      }
+    };
 
 		service.init =  function() {
 				$scope.$watch(function() {
@@ -707,6 +937,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 			sessionStorage.putObject('teamStanding', teamStanding);
 	    console.log('Done computing team standing.');
 		}
+    
+    
 
 		service.getJudgmentsByAllJudges = function() {
 			var defer = $q.defer();
@@ -719,12 +951,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 			}
 
 			$q.all(promises).then(function(resp) {
-		console.log('Judgments successfully retrieved from server.');
+		    console.log('Judgments successfully retrieved from server.');
+        console.log('JUDGMENTS ' + JSON.stringify(resp));
 				defer.resolve(resp);
 			}).catch(function() {
 				defer.reject();
-		var error = 'Error getting judgments by judge Ids.';
-		sessionStorage.put('generalErrorMessage', error);
+		    var error = 'Error getting judgments by judge Ids.';
+		    sessionStorage.put('generalErrorMessage', error);
 				console.log('Error getting judgments by judge ids.');
 			});
 
