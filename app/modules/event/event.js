@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
+angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
 	$routeProvider.when('/eventLoading', {
@@ -256,9 +256,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 ])
 
 .controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 'JudgeManagementService', 
-								 'TeamManagementService', 'EventDashboardService', 'ngProgressFactory',
+								 'TeamManagementService', 'EventDashboardService',
 	function($q, $scope, $location, $timeout, sessionStorage, JudgeManagementService, 
-			TeamManagmentService, EventDashboardService, ngProgressFactory) {
+			TeamManagmentService, EventDashboardService) {
   
 	var teamManagmentService = TeamManagmentService($scope, sessionStorage);
 	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
@@ -266,11 +266,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 
 	$scope.getEverything = function() {
 	  var masterDefer = $q.defer();
-    
-    $scope.progressbar = ngProgressFactory.createInstance();
-    $scope.progressbar.setHeight('20px');
-    $scope.progressbar.setColor('#3498db');
-    $scope.progressbar.start();
 	  
 	  $timeout(function() {
 		  masterDefer.reject();
@@ -279,7 +274,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 	  
 	  eventDashboardService.getDashboardInfo().then(function() {
 		  masterDefer.resolve();
-      $scope.progressbar.complete();
 	  }).catch(function(error) {
 		  masterDefer.reject();
 	  });
