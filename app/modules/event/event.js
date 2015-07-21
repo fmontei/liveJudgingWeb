@@ -439,25 +439,17 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			return categoryManagementService.convertColorToHex(decimalColor);
 		}
     
-    $scope.populateCompletedTeamModal = function(team, judge) {
-      var team_category_id = team.team_category_id;
+    $scope.populateCompletedTeamModal = function(teamCategory, judge) {
+      var team_category_id = teamCategory.id;
       var authHeader = CurrentUserService.getAuthHeader();
       var eventId = sessionStorage.getObject('selected_event').id;
-      
-      // The judge Id is not judge.id...must look elsewhere in the string for the actual id
-      var judgeString = JSON.stringify(judge);
-      var firstIndex = judgeString.indexOf('"judgeId":') + '"judgeId":'.length;
-      var firstPart = judgeString.substring(firstIndex);
-      var judgeId = firstPart.substring(0, firstPart.indexOf(','));
-      
-      if (!judgeId || isNaN(judgeId)) 
-        return;
+      var judgeId = judge.id;
       
       $scope.completedTeamModal = {};
-      $scope.completedTeamModal.completed = team.completed;
+      $scope.completedTeamModal.completed = teamCategory.completed;
       $scope.completedTeamModal.loading = true;
-      $scope.completedTeamModal.team = team.team;
-      $scope.completedTeamModal.categoryName = team.category.label;
+      $scope.completedTeamModal.team = teamCategory.team;
+      $scope.completedTeamModal.categoryName = teamCategory.category.label;
       $scope.completedTeamModal.overall_score = 0; // Display while loading data
       $('#completed-team-modal').modal('show');
       
@@ -841,7 +833,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         var judgments_in_progress = jJudgments[i].judgments.in_progress;
 				for (var j = 0; j < judgments_in_progress.length; j++) {
 					var judgment = judgments_in_progress[j];
-          console.log(JSON.stringify(judgment));
 					// If there's at least submitted criteria, take the 'judgment' into account
 					if (seenCats.indexOf(judgment.category.id) == -1) {
 						seenCats.push(judgment.category.id);
