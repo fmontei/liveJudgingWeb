@@ -762,20 +762,25 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
                                                                         mergedJudgeData[i].id);
             var newTeamCategory = jQuery.extend(true, {}, thisTeamCategory[k]);
             if (theseJudgments.length > 0) {
-              var rubric = theseJudgments[0].rubric;
-              var criteria = [];
+              // There are judgments from this judge for this team category: mark as 'in_progress'
+              var rubric = theseJudgments[0].rubric, criteria = [], score = 0;
               for (var l = 0; l < theseJudgments.length; l++) {
                 var thisCriterion = theseJudgments[l].criterion;
                 var thisValue = theseJudgments[l].value; 
                 var newCriterion = jQuery.extend(true, {}, thisCriterion);
                 newCriterion.judgment = thisValue;
+                score = score + (thisValue / thisCriterion.max_score);
                 criteria.push(newCriterion);
-              }
+              } 
               var allRubricData = getObjectById(allRubrics, rubric.id);
               newTeamCategory.criteria = criteria;
               newTeamCategory.rubric = rubric;
               newTeamCategory.submittedCriteria = criteria.length;
               newTeamCategory.totalCriteria = allRubricData.criteria.length;
+              
+              var percentScore = (score / theseJudgments.length);
+              newTeamCategory.percentScore = percentScore;
+              console.log(newTeamCategory.percentScore);
               if (newTeamCategory.submittedCriteria == newTeamCategory.totalCriteria) {
                 newTeamCategory.completed = true;
                 judgeTrue++;
@@ -790,108 +795,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
               judgeFalse++;
               mergedJudgeData[i].judgments.not_started.push(newTeamCategory);
             }
-            
-          }
-          
+          } 
         }
         mergedJudgeData[i].judge_completion = prettyPercent(judgeTrue / (judgeTrue + judgeFalse));
         mergedJudgeData[i].numCompletedTeams = judgeTrue;
         mergedJudgeData[i].numAssignedTeams = (judgeTrue + judgeFalse);
         delete mergedJudgeData[i].judgments.all;
       }
-      
-      console.log('merged judge data ' + JSON.stringify(mergedJudgeData));
+
       sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
-      return;
-      
-      /* Merge judges and judgments together */
-      /*for (var i = 0; i < allJudges.length; i++) {
-        var judge = allJudges[i];
-        var judgeId = judge.id;
-        var judgeJudgments = {
-          in_progress: [],
-          not_started: [],
-          all: []
-        }
-        for (var j = 0; j < allJudgments.length; j++) {
-          var judgment = allJudgments[j];
-          if (judgeId === judgment.judge.id) {
-            var teamCat = getObjectById(allTeamCategories, judgment.team_category.id);
-            var formattedJudgment = {
-              judgment_id: judgment.id,
-              value: judgment.value,
-              team_category: teamCat,
-              rubric: judgment.rubric
-            };
-            judgment.team_category = teamCat;
-            if (judgeJudgments.all.indexOf(formattedJudgment) === -1)
-              judgeJudgments.all.push(formattedJudgment);
-          }
-        }
-        var newJudge = jQuery.extend(true, {}, judge);
-        newJudge.judgments = judgeJudgments;
-        delete newJudge.event;
-        delete newJudge.teams;
-        mergedJudgeData.push(newJudge);
-      }*/
-      
-      /* Process in progress judgments */
-      /*for (var i = 0; i < mergedJudgeData.length; i++) {
-        var judge = mergedJudgeData[i];      
-        var judgeId = judge.id;   
-        judge.judgments.all.sort(function(a, b) {return a.team_category.id - b.team_category.id});
-        var all = judge.judgments.all;
-        var previousTeamCatId = (all.length !== 0) ? all[0].team_category.id : null;
-        var submissionCount = 0;
-        for (var j = 0; j < all.length; j++) {
-          if (previousTeamCatId === all[j].team_category.id) {
-            submissionCount += 1;
-          } else { 
-            all[j].submittedCriteria = submissionCount;
-            if (all[j].totalCriteria === undefined) {
-              var thisRubric = getObjectById(allRubrics, all[j].rubric.id);
-              var totalCriteria = thisRubric.criteria.length;
-              all[j].totalCriteria = totalCriteria;
-              if (submissionCount === totalCriteria)
-                all[j].completed = true;
-              else
-                all[j].completed = false;
-            }
-            judge.judgments.in_progress.push(all[j]);
-            submissionCount = 0;
-        }
-          previousTeamCatId = all[j].team_category.id;
-        }
-        delete judge.judgments.all;
-      }*/
-      
-      /* Add unjudged teams to judgeJudgments */
-      /*for (var i = 0; i < allJudgeTeams.length; i++) {
-        var judgeTeamCollection = allJudgeTeams[i];
-        for (var j = 0; j < judgeTeamCollection.length; j++) {
-          var judgeTeam = judgeTeamCollection[j];  
-          var firstJudgeId = judgeTeam.judge.id;
-          var firstTeamId = judgeTeam.team.id;     
-          for (var k = 0; k < mergedJudgeData.length; k++) {
-            var judge = mergedJudgeData[k];
-            var thisJudgeId = judge.judge.id;
-            if (thisJudgeId === firstJudgeId) {
-              var found = false;
-              for (var l = 0; l < judge.judgments.in_progress.length; l++) {
-                var judgment = judge.judgments.in_progress[l];
-                var thisTeamId = judgment.team_category.team.id;
-                if (firstTeamId === thisTeamId)
-                  found = true;
-              }
-              if (!found)
-                judge.judgments.not_started.push(judgeTeam);
-            }
-          }
-        }
-      }*/
-      
-      console.log('merged judge data ' + JSON.stringify(mergedJudgeData));
-      sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
+      service.determineTeamStanding(mergedJudgeData);
       
       function getObjectById(objects, id) {
         for (var i = 0; i < objects.length; i++) {
@@ -924,8 +837,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       }
       
       function prettyPercent(uglyPercent) {
-			 uglyPercent *= 100;
-			 return +uglyPercent.toFixed(2);
+		    uglyPercent *= 100;
+		    return +uglyPercent.toFixed(2);
 		  }
     };
 
@@ -969,36 +882,31 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 				sessionStorage.put('categoryInc', '0');
 		}
 
-		/* THIS CODE IS A MONUMENT TO MY SINS.
-		   Dear anyone who wants to improve upon Live Judging Web:
-		   Do yourself a favor and rewrite this entire service. It
-		   is extremely, EXTREMELY awful & I hate it.
-		   Luv, Christina K */
-
 		service.determineTeamStanding = function(jJudgments) {
-			// jJudgments refers to all the team-category assignments
+      // jJudgments refers to all the team-category assignments
 			// for all judges, whether they are completed, in progress, or unstarted.
 			var teamStanding = [];
 			var seenCats = [];
 			for (var i = 0; i < jJudgments.length; i++) {
-				for (var j = 0; j < jJudgments[i].teamCats.length; j++) {
-					var judgment = jJudgments[i].teamCats[j];
+        var judgments_in_progress = jJudgments[i].judgments.in_progress;
+				for (var j = 0; j < judgments_in_progress.length; j++) {
+					var judgment = judgments_in_progress[j];
+          console.log(JSON.stringify(judgment));
 					// If there's at least submitted criteria, take the 'judgment' into account
-					if (judgment.submitedCriteria && seenCats.indexOf(judgment.category.id) == -1) {
+					if (seenCats.indexOf(judgment.category.id) == -1) {
 						seenCats.push(judgment.category.id);
 						teamStanding.push({
 							category: judgment.category,
-              team_category_id: judgment.team_category_id,
+              team_category_id: judgment.id,
 							teams: []
 						});
 						teamStanding[teamStanding.length - 1].teams.push({
 							team: judgment.team,
-              team_category_id: judgment.team_category_id,
+              team_category_id: judgment.id,
 							teamPercentScore: judgment.percentScore,
 							teamJudgmentsCount: 1
 						});
-					// Just to be explicit:
-					} else if (judgment.submitedCriteria &&  seenCats.indexOf(judgment.category.id) != -1) { // We've seen this team-category pairing before, combine it.
+					} else if (seenCats.indexOf(judgment.category.id) != -1) { // We've seen this team-category pairing before, combine it.
 						var foundTeam;
 						for (var k = 0; k < teamStanding.length; k++) {
 							foundTeam = false;
@@ -1013,7 +921,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 								if (!foundTeam) {
 									teamStanding[k].teams.push({
 										team: judgment.team,
-                    team_category_id: judgment.team_category_id,
+                    team_category_id: judgment.id,
 										teamPercentScore: judgment.percentScore,
 										teamJudgmentsCount: 1
                   });
