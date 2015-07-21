@@ -300,9 +300,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 		teamStandingService.init();
 
     var updateDashboardInterval = $interval(function() {
-      //teamStandingService.getDashboardInfo();
-      //console.log('Updating dashboard.');
-    }, 90000);
+      teamStandingService.getDashboardInfo();
+      console.log('Updating dashboard.');
+    }, 9000000);
     
     $scope.$on("$destroy", function() {
       $interval.cancel(updateDashboardInterval);
