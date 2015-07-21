@@ -371,21 +371,21 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		  if (type === 'judge') {
 			$scope.$broadcast('firstRecipientsAdded', item.judge.name);
 		  } else if (type === 'team') {
-			var judgeIds = item.judges;
-			var judgeObjs = sessionStorage.getObject('judges');
-			var judgeNames = [];
-			if (judgeObjs) {
-			  for (var i = 0; i < judgeIds.length; i++) {
-				var judgeId = judgeIds[i].id;
-				for (var j = 0; j < judgeObjs.length; j++) {
-				  if (judgeObjs[i].id === judgeId) {
-					judgeNames.push(judgeObjs[i].judge.name);
-					break;
-				  }
-				}
-			  }
-			  $scope.$broadcast('firstRecipientsAdded', judgeNames);
-			}
+        var judgeIds = item.judges;
+        var judgeObjs = sessionStorage.getObject('judges');
+        var judgeNames = [];
+        if (judgeObjs) {
+          for (var i = 0; i < judgeIds.length; i++) {
+          var judgeId = judgeIds[i].id;
+          for (var j = 0; j < judgeObjs.length; j++) {
+            if (judgeObjs[i].id === judgeId) {
+            judgeNames.push(judgeObjs[i].judge.name);
+            break;
+            }
+          }
+          }
+          $scope.$broadcast('firstRecipientsAdded', judgeNames);
+        }
 		  }
 		}
 
@@ -406,6 +406,24 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		$scope.judgeOrderReverse = true;
 		$scope.judgeAssignmentCount = 0;
 		$scope.judgeCompletedCount = 0;
+    
+    $scope.$watch(function() {
+      return sessionStorage.get('judgeAssignmentCount');
+    }, function(newValue) {
+      $scope.judgeAssignmentCount = newValue;
+    });
+    
+    $scope.$watch(function() {
+      return sessionStorage.get('judgeCompletedCount');
+    }, function(newValue) {
+      $scope.judgeCompletedCount = newValue;
+    });
+    
+    $scope.$watch(function() {
+      return sessionStorage.get('overallEventCompletionPercentage');
+    }, function(newValue) {
+      $scope.overallEventCompletionPercentage = newValue;
+    });
 
 		$scope.orderByCompletion = function(judgeJudgment) {
 			return judgeJudgment.judge_completion;
@@ -414,25 +432,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		$scope.prettyPercent = function(uglyPercent) {
 			uglyPercent *= 100;
 			return +uglyPercent.toFixed(2);
-		}
-
-		$scope.determineOverallJudgeProgress = function(judgeJudgments) {
-			if (!judgeJudgments || judgeJudgments.length === 0) {
-				return [0, 0, 0];
-			}
-			var teamCatCount = 0;
-			var completedTeamCatCount = 0;
-			for (var i = 0; i < judgeJudgments.length; i++) {
-				for (var j = 0; j < judgeJudgments[i].teamCats.length; j++) {
-					if (judgeJudgments[i].teamCats[j].completed) {
-						completedTeamCatCount++;
-					}
-				}
-				teamCatCount += judgeJudgments[i].teamCats.length;
-			}
-			$scope.judgeAssignmentCount = teamCatCount;
-			$scope.judgeCompletedCount = completedTeamCatCount;
-			return [completedTeamCatCount, teamCatCount, Math.floor(completedTeamCatCount / teamCatCount * 100)];
 		}
 
 		$scope.convertColorToHex = function(decimalColor) {
@@ -791,6 +790,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
       sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
       computeTeamStanding(mergedJudgeData);
+      computeOverallJudgeProgress(mergedJudgeData);
       
       /* Helper functions */
       function getRubricById(objects, id) {
@@ -879,6 +879,31 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				}
 			}
 			sessionStorage.putObject('teamStanding', teamStanding);
+		}
+    
+    var computeOverallJudgeProgress = function(judgeJudgments) {
+			if (!judgeJudgments || judgeJudgments.length === 0) {
+				return [0, 0, 0];
+			}
+			var completedTeamCatCount = 0, uncompletedTeamCatCount = 0;
+			for (var i = 0; i < judgeJudgments.length; i++) {
+				for (var j = 0; j < judgeJudgments[i].judgments.in_progress.length; j++) {
+					if (judgeJudgments[i].judgments.in_progress[j].completed) {
+						completedTeamCatCount++;
+					} else {
+            uncompletedTeamCatCount++;
+          }
+				}
+        for (var j = 0; j < judgeJudgments[i].judgments.not_started.length; j++) {
+					uncompletedTeamCatCount++;
+				}
+			}
+			var judgeAssignmentCount = completedTeamCatCount + uncompletedTeamCatCount;
+			var judgeCompletedCount = completedTeamCatCount;
+      sessionStorage.put('judgeAssignmentCount', judgeAssignmentCount);
+      sessionStorage.put('judgeCompletedCount', judgeCompletedCount);
+      sessionStorage.put('overallEventCompletionPercentage', 
+                         Math.floor(judgeCompletedCount / judgeAssignmentCount * 100));
 		}
     
     return service;
