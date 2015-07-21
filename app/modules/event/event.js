@@ -794,8 +794,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
           }
           
         }
-        console.log(mergedJudgeData[i].judge.name + ' ' + judgeTrue + ' ' + judgeFalse);
-          mergedJudgeData[i].judge_completion = prettyPercent(judgeTrue / (judgeTrue + judgeFalse));
+        mergedJudgeData[i].judge_completion = prettyPercent(judgeTrue / (judgeTrue + judgeFalse));
+        mergedJudgeData[i].numCompletedTeams = judgeTrue;
+        mergedJudgeData[i].numAssignedTeams = (judgeTrue + judgeFalse);
         delete mergedJudgeData[i].judgments.all;
       }
       
