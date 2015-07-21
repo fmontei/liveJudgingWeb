@@ -255,8 +255,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
-.controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 'JudgeManagementService', 
-								 'TeamManagementService', 'EventDashboardService',
+.controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 
+                                 'JudgeManagementService', 'TeamManagementService', 'EventDashboardService',
 	function($q, $scope, $location, $timeout, sessionStorage, JudgeManagementService, 
 			TeamManagmentService, EventDashboardService) {
   
@@ -270,7 +270,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	  $timeout(function() {
 		  masterDefer.reject();
 		  //TODO: raise alert if loading timeout occurs--something went wrong
-	  }, 60000);
+	  }, 90000);
 	  
 	  eventDashboardService.getDashboardInfo().then(function() {
 		  masterDefer.resolve();
@@ -300,7 +300,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     var updateDashboardInterval = $interval(function() {
       eventDashboardService.getDashboardInfo();
       console.log('Updating dashboard.');
-    }, 9000000);
+    }, 30000);
     
     $scope.$on("$destroy", function() {
       $interval.cancel(updateDashboardInterval);
@@ -314,9 +314,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			current_view: sessionStorage.get('event_view')
 		};
 
-	$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
-						{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
-						{name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
+	  $scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
+                        {name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
+                        {name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
 	
 		$scope.getSelectedEvent = function() {
 			return sessionStorage.getObject('selected_event');
@@ -661,7 +661,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       
       var defer = $q.defer(), promises = [], allData = {};
       
-      var teamPromise = teamManagmentService.getTeams()
+      var teamPromise = teamManagmentService.getTeamCategories()
         .then(function(teams) {
         allData['teams'] = teams;
       });
@@ -798,8 +798,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       }
 
       sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
-      service.determineTeamStanding(mergedJudgeData);
+      computeTeamStanding(mergedJudgeData);
       
+      /* Helper functions */
       function getRubricById(objects, id) {
         for (var i = 0; i < objects.length; i++) {
           if (objects[i].id === id)
@@ -831,7 +832,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       }
     }
 
-		service.determineTeamStanding = function(jJudgments) {
+		var computeTeamStanding = function(jJudgments) {
       // jJudgments refers to all the team-category assignments
 			// for all judges, whether they are completed, in progress, or unstarted.
 			var teamStanding = [];
