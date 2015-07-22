@@ -297,10 +297,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		var eventDashboardService = EventDashboardService($scope);
 		eventDashboardService.init();
 
+    eventDashboardService.getDashboardInfo();
     var updateDashboardInterval = $interval(function() {
       eventDashboardService.getDashboardInfo();
-      console.log('Updating dashboard.');
-    }, 30000);
+      console.log('Updating event dashboard.');
+    }, 60000);
     
     $scope.$on("$destroy", function() {
       $interval.cancel(updateDashboardInterval);
