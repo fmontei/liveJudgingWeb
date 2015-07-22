@@ -299,7 +299,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		eventDashboardService.init();
 
     var updateDashboardInterval = $interval(function() {
-    eventDashboardService.getDashboardInfo();
+      $scope.refreshDashboardInfo();
       console.log('Updating event dashboard.');
     }, 90000);
     
@@ -312,7 +312,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       $scope.refreshDashboardInfoRecentlyClicked = true;
       $timeout(function() {
         $scope.refreshDashboardInfoRecentlyClicked = false;
-      }, 10000);
+      }, 10000); // Prevent refresh spam
     }
 
 		$scope.event = {
