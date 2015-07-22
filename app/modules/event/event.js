@@ -288,15 +288,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
   });
 }])
 
-.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 
-                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'EventDashboardService', 'JudgmentRESTService',
-	function(sessionStorage, $filter, $location, $interval, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
-						 TeamRESTService, EventDashboardService, JudgmentRESTService) {
+.controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$timeout', '$rootScope', '$scope', 'CategoryManagementService', 
+                          'CurrentUserService', 'EventRESTService', 'EventUtilService', 'TeamRESTService', 'EventDashboardService', 'JudgmentRESTService',
+	function(sessionStorage, $filter, $location, $interval, $timeout, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, 
+           EventUtilService, TeamRESTService, EventDashboardService, JudgmentRESTService) {
+    
+    var categoryManagementService = CategoryManagementService($scope);
     
 		var eventDashboardService = EventDashboardService($scope);
 		eventDashboardService.init();
 
-    eventDashboardService.getDashboardInfo();
     var updateDashboardInterval = $interval(function() {
     eventDashboardService.getDashboardInfo();
       console.log('Updating event dashboard.');
@@ -306,7 +307,13 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       $interval.cancel(updateDashboardInterval);
     });
 
-		var categoryManagementService = CategoryManagementService($scope);
+    $scope.refreshDashboardInfo = function() {
+      eventDashboardService.getDashboardInfo();
+      $scope.refreshDashboardInfoRecentlyClicked = true;
+      $timeout(function() {
+        $scope.refreshDashboardInfoRecentlyClicked = false;
+      }, 10000);
+    }
 
 		$scope.event = {
 			EVENT_READY_VIEW: EventUtilService.views.EVENT_READY_VIEW,

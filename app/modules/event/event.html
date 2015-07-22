@@ -13,7 +13,7 @@
           <div class="col col-md-11 col-lg-11">
             <div class="row">
               <span class="col col-lg-5 col-md-5 col-sm-5 col-xs-6 event-ready">
-                <div class="btn-group" role="group">
+                <div class="btn-group" role="group">               
                   <input type="button" 
                          class="btn btn-warning" 
                          ng-click="enableHints();"
@@ -104,7 +104,7 @@
 
             <!-- Overall event progress / Edit Event button-->
             <div class="row">
-              <div class="col col-sm-7">
+              <div class="col col-sm-6">
                 <div class="row">
                   <span class="col col-sm-6 col-lg-5">
                     <progressbar max="100"
@@ -125,10 +125,16 @@
                   </span>
                 </div>
               </div>
-              <div class="col col-sm-5">
+              <div class="col col-sm-6">
                 <div class="btn-group" 
                      role="group"
                      style="margin-top: -10px; float: right">
+                  <button class="btn btn-info" 
+                          role="button"
+                          ng-click="refreshDashboardInfo()"
+                          ng-disabled="refreshDashboardInfoRecentlyClicked === true">
+                    Refresh Data
+                  </button>
                   <input type="button" 
 							           class="btn btn-warning" 
 							           ng-click="enableHints();"
