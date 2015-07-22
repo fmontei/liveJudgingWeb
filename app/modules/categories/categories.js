@@ -79,7 +79,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
             $scope.categoryID = category.id;
             $scope.categoryName = category.label;
             $scope.categoryDesc = category.description;
-            $scope.categoryTime = category.time;
+            $scope.categoryTime = category.due_at;
             $scope.categoryColor = category.color;
         }
 

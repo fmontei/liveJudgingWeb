@@ -71,7 +71,6 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			$scope.judgeInfoForm.judgeLastName = judge.name.substring(lastSpace + 1, judge.name.length);
 			$scope.judgeInfoForm.judgeEmail = judge.email;
       $scope.judgeInfoForm.originalJudgeEmail = judge.email; // Needed by verifyFormData()
-			$scope.judgeInfoForm.judgeAffliation = judge.affiliation;
 			$scope.judgeInfoForm.isEmailTaken = true;
       $scope.assignedTeams = judgeObj.teams;
       sessionStorage.putObject('draggedJudge', judgeObj); // Needed by judgeManagentService.assignedTeamsToJudge()
