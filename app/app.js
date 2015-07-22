@@ -104,6 +104,10 @@ angular.module('liveJudgingAdmin', [
       $scope.user = newVal;
     });
 
+    $scope.goToChangeEvent = function() {
+      $location.path('/eventSelect');
+    }
+
     $scope.logout = CurrentUserService.logout;
 }])
 
