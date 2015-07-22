@@ -826,5 +826,30 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			})
 		}
 	}
-});
+})
+
+.factory('JudgmentManagementService', ['$q', 'JudgmentRESTService', function($q, JudgmentRESTService) {
+  return function($scope, sessionStorage) {
+    var service = {};
+
+    var eventId = sessionStorage.getObject('selected_event').id;
+
+    service.getAllJudgments = function(authHeader) {
+      var defer = $q.defer();
+
+      JudgmentRESTService(authHeader).judgments.get({event_id: eventId})
+        .$promise.then(function(resp) {
+        defer.resolve(resp);
+        console.log('Successfully retrieved all judgments from server.');
+      }).catch(function(error) {
+        defer.reject();
+        console.log('Error retrieving all judgments from server.');
+      });
+      
+      return defer.promise;
+    }
+
+    return service; 
+  }
+}]);
 

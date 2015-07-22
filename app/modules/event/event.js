@@ -54,8 +54,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	}
 ])
 
-.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService',
-							  'EventUtilService',
+.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
 	function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
 		$scope.isCreation = sessionStorage.getObject('selected_event') ? false : true;
 
@@ -552,31 +551,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 	}
 ])
-
-.factory('JudgmentManagementService', ['$q', 'JudgmentRESTService', function($q, JudgmentRESTService) {
-  return function($scope, sessionStorage) {
-    var service = {};
-
-    var eventId = sessionStorage.getObject('selected_event').id;
-
-    service.getAllJudgments = function(authHeader) {
-      var defer = $q.defer();
-
-      JudgmentRESTService(authHeader).judgments.get({event_id: eventId})
-        .$promise.then(function(resp) {
-        defer.resolve(resp);
-        console.log('Successfully retrieved all judgments from server.');
-      }).catch(function(error) {
-        defer.reject();
-        console.log('Error retrieving all judgments from server.');
-      });
-      
-      return defer.promise;
-    }
-
-    return service; 
-  }
-}])
 
 .factory('EventDashboardService', ['$q', 'sessionStorage', 'CurrentUserService',
 				 'JudgeManagementService', 'RubricRESTService', 'TeamManagementService', 'JudgmentManagementService',
