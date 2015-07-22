@@ -297,10 +297,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		eventDashboardService.init();
 
     eventDashboardService.getDashboardInfo();
+    var updateDashboardInterval = $interval(function() {
     eventDashboardService.getDashboardInfo();
-      eventDashboardService.getDashboardInfo();
       console.log('Updating event dashboard.');
-    }, 60000);
+    }, 90000);
     
     $scope.$on("$destroy", function() {
       $interval.cancel(updateDashboardInterval);
@@ -487,7 +487,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       $('#completed-team-modal').modal('hide');
     }
     
-    $scope.populateTeamStandingModal = function(teamObj, category) {
+    $scope.populateTeamStandingModal = function(teamObj, category, totalCriteria) {
       var authHeader = CurrentUserService.getAuthHeader(),
           eventId = sessionStorage.getObject('selected_event').id,
           teamId = teamObj.team.id,
@@ -502,7 +502,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       $scope.teamStandingModal.overall_score = 0; // Display while loading data
       $('#team-standing-modal').modal('show');
       
-      JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId}).$promise.then(function(resp) {    
+      JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId})
+        .$promise.then(function(resp) {    
         var filter = filterOutJudgmentsForThisTeam(resp, team_category_id);
         $scope.teamStandingModal.criteria = filter[0];
         $scope.teamStandingModal.overall_score = filter[1];
@@ -515,10 +516,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
       
       // Because multiple judges are judging, criteria repeat
       function filterOutJudgmentsForThisTeam(judgeJudgments, team_category_id) {
-        var criteria = [], overall_numerator = 0, overall_denominator = 0;
+        var criteria = [], overall_score = 0, overall_score_count = 0;
         var already_seen = []; // Already seen criteria
-        for (var i = 0; i < judgeJudgments.length; i++) {
+    
+        for (var i = 0; i < judgeJudgments.length; i++) {      
           if (judgeJudgments[i].team_category.id === team_category_id) {
+            overall_score_count++;
             var criterion = { 
               name: judgeJudgments[i].criterion.label,
               denominator: judgeJudgments[i].criterion.max_score,
@@ -530,18 +533,22 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
               already_seen.push(criterion.name);
               criteria.push(criterion);
             } else {
-              criteria[index].numerator += judgeJudgments[i].value, 
               criteria[index].score_count += 1
+              criteria[index].numerator += judgeJudgments[i].value 
             }
-            overall_numerator += judgeJudgments[i].value;
-            overall_denominator += judgeJudgments[i].criterion.max_score;
           }
         }
-        for (var i = 0; i < criteria.length; i++) {
-          criteria[i].numerator /= criteria[i].score_count; 
+        
+        for (var i = 0; i < criteria.length; i++) { 
+          criteria[i].numerator /= criteria[i].denominator; 
+          overall_score += criteria[i].numerator;
         }
-        var overall_score = (overall_denominator !== 0) ? overall_numerator / overall_denominator : 0;
-        return [criteria, overall_score];
+        
+        return [criteria, overall_score / overall_score_count];
+        
+        function hasJudgeCompletedJudgingThisTeam(judgeJudgment, totalCriteria) {
+         // for (var i = 0; i < judgeJudgment; i++
+        }
       }
     }
     
@@ -711,7 +718,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         mergedJudgeData.push(newJudge);
       }
     
-      /* Process in progress judgments */
       for (var i = 0; i < mergedJudgeData.length; i++) {
         var allTeamCategories = mergedJudgeData[i].judgments.all;
         var judgeTrue = 0, judgeFalse = 0;
@@ -814,6 +820,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 						teamStanding.push({
 							category: judgment.category,
               team_category_id: judgment.id,
+              rubric: {
+                id: judgment.rubric.id,
+                name: judgment.rubric.name,
+                total_criteria: judgment.totalCriteria
+              },
 							teams: []
 						});
 						teamStanding[teamStanding.length - 1].teams.push({

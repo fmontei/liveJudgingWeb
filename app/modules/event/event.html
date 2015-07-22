@@ -156,7 +156,7 @@
 
               <!-- sorter / expand & collapse buttons -->
               <div style="margin-bottom: 5px">
-                <span style="margin-right: 20px">Sort direction:</span>
+                <span style="margin-right: 20px">Sort by % completed:</span>
                 <div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Order <span class="caret"></span>
@@ -166,7 +166,10 @@
                     <li><a ng-click="judgeOrderReverse = true">Descending</a></li>
                   </ul>
                 </div>
-                <span class="badge" style="margin-left: 20px">{{judges.length}}</span>
+                <span style="margin-left: 20px">
+                  Number of judges: 
+                  <span class="badge">{{judges.length}}</span>
+                </span>
                 <div style="float: right">
                   <expand-all-accordions>
                     <button class="btn btn-default expand-all-accordions judge">
@@ -592,7 +595,7 @@
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
                               <div class="media media-standing" 
-                                   ng-click="populateTeamStandingModal(teamObj, catTeamGroup.category)">
+                                   ng-click="populateTeamStandingModal(teamObj, catTeamGroup.category, catTeamGroup.rubric.total_criteria)">
                                 <div class="media-left">
                                   <a href="javascript:void(0)">
                                     <img class="media-object"
@@ -847,6 +850,16 @@
             </tr>
           </tbody>
         </table>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-warning">
+              <span class="glyphicon glyphicon-alert"></span>
+              These scores are based off the most up-to-date data available. Overall score discrepancy may exist,
+              because all submitted judgments are considered, not just those from judges who have completely
+              finished judging this team.
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <div class="row">
