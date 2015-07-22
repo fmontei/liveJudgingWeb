@@ -27,8 +27,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
 
 		var teamManagementService = TeamManagementService($scope, sessionStorage);
-		teamManagementService.getTeams().then(function(resp) {
-			teamManagementService.getTeamsCategories(resp);
+		teamManagementService.getTeamsAndTheirCategories().then(function(resp) {
+			
 		});
 		$scope.teamNumberOptions = teamManagementService.getTeamNumberOptions();
 
@@ -162,16 +162,19 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 	}
 })
 
-.factory('TeamManagementService', ['$log', '$q', 'CategoryManagementService', 'CurrentUserService', 'TeamInitService', 'TeamRESTService', 'sessionStorage',
-	function($log, $q, CategoryManagementService, CurrentUserService, TeamInitService, TeamRESTService, sessionStorage) {
+.factory('TeamManagementService', ['$log', '$q', 'CategoryManagementService', 'CurrentUserService', 'TeamRESTService', 'sessionStorage',
+	function($log, $q, CategoryManagementService, CurrentUserService, TeamRESTService, sessionStorage) {
 	return function($scope, sessionStorage) {
 		var teamManagement = {};
 		var authHeader = CurrentUserService.getAuthHeader();
 		var selectedEvent = sessionStorage.getObject('selected_event');
 		var categoryManagementService = CategoryManagementService($scope, sessionStorage);
-		var teamInitService = TeamInitService($scope, sessionStorage);
-
-		teamManagement.getTeams = function() {
+    
+    /*
+     * Returns all teams, and each teams contains an array of categories it is in
+     */
+    
+    teamManagement.getTeamsAndTheirCategories = function() {
 			var defer = $q.defer();
 
 			var connection = TeamRESTService(authHeader);
@@ -188,40 +191,8 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 
 			return defer.promise;
 		}
-
-		// Gets the team_category ids
-		teamManagement.getTeamsCategories = function(teams) {
-			var defer = $q.defer();
-
-			var promises = [];
-			for (var i = 0; i < teams.length; i++) {
-				promises.push(getTeamCategories(teams[i].id));
-			}
-
-			$q.all(promises).then(function(resp) {
-				sessionStorage.putObject('teamsCategories', resp);
-				defer.resolve(resp);
-        console.log('Successfully retrieved team categories.');
-			}).catch(function() {
-				defer.reject();
-			});	
-
-			function getTeamCategories(teamId) {
-				var defer = $q.defer();
-
-				TeamRESTService(authHeader).team_categories.get({team_id: teamId}).$promise.then(function(resp) {
-					defer.resolve(resp);
-				}).catch(function() {
-					defer.reject();
-				});
-
-				return defer.promise;
-			}
-      
-      return defer.promise;
-		}
-
-		var getCategoriesForEachTeam = function(eventTeams) {
+    
+    var getCategoriesForEachTeam = function(eventTeams) {
 			var deferred = $q.defer();
 			var filledTeams = [], promises = [];
 			var connection = TeamRESTService(authHeader);
@@ -251,6 +222,73 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 				deferred.resolve(filledTeams);
 			});
 			return deferred.promise;
+		}
+    
+    /*
+     * Returns an array of team-category pairings: each array entry contains
+     * a pairing between a team and category, with a unqiue team-category id
+     */
+
+		teamManagement.getTeamCategories = function() {
+			var defer = $q.defer();
+
+			var connection = TeamRESTService(authHeader);
+			connection.teams.get({event_id: selectedEvent.id}).$promise.then(function(resp) {
+				return getAllTeamCategories(resp);
+			}).then(function(filledTeams) {
+				sessionStorage.putObject('teams', filledTeams);
+				defer.resolve(filledTeams);
+			}).catch(function() {
+				sessionStorage.put('generalErrorMessage', 'Error getting teams from server.');
+				defer.reject('Error getting teams.');
+				$log.log('Error getting teams from server.');
+			});
+
+			return defer.promise;
+		}
+    
+    teamManagement.getTeamCategory = function(team_category_id) {
+      var defer = $q.defer();
+      
+      TeamRESTService(authHeader).team_category.get({id: team_category_id})
+        .$promise.then(function(teamCategory) {
+        defer.resolve(teamCategory);
+      }).catch(function(error) {
+        defer.reject();
+      });
+      
+      return defer.promise;
+    }
+
+		// Gets the team_category ids
+		var getAllTeamCategories = function(teams) {
+			var defer = $q.defer();
+
+			var promises = [];
+			for (var i = 0; i < teams.length; i++) {
+				promises.push(getTeamCategories(teams[i].id));
+			}
+
+			$q.all(promises).then(function(resp) {
+				defer.resolve(resp);
+        console.log('Successfully retrieved teams with their respective categories.');
+			}).catch(function() {
+				defer.reject();
+			});	
+
+			function getTeamCategories(teamId) {
+				var defer = $q.defer();
+
+				TeamRESTService(authHeader).team_categories.get({team_id: teamId}).$promise.then(function(resp) {
+					defer.resolve(resp);
+				}).catch(function() {
+					defer.reject();
+				});
+
+				return defer.promise;
+			}
+      
+      return defer.promise;
 		}
 
 		teamManagement.createNewTeam = function() {
@@ -476,6 +514,14 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 					headers: authHeader
 				}
 			}),
+      team_category: $resource('http://api.stevedolan.me/team_categories/:id', {
+				id: '@id'
+			}, {
+				get: {
+					method: 'GET',
+					headers: authHeader
+				}
+      }),
 			team_categories: $resource('http://api.stevedolan.me/teams/:team_id/categories', {
 				team_id: '@id', category_id: '@category_id'
 			}, {
