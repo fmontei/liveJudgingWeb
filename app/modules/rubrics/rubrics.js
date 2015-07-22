@@ -23,7 +23,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	$scope.criteriaToRemove = [];
 	$scope.rubricId = null; // Used for storing the id of the rubric currently in the modal.
 
-	$scope.rubricRating = 0; // Default -- the server does keep track of this.
+	$scope.rubricRating = 5; // Default -- the server does keep track of this.
 
 	$scope.createNewAccordionCriterion = function() {
 		console.log($scope.modalCriteria);
@@ -34,12 +34,10 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 		if (numberOfNewCriteria > 0)
 			$scope.modalCriteria.push({label: 'New Criterion (' + numberOfNewCriteria + ')',
 										max_score: $scope.rubricRating,
-										ratingType: 'Inherited',
 										isAddition: true});
 		else
 			$scope.modalCriteria.push({label: 'New Criterion',
 										max_score: $scope.rubricRating,
-										ratingType: 'Inherited',
 										isAddition: true});
 	}
 
