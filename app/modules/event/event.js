@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
+angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
 	$routeProvider.when('/eventLoading', {
@@ -54,8 +54,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 	}
 ])
 
-.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService',
-							  'EventUtilService',
+.controller('EventEditCtrl', ['sessionStorage', '$filter', '$location', '$scope', 'CurrentUserService', 'EventRESTService', 'EventUtilService',
 	function(sessionStorage, $filter, $location, $scope, CurrentUserService, EventRESTService, EventUtilService) {
 		$scope.isCreation = sessionStorage.getObject('selected_event') ? false : true;
 
@@ -243,7 +242,11 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 									 endTime.getHours(), endTime.getMinutes(), endTime.getSeconds());
 			if (Date.now() > endDateTime)
 				return true;
-		  	if (!$scope.eventForm.startDate || !$scope.eventForm.startTime || !$scope.eventForm.endTime || !$scope.eventForm.name || !$scope.eventForm.location) {
+		  	if (!$scope.eventForm.startDate || 
+            !$scope.eventForm.startTime || 
+            !$scope.eventForm.endTime || 
+            !$scope.eventForm.name || 
+            !$scope.eventForm.location) {
 		  		return true;
 		  	}
 		  	return false;
@@ -251,31 +254,25 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 	}
 ])
 
-.controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 'JudgeManagementService', 
-								 'TeamManagementService', 'TeamStandingService', 'ngProgressFactory',
+.controller('EventLoadingCtrl', ['$q', '$scope', '$location', '$timeout', 'sessionStorage', 
+                                 'JudgeManagementService', 'TeamManagementService', 'EventDashboardService',
 	function($q, $scope, $location, $timeout, sessionStorage, JudgeManagementService, 
-			TeamManagmentService, TeamStandingService, ngProgressFactory) {
+			TeamManagmentService, EventDashboardService) {
   
 	var teamManagmentService = TeamManagmentService($scope, sessionStorage);
 	var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-	var teamStandingService = TeamStandingService($scope);
+	var eventDashboardService = EventDashboardService($scope);
 
 	$scope.getEverything = function() {
 	  var masterDefer = $q.defer();
-    
-    $scope.progressbar = ngProgressFactory.createInstance();
-    $scope.progressbar.setHeight('20px');
-    $scope.progressbar.setColor('#3498db');
-    $scope.progressbar.start();
 	  
 	  $timeout(function() {
 		  masterDefer.reject();
 		  //TODO: raise alert if loading timeout occurs--something went wrong
-	  }, 60000);
+	  }, 90000);
 	  
-	  teamStandingService.getDashboardInfo().then(function() {
+	  eventDashboardService.getDashboardInfo().then(function() {
 		  masterDefer.resolve();
-      $scope.progressbar.complete();
 	  }).catch(function(error) {
 		  masterDefer.reject();
 	  });
@@ -292,17 +289,18 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 }])
 
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$rootScope', '$scope', 'CategoryManagementService', 'CurrentUserService', 
-                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'TeamStandingService', 'JudgmentRESTService',
+                          'EventRESTService', 'EventUtilService', 'TeamRESTService', 'EventDashboardService', 'JudgmentRESTService',
 	function(sessionStorage, $filter, $location, $interval, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, EventUtilService,
-						 TeamRESTService, TeamStandingService, JudgmentRESTService) {
+						 TeamRESTService, EventDashboardService, JudgmentRESTService) {
     
-		var teamStandingService = TeamStandingService($scope);
-		teamStandingService.init();
+		var eventDashboardService = EventDashboardService($scope);
+		eventDashboardService.init();
 
+    eventDashboardService.getDashboardInfo();
     var updateDashboardInterval = $interval(function() {
-      teamStandingService.getDashboardInfo();
-      console.log('Updating dashboard.');
-    }, 9000000);
+    eventDashboardService.getDashboardInfo();
+      console.log('Updating event dashboard.');
+    }, 90000);
     
     $scope.$on("$destroy", function() {
       $interval.cancel(updateDashboardInterval);
@@ -316,9 +314,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 			current_view: sessionStorage.get('event_view')
 		};
 
-	$scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
-						{name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
-						{name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
+	  $scope.eventTabs = [{name: 'Judge Progress', id: 'judge-progress-tab', sectionId: 'judge-progress-section'},
+                        {name: 'Team Progress', id: 'team-progress-tab', sectionId: 'team-progress-section'},
+                        {name: 'Team Standing', id: 'team-standing-tab', sectionId: 'team-standing-section'}];
 	
 		$scope.getSelectedEvent = function() {
 			return sessionStorage.getObject('selected_event');
@@ -346,53 +344,48 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 					location: curEvent.location
 			};
 	  
-			EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, 
-																		updatedEvent)
-		.$promise.then(function(resp) {
-				sessionStorage.putObject('selected_event', resp);
-				var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
-				sessionStorage.put('event_view', view);
-				$scope.event.current_view = view;
-				console.log('Event started.');
-			}).catch(function() {
-				console.log('Error updating event times.');
-			});
+			EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, updatedEvent)
+        .$promise.then(function(resp) {
+        sessionStorage.putObject('selected_event', resp);
+        var view = EventUtilService.views.EVENT_IN_PROGRESS_VIEW;
+        sessionStorage.put('event_view', view);
+        $scope.event.current_view = view;
+        console.log('Event started.');
+      }).catch(function() {
+        console.log('Error updating event times.');
+      });
 		};
 
-		$scope.reveal_event_desc = function(desc) {
-			$('#event-selection-desc').html('<strong>Event Description:</strong><br />' + desc).show();
-		};
+    $scope.rankNext3Categories = function() {
+      var categoryInc = parseInt(sessionStorage.get('categoryInc')) + 3;
+      var numCategories = $scope.teamStanding.length;
+      if (categoryInc > numCategories)
+        sessionStorage.put('categoryInc', 0);
+      else
+        sessionStorage.put('categoryInc', categoryInc);
+    }
 
-				$scope.rankNext3Categories = function() {
-					var categoryInc = parseInt(sessionStorage.get('categoryInc')) + 3;
-					var numCategories = $scope.teamStanding.length;
-					if (categoryInc > numCategories)
-						sessionStorage.put('categoryInc', 0);
-					else
-						sessionStorage.put('categoryInc', categoryInc);
-				}
-
-				$scope.recipientList = []; // Contains list of judges to be notified
+    $scope.recipientList = []; // Contains list of judges to be notified
 
 		$scope.initRecipientList = function(item, type) {
 		  if (type === 'judge') {
 			$scope.$broadcast('firstRecipientsAdded', item.judge.name);
 		  } else if (type === 'team') {
-			var judgeIds = item.judges;
-			var judgeObjs = sessionStorage.getObject('judges');
-			var judgeNames = [];
-			if (judgeObjs) {
-			  for (var i = 0; i < judgeIds.length; i++) {
-				var judgeId = judgeIds[i].id;
-				for (var j = 0; j < judgeObjs.length; j++) {
-				  if (judgeObjs[i].id === judgeId) {
-					judgeNames.push(judgeObjs[i].judge.name);
-					break;
-				  }
-				}
-			  }
-			  $scope.$broadcast('firstRecipientsAdded', judgeNames);
-			}
+        var judgeIds = item.judges;
+        var judgeObjs = sessionStorage.getObject('judges');
+        var judgeNames = [];
+        if (judgeObjs) {
+          for (var i = 0; i < judgeIds.length; i++) {
+          var judgeId = judgeIds[i].id;
+          for (var j = 0; j < judgeObjs.length; j++) {
+            if (judgeObjs[i].id === judgeId) {
+            judgeNames.push(judgeObjs[i].judge.name);
+            break;
+            }
+          }
+          }
+          $scope.$broadcast('firstRecipientsAdded', judgeNames);
+        }
 		  }
 		}
 
@@ -413,9 +406,27 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 		$scope.judgeOrderReverse = true;
 		$scope.judgeAssignmentCount = 0;
 		$scope.judgeCompletedCount = 0;
+    
+    $scope.$watch(function() {
+      return sessionStorage.get('judgeAssignmentCount');
+    }, function(newValue) {
+      $scope.judgeAssignmentCount = newValue;
+    });
+    
+    $scope.$watch(function() {
+      return sessionStorage.get('judgeCompletedCount');
+    }, function(newValue) {
+      $scope.judgeCompletedCount = newValue;
+    });
+    
+    $scope.$watch(function() {
+      return sessionStorage.get('overallEventCompletionPercentage');
+    }, function(newValue) {
+      $scope.overallEventCompletionPercentage = newValue;
+    });
 
 		$scope.orderByCompletion = function(judgeJudgment) {
-			return parseInt(judgeJudgment.completion);
+			return judgeJudgment.judge_completion;
 		}
 
 		$scope.prettyPercent = function(uglyPercent) {
@@ -423,48 +434,21 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 			return +uglyPercent.toFixed(2);
 		}
 
-		$scope.determineOverallJudgeProgress = function(judgeJudgments) {
-			if (!judgeJudgments || judgeJudgments.length === 0) {
-				return [0, 0, 0];
-			}
-			var teamCatCount = 0;
-			var completedTeamCatCount = 0;
-			for (var i = 0; i < judgeJudgments.length; i++) {
-				for (var j = 0; j < judgeJudgments[i].teamCats.length; j++) {
-					if (judgeJudgments[i].teamCats[j].completed) {
-						completedTeamCatCount++;
-					}
-				}
-				teamCatCount += judgeJudgments[i].teamCats.length;
-			}
-			$scope.judgeAssignmentCount = teamCatCount;
-			$scope.judgeCompletedCount = completedTeamCatCount;
-			return [completedTeamCatCount, teamCatCount, Math.floor(completedTeamCatCount/teamCatCount * 100)];
-		}
-
 		$scope.convertColorToHex = function(decimalColor) {
 			return categoryManagementService.convertColorToHex(decimalColor);
 		}
     
-    $scope.populateCompletedTeamModal = function(team, judge) {
-      var team_category_id = team.team_category_id;
+    $scope.populateCompletedTeamModal = function(teamCategory, judge) {
+      var team_category_id = teamCategory.id;
       var authHeader = CurrentUserService.getAuthHeader();
       var eventId = sessionStorage.getObject('selected_event').id;
-      
-      // The judge Id is not judge.id...must look elsewhere in the string for the actual id
-      var judgeString = JSON.stringify(judge);
-      var firstIndex = judgeString.indexOf('"judgeId":') + '"judgeId":'.length;
-      var firstPart = judgeString.substring(firstIndex);
-      var judgeId = firstPart.substring(0, firstPart.indexOf(','));
-      
-      if (!judgeId || isNaN(judgeId)) 
-        return;
+      var judgeId = judge.id;
       
       $scope.completedTeamModal = {};
-      $scope.completedTeamModal.completed = team.completed;
+      $scope.completedTeamModal.completed = teamCategory.completed;
       $scope.completedTeamModal.loading = true;
-      $scope.completedTeamModal.team = team.team;
-      $scope.completedTeamModal.categoryName = team.category.label;
+      $scope.completedTeamModal.team = teamCategory.team;
+      $scope.completedTeamModal.categoryName = teamCategory.category.label;
       $scope.completedTeamModal.overall_score = 0; // Display while loading data
       $('#completed-team-modal').modal('show');
       
@@ -503,7 +487,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       $('#completed-team-modal').modal('hide');
     }
     
-    $scope.populateTeamStandingModal = function(teamObj, category) {
+    $scope.populateTeamStandingModal = function(teamObj, category, totalCriteria) {
       var authHeader = CurrentUserService.getAuthHeader(),
           eventId = sessionStorage.getObject('selected_event').id,
           teamId = teamObj.team.id,
@@ -518,7 +502,8 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       $scope.teamStandingModal.overall_score = 0; // Display while loading data
       $('#team-standing-modal').modal('show');
       
-      JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId}).$promise.then(function(resp) {    
+      JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId})
+        .$promise.then(function(resp) {    
         var filter = filterOutJudgmentsForThisTeam(resp, team_category_id);
         $scope.teamStandingModal.criteria = filter[0];
         $scope.teamStandingModal.overall_score = filter[1];
@@ -531,10 +516,12 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
       
       // Because multiple judges are judging, criteria repeat
       function filterOutJudgmentsForThisTeam(judgeJudgments, team_category_id) {
-        var criteria = [], overall_numerator = 0, overall_denominator = 0;
+        var criteria = [], overall_score = 0, overall_score_count = 0;
         var already_seen = []; // Already seen criteria
-        for (var i = 0; i < judgeJudgments.length; i++) {
+    
+        for (var i = 0; i < judgeJudgments.length; i++) {      
           if (judgeJudgments[i].team_category.id === team_category_id) {
+            overall_score_count++;
             var criterion = { 
               name: judgeJudgments[i].criterion.label,
               denominator: judgeJudgments[i].criterion.max_score,
@@ -546,18 +533,22 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
               already_seen.push(criterion.name);
               criteria.push(criterion);
             } else {
-              criteria[index].numerator += judgeJudgments[i].value, 
               criteria[index].score_count += 1
+              criteria[index].numerator += judgeJudgments[i].value 
             }
-            overall_numerator += judgeJudgments[i].value;
-            overall_denominator += judgeJudgments[i].criterion.max_score;
           }
         }
-        for (var i = 0; i < criteria.length; i++) {
-          criteria[i].numerator /= criteria[i].score_count; 
+        
+        for (var i = 0; i < criteria.length; i++) { 
+          criteria[i].numerator /= criteria[i].denominator; 
+          overall_score += criteria[i].numerator;
         }
-        var overall_score = (overall_denominator !== 0) ? overall_numerator / overall_denominator : 0;
-        return [criteria, overall_score];
+        
+        return [criteria, overall_score / overall_score_count];
+        
+        function hasJudgeCompletedJudgingThisTeam(judgeJudgment, totalCriteria) {
+         // for (var i = 0; i < judgeJudgment; i++
+        }
       }
     }
     
@@ -568,113 +559,281 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 	}
 ])
 
-.factory('TeamStandingService', ['$q', 'sessionStorage', 'CategoryManagementService', 'CurrentUserService',
-								 'JudgeManagementService', 'JudgeRESTService', 'JudgmentRESTService', 'RubricRESTService',
-								 'TeamManagementService', 'TeamRESTService', '$location',
-	function($q, sessionStorage, CategoryManagementService, CurrentUserService, JudgeManagementService, JudgeRESTService,
-			JudgmentRESTService, RubricRESTService, TeamManagmentService, TeamRESTService, $location) {
+.factory('EventDashboardService', ['$q', 'sessionStorage', 'CurrentUserService',
+				 'JudgeManagementService', 'RubricRESTService', 'TeamManagementService', 'JudgmentManagementService',
+	function($q, sessionStorage, CurrentUserService, JudgeManagementService,
+           RubricRESTService, TeamManagmentService, JudgmentManagementService) {
 	return function($scope) {
 	
-		var authHeader = CurrentUserService.getAuthHeader();
-    var eventId = sessionStorage.getObject('selected_event').id;
-
-    var categoryManagementService = CategoryManagementService($scope);
-    categoryManagementService.getCategories();
-
-    var teamManagmentService = TeamManagmentService($scope, sessionStorage);
-    var judgeManagementService = JudgeManagementService($scope, sessionStorage);
-	
 		var service = {};
+    
+    service.init =  function() {
+      $scope.$watch(function() {
+        return sessionStorage.getObject('categories');
+      }, function(newValue) {
+        $scope.categories = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('teams');
+      }, function(newValue) {
+          $scope.teams = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('judges');
+      }, function(newValue) {
+          $scope.judges = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('selected_event');
+      }, function(newValue) {
+          $scope.selectedEvent = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('judgeJudgments');
+      }, function(newValue) {
+          $scope.judgeJudgments = newValue;
+      }, true);
+
+      $scope.$watch(function() {
+          return sessionStorage.getObject('teamStanding');
+      }, function(newValue) {
+          $scope.teamStanding = newValue;
+      }, true);
+
+      sessionStorage.put('categoryInc', '0');
+		}
     
     service.getDashboardInfo = function() {
       var defer = $q.defer();
       
-      teamManagmentService.getTeams().then(function(resp) {
-        teamManagmentService.getTeamsCategories(resp).then(function(teamsCategories) {
-          service.getJudgmentsOfAllTeams();
-          judgeManagementService.getJudges().then(function() {
-            service.getJudgmentsByAllJudges().then(function(resp) {
-                sessionStorage.putObject('judgeJudgments', resp);
-                service.determineTeamStanding(resp);
-                defer.resolve();
-            });
-          });
-        });
+      getAllEventDashboardData().then(function(allData) {
+        console.log('Generating dashboard...'); 
+        mergeAllEventDashboardData(allData['judges'],
+                                   allData['judgments'],
+                                   allData['rubrics'],
+                                   allData['teams']);
+        console.log('Successfully generated dashboard.'); 
+        defer.resolve();
       });
+      
       
       return defer.promise;
     }
+    
+    var getAllEventDashboardData = function() {
+      var authHeader = CurrentUserService.getAuthHeader();
+      var eventId = sessionStorage.getObject('selected_event').id;
 
-		service.init =  function() {
-				$scope.$watch(function() {
-					return sessionStorage.getObject('categories');
-				}, function(newValue) {
-					$scope.categories = newValue;
-				}, true);
+      var teamManagmentService = TeamManagmentService($scope, sessionStorage);
+      var judgeManagementService = JudgeManagementService($scope, sessionStorage);
+      var judgmentManagementService = JudgmentManagementService($scope, sessionStorage);
+      
+      var defer = $q.defer(), promises = [], allData = {};
+      
+      var teamPromise = teamManagmentService.getTeamCategories()
+        .then(function(teams) {
+        allData['teams'] = teams;
+      });
+      
+      var judgePromise = judgeManagementService.getJudges()
+        .then(function(judges) {
+        allData['judges'] = judges;
+      });
+      
+      var judgmentPromise = judgmentManagementService.getAllJudgments(authHeader)
+        .then(function(judgments) {
+        allData['judgments'] = judgments;
+      });
+      
+      var rubricPromise = RubricRESTService(authHeader).rubrics.get({event_id: eventId})
+        .$promise.then(function(rubrics) {
+        allData['rubrics'] = rubrics;
+      });
+      
+      promises.push(teamPromise);
+      promises.push(judgePromise);
+      promises.push(judgmentPromise);
+      
+      $q.all(promises).then(function() {
+        var teamCategoryPromise = getTeamCategories(allData['judgments']).then(function(teamCategories) {
+          allData['teamCategories'] = teamCategories;
+          defer.resolve(allData);
+        });
+      });
+      
+      function getTeamCategories(judgments) {
+        var defer = $q.defer();
+        
+        var processedTeamCategoryIds = [], teamCategoryPromises = [], teamCategories = [];
+        angular.forEach(judgments, function(judgment) {
+          var team_category_id = judgment.team_category.id;
+          if (processedTeamCategoryIds.indexOf(team_category_id) === -1) {
+            processedTeamCategoryIds.push(team_category_id);
+            var promise = teamManagmentService.getTeamCategory(team_category_id).then(function(teamCategory) {
+              teamCategories.push(teamCategory);                       
+            });
+            teamCategoryPromises.push(promise);
+          }
+        });
+        
+        $q.all(teamCategoryPromises).then(function() {
+          defer.resolve(teamCategories);
+        });
+        
+        return defer.promise;
+      };
+      
+      return defer.promise;
+    };
+    
+    var mergeAllEventDashboardData = function(allJudges,
+                                              allJudgments, 
+                                              allRubrics,
+                                              allTeamCategories) {
 
-				$scope.$watch(function() {
-						return sessionStorage.getObject('teams');
-				}, function(newValue) {
-						$scope.teams = newValue;
-				}, true);
+      var mergedJudgeData = [];
 
-				$scope.$watch(function() {
-						return sessionStorage.getObject('judges');
-				}, function(newValue) {
-						$scope.judges = newValue;
-				}, true);
+      for (var i = 0; i < allJudges.length; i++) {
+        var judge = allJudges[i];
+        var judgeId = judge.id;
+        var judgeJudgments = {
+          in_progress: [],
+          not_started: [],
+          all: []
+        }
+        for (var j = 0; j < judge.teams.length; j++) {
+          var thisTeam = judge.teams[j];
+          var thisTeamId = thisTeam.team.id;
+          var theseTeamCategories = getAllTeamCategoriesById(allTeamCategories, thisTeamId);
+          judgeJudgments.all.push(theseTeamCategories);
+        }
+        var newJudge = jQuery.extend(true, {}, judge);
+        newJudge.judgments = judgeJudgments;
+        delete newJudge.event;
+        delete newJudge.teams;
+        mergedJudgeData.push(newJudge);
+      }
+    
+      for (var i = 0; i < mergedJudgeData.length; i++) {
+        var allTeamCategories = mergedJudgeData[i].judgments.all;
+        var judgeTrue = 0, judgeFalse = 0;
+        for (var j = 0; j < allTeamCategories.length; j++) {
+          var thisTeamCategory = allTeamCategories[j];
+          for (var k = 0; k < thisTeamCategory.length; k++) {
+            var teamCategoryId = thisTeamCategory[k].id;
+            var theseJudgments = getJudgmentsByTeamCategoryIdAndJudgeId(allJudgments, 
+                                                                        teamCategoryId,
+                                                                        mergedJudgeData[i].id);
+            var newTeamCategory = jQuery.extend(true, {}, thisTeamCategory[k]);
+            if (theseJudgments.length > 0) {
+              // There are judgments from this judge for this team category: mark as 'in_progress'
+              var rubric = theseJudgments[0].rubric, criteria = [], score = 0;
+              for (var l = 0; l < theseJudgments.length; l++) {
+                var thisCriterion = theseJudgments[l].criterion;
+                var thisValue = theseJudgments[l].value; 
+                var newCriterion = jQuery.extend(true, {}, thisCriterion);
+                newCriterion.judgment = thisValue;
+                score = score + (thisValue / thisCriterion.max_score);
+                criteria.push(newCriterion);
+              } 
+              var allRubricData = getRubricById(allRubrics, rubric.id);
+              newTeamCategory.criteria = criteria;
+              newTeamCategory.rubric = rubric;
+              newTeamCategory.submittedCriteria = criteria.length;
+              newTeamCategory.totalCriteria = allRubricData.criteria.length;
+              var percentScore = (score / theseJudgments.length);
+              newTeamCategory.percentScore = percentScore;
+              if (newTeamCategory.submittedCriteria == newTeamCategory.totalCriteria) {
+                newTeamCategory.completed = true;
+                judgeTrue++;
+              } else {
+                newTeamCategory.completed = false;
+                judgeFalse++;
+              }
+              mergedJudgeData[i].judgments.in_progress.push(newTeamCategory);
+            } else {
+              // No judgments from this judge for this team category: mark as 'not_started'
+              newTeamCategory.completed = false;
+              judgeFalse++;
+              mergedJudgeData[i].judgments.not_started.push(newTeamCategory);
+            }
+          } 
+        }
+        mergedJudgeData[i].judge_completion = judgeTrue / (judgeTrue + judgeFalse);
+        mergedJudgeData[i].numCompletedTeams = judgeTrue;
+        mergedJudgeData[i].numAssignedTeams = (judgeTrue + judgeFalse);
+        delete mergedJudgeData[i].judgments.all;
+      }
 
-				$scope.$watch(function() {
-						return sessionStorage.getObject('selected_event');
-				}, function(newValue) {
-						$scope.selectedEvent = newValue;
-				}, true);
+      sessionStorage.putObject('judgeJudgments', mergedJudgeData); 
+      computeTeamStanding(mergedJudgeData);
+      computeOverallJudgeProgress(mergedJudgeData);
+      
+      /* Helper functions */
+      function getRubricById(objects, id) {
+        for (var i = 0; i < objects.length; i++) {
+          if (objects[i].id === id)
+            return objects[i];
+        }
+      }
+      
+      function getAllTeamCategoriesById(teamCategories, id) {
+        var results = [];
+        for (var i = 0; i < teamCategories.length; i++) {
+          var thisTeamCategoryCollection = teamCategories[i];
+          for (var j = 0; j < thisTeamCategoryCollection.length; j++) {
+            if (thisTeamCategoryCollection[j].team.id === id)
+              results.push(thisTeamCategoryCollection[j]);  
+          }
+        }
+        return results;
+      }
+      
+      function getJudgmentsByTeamCategoryIdAndJudgeId(judgments, teamCategoryId, judgeId) {
+        var results = [];
+        for (var i = 0; i < judgments.length; i++) {
+          var thisJudgment = judgments[i];
+          if (thisJudgment.team_category.id === teamCategoryId && thisJudgment.judge.id === judgeId) {
+            results.push(thisJudgment);
+          }
+        }
+        return results;
+      }
+    }
 
-				$scope.$watch(function() {
-						return sessionStorage.getObject('judgeJudgments');
-				}, function(newValue) {
-						$scope.judgeJudgments = newValue;
-				}, true);
-
-				$scope.$watch(function() {
-						return sessionStorage.getObject('teamStanding');
-				}, function(newValue) {
-						$scope.teamStanding = newValue;
-				}, true);
-
-				sessionStorage.put('categoryInc', '0');
-		}
-
-		/* THIS CODE IS A MONUMENT TO MY SINS.
-		   Dear anyone who wants to improve upon Live Judging Web:
-		   Do yourself a favor and rewrite this entire service. It
-		   is extremely, EXTREMELY awful & I hate it.
-		   Luv, Christina K */
-
-		service.determineTeamStanding = function(jJudgments) {
-			// jJudgments refers to all the team-category assignments
+		var computeTeamStanding = function(jJudgments) {
+      // jJudgments refers to all the team-category assignments
 			// for all judges, whether they are completed, in progress, or unstarted.
 			var teamStanding = [];
 			var seenCats = [];
 			for (var i = 0; i < jJudgments.length; i++) {
-				for (var j = 0; j < jJudgments[i].teamCats.length; j++) {
-					var judgment = jJudgments[i].teamCats[j];
+        var judgments_in_progress = jJudgments[i].judgments.in_progress;
+				for (var j = 0; j < judgments_in_progress.length; j++) {
+					var judgment = judgments_in_progress[j];
 					// If there's at least submitted criteria, take the 'judgment' into account
-					if (judgment.submitedCriteria && seenCats.indexOf(judgment.category.id) == -1) {
+					if (seenCats.indexOf(judgment.category.id) == -1) {
 						seenCats.push(judgment.category.id);
 						teamStanding.push({
 							category: judgment.category,
-              team_category_id: judgment.team_category_id,
+              team_category_id: judgment.id,
+              rubric: {
+                id: judgment.rubric.id,
+                name: judgment.rubric.name,
+                total_criteria: judgment.totalCriteria
+              },
 							teams: []
 						});
 						teamStanding[teamStanding.length - 1].teams.push({
 							team: judgment.team,
-              team_category_id: judgment.team_category_id,
+              team_category_id: judgment.id,
 							teamPercentScore: judgment.percentScore,
 							teamJudgmentsCount: 1
 						});
-					// Just to be explicit:
-					} else if (judgment.submitedCriteria &&  seenCats.indexOf(judgment.category.id) != -1) { // We've seen this team-category pairing before, combine it.
+					} else if (seenCats.indexOf(judgment.category.id) != -1) { // We've seen this team-category pairing before, combine it.
 						var foundTeam;
 						for (var k = 0; k < teamStanding.length; k++) {
 							foundTeam = false;
@@ -689,7 +848,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 								if (!foundTeam) {
 									teamStanding[k].teams.push({
 										team: judgment.team,
-                    team_category_id: judgment.team_category_id,
+                    team_category_id: judgment.id,
 										teamPercentScore: judgment.percentScore,
 										teamJudgmentsCount: 1
                   });
@@ -701,286 +860,39 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 			}
 			for (var i = 0; i < teamStanding.length; i++) {
 				for (var j = 0; j < teamStanding[i].teams.length; j++) {
-					teamStanding[i].teams[j].teamPercentScore = teamStanding[i].teams[j].teamPercentScore / teamStanding[i].teams[j].teamJudgmentsCount;
+					teamStanding[i].teams[j].teamPercentScore = 
+            teamStanding[i].teams[j].teamPercentScore / teamStanding[i].teams[j].teamJudgmentsCount;
 				}
 			}
 			sessionStorage.putObject('teamStanding', teamStanding);
-	    console.log('Done computing team standing.');
 		}
-
-		service.getJudgmentsByAllJudges = function() {
-			var defer = $q.defer();
-
-			var judges = sessionStorage.getObject('judges');
-			var eventId = sessionStorage.getObject('selected_event').id;
-			var promises = [];
-			for (var i = 0; i < judges.length; i++) {
-				promises.push(service.getJudgmentsByJudge(eventId, judges[i]));
+    
+    var computeOverallJudgeProgress = function(judgeJudgments) {
+			if (!judgeJudgments || judgeJudgments.length === 0) {
+				return [0, 0, 0];
 			}
-
-			$q.all(promises).then(function(resp) {
-		console.log('Judgments successfully retrieved from server.');
-				defer.resolve(resp);
-			}).catch(function() {
-				defer.reject();
-		var error = 'Error getting judgments by judge Ids.';
-		sessionStorage.put('generalErrorMessage', error);
-				console.log('Error getting judgments by judge ids.');
-			});
-
-			return defer.promise;
-		}
-
-		service.getJudgmentsByJudge = function(eventId, judgeObj) {
-			var defer = $q.defer();
-			JudgmentRESTService(authHeader).judgments.getByJudge({event_id: eventId, judge_id: judgeObj.id}).$promise.then(function(resp) {
-				service.addTeamsToJudgments(resp).then(function(resp2) {
-					service.determineCompletedTeamsByJudge(judgeObj.id, resp2).then(function(resp3) { //great variable naming skills
-						service.determineUnstartedTeamsByJudge(judgeObj.id, resp3).then(function(resp4) {
-							var completedTeamCount = 0;
-							for (var i = 0; i < resp4.length; i++) {
-								if (resp4[i].completed) {
-									completedTeamCount++;
-								}
-							}
-							var assignedTeamsCount = resp4.length;
-							var percentCompleted = Math.floor((completedTeamCount / assignedTeamsCount) * 100);
-							var judgeJudgments = {
-									judge: judgeObj.judge,
-									teamCats: resp4,
-									completion: isNaN(percentCompleted) ? 0 : percentCompleted,
-									numCompletedTeams: completedTeamCount,
-									numAssignedTeams: assignedTeamsCount
-							};
-							defer.resolve(judgeJudgments);
-						})
-					});
-				});
-			}).catch(function() {
-				defer.reject();
-			});
-
-			return defer.promise;
-		}
-
-		service.addTeamsToJudgments = function(judgments) {
-			var defer = $q.defer();
-
-			if (judgments.length == 0) {
-				defer.resolve([]);
-			} else {
-				var teamCatPromises = [];
-				var seenTeamCats = [];
-
-				for (var i = 0; i < judgments.length; i++) {
-					teamCatPromises.push(addTeamToJudgment(judgments[i]));
+			var completedTeamCatCount = 0, uncompletedTeamCatCount = 0;
+			for (var i = 0; i < judgeJudgments.length; i++) {
+				for (var j = 0; j < judgeJudgments[i].judgments.in_progress.length; j++) {
+					if (judgeJudgments[i].judgments.in_progress[j].completed) {
+						completedTeamCatCount++;
+					} else {
+            uncompletedTeamCatCount++;
+          }
 				}
-
-				$q.all(teamCatPromises).then(function(resp) {
-					defer.resolve(resp);
-				}).catch(function() {
-					console.log('Error adding team & cat ids to judgments');
-				});
-			}
-
-			return defer.promise;
-
-			function addTeamToJudgment(judgment) {
-				var defer = $q.defer();
-
-				var judgmentWithTeam = judgment;
-
-				var teamCats = sessionStorage.getObject('teamsCategories');
-				for (var i = 0; i < teamCats.length; i++) {
-					for (var j = 0; j < teamCats[i].length; j++) {
-						if (judgmentWithTeam.team_category.id == teamCats[i][j].id) {
-							judgmentWithTeam.team = teamCats[i][j].team;
-							judgmentWithTeam.category = teamCats[i][j].category;
-							break;
-						}
-					}
+        for (var j = 0; j < judgeJudgments[i].judgments.not_started.length; j++) {
+					uncompletedTeamCatCount++;
 				}
-				defer.resolve(judgmentWithTeam);
-
-				return defer.promise;
 			}
-
+			var judgeAssignmentCount = completedTeamCatCount + uncompletedTeamCatCount;
+			var judgeCompletedCount = completedTeamCatCount;
+      sessionStorage.put('judgeAssignmentCount', judgeAssignmentCount);
+      sessionStorage.put('judgeCompletedCount', judgeCompletedCount);
+      sessionStorage.put('overallEventCompletionPercentage', 
+                         Math.floor(judgeCompletedCount / judgeAssignmentCount * 100));
 		}
-
-		service.determineCompletedTeamsByJudge = function(id, judgments) {
-			var defer = $q.defer();
-
-			if (judgments.length == 0) {
-				defer.resolve([]);
-			} else {
-				var rubricRESTService = RubricRESTService(authHeader);
-
-				var promises = [];
-				// Makes a mapping of rubric Ids to number of criteria in the rubric.
-				// Used to determine whether a judge has completed judging a specific team.
-				var seenRubrics = [];
-				for (var i = 0; i < judgments.length; i++) {
-					if (seenRubrics.indexOf(judgments[i].rubric.id) == -1) {
-						seenRubrics.push(judgments[i].rubric.id);
-						promises.push(getNumCriteriaInRubric(judgments[i].rubric.id));
-					}
-				}
-
-				$q.all(promises).then(function(rubricNumCriteriaMapping) {
-					var teamCatJudgments = [];
-					var encounteredTeamCats = [];
-					for (var i = 0; i < judgments.length; i++) {
-						// Building criteria into complete team-category judgments.
-						var index = encounteredTeamCats.indexOf(judgments[i].team_category.id);
-						if (index == -1) { // If we haven't seen this team-category pair before, initalize the object for it.
-							encounteredTeamCats.push(judgments[i].team_category.id);
-							var numCriteria = 0; // Determine the number of criteria in the rubric
-							for (var j = 0; j < rubricNumCriteriaMapping.length; j++) {
-								if (judgments[i].rubric.id == rubricNumCriteriaMapping[j].rubricId) {
-									numCriteria = rubricNumCriteriaMapping[j].numCriteria;
-								}
-							}
-							teamCatJudgments.push({
-								completed: false,
-								submitedCriteria: 1,
-								totalCriteria: numCriteria,
-								percentScore: judgments[i].value/judgments[i].criterion.max_score,
-								team: judgments[i].team,
-								category: judgments[i].category,
-								team_category_id: judgments[i].team_category.id,
-								judgeId: judgments[i].judge.id
-							});
-						} else { // We've seen this team-category pairing before, add this criterion judgment to the aggregate judgment.
-							for (var j = 0; j < teamCatJudgments.length; j++) { // First, find the index of the team-cat this criterion judgment belongs to.
-								if (teamCatJudgments[j].team_category_id == judgments[i].team_category.id) { // Once it's found, and criterion judgment data to it
-									teamCatJudgments[j].submitedCriteria++;
-									if (teamCatJudgments[j].submitedCriteria == teamCatJudgments[j].totalCriteria) { // If true, this all the criterion for the rubric have been traversed
-										teamCatJudgments[j].completed = true;
-									}
-									// Adding scores as percentages. This means that every criterion is weighted evenly, regardless of how many stars it's out of.
-									teamCatJudgments[j].percentScore = (teamCatJudgments[j].percentScore + (judgments[i].value/judgments[i].criterion.max_score));
-								}
-							}
-						}
-					}
-					// This takes the added percent scores and divides each by the number that were added together
-					// to get the equally weighted average: represents a particular judge's overall score for a particular
-					// team in a particular category.
-					for (var i = 0; i < teamCatJudgments.length; i++) {
-						teamCatJudgments[i].percentScore = teamCatJudgments[i].percentScore / teamCatJudgments[i].submitedCriteria;
-					}
-					defer.resolve(teamCatJudgments);
-				});
-			}
-
-			return defer.promise;
-
-			function getNumCriteriaInRubric(rId, rubricNumCriteriaMapping) {
-				var defer = $q.defer();
-				rubricRESTService.rubric.get({id: rId}).$promise.then(function(resp) {
-					defer.resolve({rubricId: rId, numCriteria: resp.criteria.length});
-				}).catch(function() {
-					defer.reject();
-					console.log('Error getting rubric');
-				});
-
-				return defer.promise;
-			}
-		}
-
-		service.determineUnstartedTeamsByJudge = function(judgeId, judgments) {
-			// This just loops through the judge's assigned teams and the
-			// judgments of the teams
-			var defer = $q.defer();
-
-			JudgeRESTService(authHeader).judgeTeams.get({judge_id: judgeId}).$promise.then(function(judgeTeams) {
-				var promises = [];
-
-				for (var i = 0; i < judgeTeams.length; i++) {
-					promises.push(getTeamCategoriesByTeam(judgeTeams[i].team.id));
-				}
-
-				$q.all(promises).then(function(teamCats) {
-					var flattenedTeamCats = [];
-					for (var i = 0; i < teamCats.length; i++) {
-						for (var j = 0; j < teamCats[i].length; j++) {
-							teamCats[i][j].judgeId = judgeId;
-							teamCats[i][j].team_category_id = teamCats[i][j].id;
-							delete teamCats[i][j].id;
-							flattenedTeamCats.push(teamCats[i][j]);
-						}
-					}
-					var finalTeamCats = [];
-					for (var i = 0; i < flattenedTeamCats.length; i++) {
-						for (var j = 0; j < judgments.length; j++) {
-							if (flattenedTeamCats[i].team_category_id == judgments[j].team_category_id) {
-								flattenedTeamCats[i].judged = true;
-							}
-						}
-					}
-					for (var i = 0; i < flattenedTeamCats.length; i++) {
-						if (!flattenedTeamCats[i].judged) {
-							finalTeamCats.push(flattenedTeamCats[i]);
-						}
-					}
-					for (var i = 0; i < judgments.length; i++) {
-						finalTeamCats.push(judgments[i]);
-					}
-					//console.log(finalTeamCats);
-					defer.resolve(finalTeamCats);
-				});
-			}).catch(function() {
-				defer.reject();
-			});
-
-			return defer.promise;
-
-			function getTeamCategoriesByTeam(teamId) {
-				var defer = $q.defer();
-
-				TeamRESTService(authHeader).team_categories.get({team_id: teamId}).$promise.then(function(teamCatsResp) {
-					defer.resolve(teamCatsResp);
-				}).catch(function() {
-					defer.reject();
-				});
-
-				return defer.promise;
-			}
-		}
-
-		service.getJudgmentsOfAllTeams = function() {
-			var defer = $q.defer();
-
-			var teams = sessionStorage.getObject('teams');
-			var eventId = sessionStorage.getObject('selected_event').id;
-			var promises = [];
-			for (var i = 0; i < teams.length; i++) {
-				promises.push(service.getJudgmentsOfTeam(eventId, teams[i].id));
-			}
-
-			$q.all(promises).then(function(resp) {
-				defer.resolve(resp);
-			}).catch(function() {
-				defer.reject();
-				console.log('Error getting judgments by team ids');
-			});
-
-			return defer.promise;
-		}
-
-		service.getJudgmentsOfTeam = function(eventId, teamId) {
-			var defer = $q.defer();
-      
-			JudgmentRESTService(authHeader).judgments.getByTeam({event_id: eventId, team_id: teamId}).$promise.then(function(resp) {
-				defer.resolve(resp);
-			}).catch(function() {
-				defer.reject();
-			});
-
-			return defer.promise;
-		}
-
-			return service;
+    
+    return service;
 	}
 }])
 
@@ -1039,51 +951,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute', 'ngProgress'])
 				},
 				update: {
 					method: 'PUT',
-					headers: authHeader
-				}
-			})
-		}
-	}
-})
-
-.factory('JudgmentRESTService', function($resource) {
-	return function(authHeader) {
-		return {
-			judgments: $resource('http://api.stevedolan.me/events/:event_id/judgments', {
-				event_id: '@id'
-			}, {
-				get: {
-					method: 'GET',
-					isArray: true,
-					headers: authHeader
-				},
-				getByJudge: {
-					method: 'GET',
-					params: {judge_id: '@judgeId'},
-					isArray: true,
-					headers: authHeader
-				},
-				getByTeam: {
-					method: 'GET',
-					params: {team_id: '@teamId'},
-					isArray: true,
-					headers: authHeader
-				}
-			})
-		}
-	}
-})
-
-.factory('MessageRESTService', function($resource) {
-	return function(authHeader) {
-		return {
-			messages: $resource('http://api.stevedolan.me/messages', {
-				recipient_id: '@recipientId',
-				subject: '@subject',
-				body: '@body'
-			}, {
-				send: {
-					method: 'POST',
 					headers: authHeader
 				}
 			})

@@ -108,18 +108,18 @@
                 <div class="row">
                   <span class="col col-sm-6 col-lg-5">
                     <progressbar max="100"
-                                 ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0"
-                                 value="determineOverallJudgeProgress(judgeJudgments)[2]"
+                                 ng-show="overallEventCompletionPercentage !== 0"
+                                 value="overallEventCompletionPercentage"
                                  class="progress-striped active"
                                  type="success">
-                    <span ng-show="determineOverallJudgeProgress(judgeJudgments)[2] !== 0">
-                      {{determineOverallJudgeProgress(judgeJudgments)[2]}}%
-                    </span>
-                  </progressbar>
+                      <span ng-show="overallEventCompletionPercentage !== 0">
+                        {{overallEventCompletionPercentage}}%
+                      </span>
+                    </progressbar>
                   </span>
                   <span class="col col-sm-6 col-md-6 col-lg-6">
                     <span class="pull-left">
-                      {{determineOverallJudgeProgress(judgeJudgments)[0]}}/{{determineOverallJudgeProgress(judgeJudgments)[1]}}&nbsp; 
+                      {{judgeCompletedCount}}/{{judgeAssignmentCount}}&nbsp;
                       team assignments completed
                     </span>
                   </span>
@@ -156,7 +156,7 @@
 
               <!-- sorter / expand & collapse buttons -->
               <div style="margin-bottom: 5px">
-                <span style="margin-right: 20px">Sort direction:</span>
+                <span style="margin-right: 20px">Sort by % completed:</span>
                 <div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Order <span class="caret"></span>
@@ -166,7 +166,10 @@
                     <li><a ng-click="judgeOrderReverse = true">Descending</a></li>
                   </ul>
                 </div>
-                <span class="badge" style="margin-left: 20px">{{judges.length}}</span>
+                <span style="margin-left: 20px">
+                  Number of judges: 
+                  <span class="badge">{{judges.length}}</span>
+                </span>
                 <div style="float: right">
                   <expand-all-accordions>
                     <button class="btn btn-default expand-all-accordions judge">
@@ -224,10 +227,10 @@
                           <div class="progress inline">
                             <progressbar max="100"
                                          min="0"
-                                         value="judgeJudgment.completion"
+                                         value="prettyPercent(judgeJudgment.judge_completion)"
                                          class="progress-striped active"
                                          type="success">
-                              <span>{{judgeJudgment.completion}}%</span>
+                              <span>{{prettyPercent(judgeJudgment.judge_completion)}}%</span>
                             </progressbar>
                           </div>
                         </span>
@@ -244,14 +247,14 @@
                           <!--List of judge's completed teams-->
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
-                              <h4>Completed or in progress (click teams for rating details):</h4>
+                              <h4>Teams completed or in progress (click teams for rating details):</h4>
                             </div>
                           </div>
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
                               <div class="media judgedTeam active"
                                     ng-click="populateCompletedTeamModal(teamCat, judgeJudgment)"
-                                    ng-repeat="teamCat in judgeJudgment.teamCats">
+                                    ng-repeat="teamCat in judgeJudgment.judgments.in_progress">
                                 <div class="media-left">
                                   <a href="javascript:void(0)" class="team-pic">
                                     <img class="media-object"
@@ -286,6 +289,53 @@
                               </div>
                             </div>
                           </div>
+                          
+                          <div class="row" ng-show="judgeJudgment.judgments.not_started.length !== 0">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <h4>Teams not yet judged:</h4>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                              <div class="media judgedTeam active"
+                                    ng-click="populateCompletedTeamModal(teamCat, judgeJudgment)"
+                                    ng-repeat="teamCat in judgeJudgment.judgments.not_started">
+                   
+                                <div class="media-left">
+                                  <a href="javascript:void(0)" class="team-pic">
+                                    <img class="media-object"
+                                         ng-src="{{teamCat.team.logo}}"
+                                         ng-show="teamCat.team.logo !== null"
+                                         width="64"
+                                         height="64" 
+                                         alt="64x64" />
+                                    <img class="media-object" 
+                                         src="http://placehold.it/64x64"
+                                         ng-show="teamCat.team.logo === null" 
+                                         width="64"
+                                         height="64"
+                                         alt="64x64" />
+                                    <span ng-if="teamCat.completed" class="completed">
+                                      <span class="glyphicon glyphicon-ok"></span>
+                                    </span>
+                                  </a>
+                                </div>
+                                <div class="media-body dashboard-media-body">
+                                  <span title="Name: {{teamCat.team.name}} | Category: {{teamCat.category.label}}">
+                                    <small cng-wrap-word word="<b>#{{teamCat.team.id}}</b> {{teamCat.team.name}}"
+                                           line-width="25"
+                                           total-width="50">
+                                    </small><br />
+                                    <small cng-wrap-word word="<u>{{teamCat.category.label}}</u>"
+                                         line-width="20"
+                                         total-width="20">
+                                    </small>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
                               <div class="media judgedTeam"
@@ -545,7 +595,7 @@
                           <div class="row">
                             <div class="col col-sm-12 col-md-12 col-lg-12">
                               <div class="media media-standing" 
-                                   ng-click="populateTeamStandingModal(teamObj, catTeamGroup.category)">
+                                   ng-click="populateTeamStandingModal(teamObj, catTeamGroup.category, catTeamGroup.rubric.total_criteria)">
                                 <div class="media-left">
                                   <a href="javascript:void(0)">
                                     <img class="media-object"
@@ -800,6 +850,16 @@
             </tr>
           </tbody>
         </table>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-warning">
+              <span class="glyphicon glyphicon-alert"></span>
+              These scores are based off the most up-to-date data available. Overall score discrepancy may exist,
+              because all submitted judgments are considered, not just those from judges who have completely
+              finished judging this team.
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <div class="row">

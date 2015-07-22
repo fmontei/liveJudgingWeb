@@ -353,8 +353,8 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				console.log('Judges successfully retrieved from server.');
 			}).then(function() {
 				var judges = sessionStorage.getObject('judges');
-				judgeManagement.getJudgeTeams(judges).then(function() {
-					defer.resolve();
+				judgeManagement.getJudgeTeams(judges).then(function(judgesWithTeams) {
+					defer.resolve(judgesWithTeams);
 				}).catch(function() {
 					defer.reject();
 				});
@@ -376,7 +376,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 
 			$q.all(judgePromises).then(function(judgesWithTeams) {
 				sessionStorage.putObject('judges', judgesWithTeams);
-				defer.resolve();
+				defer.resolve(judgesWithTeams);
 			}).catch(function() {
         		sessionStorage.putObject('generalErrorMessage', 'Error getting judge teams.');
 				defer.reject('Error getting judge teams.');
@@ -781,7 +781,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			}, {
 				get: {
 					method: 'GET',
-          			isArray: true,
+          isArray: true,
 					headers: authHeader
 				},
 				assign: {
@@ -797,5 +797,58 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 			})
 		}
 	}
-});
+})
+
+.factory('JudgmentRESTService', function($resource) {
+	return function(authHeader) {
+		return {
+			judgments: $resource('http://api.stevedolan.me/events/:event_id/judgments', {
+				event_id: '@id'
+			}, {
+				get: {
+					method: 'GET',
+					isArray: true,
+					headers: authHeader
+				},
+				getByJudge: {
+					method: 'GET',
+					params: {judge_id: '@judgeId'},
+					isArray: true,
+					headers: authHeader
+				},
+				getByTeam: {
+					method: 'GET',
+					params: {team_id: '@teamId'},
+					isArray: true,
+					headers: authHeader
+				}
+			})
+		}
+	}
+})
+
+.factory('JudgmentManagementService', ['$q', 'JudgmentRESTService', function($q, JudgmentRESTService) {
+  return function($scope, sessionStorage) {
+    var service = {};
+
+    var eventId = sessionStorage.getObject('selected_event').id;
+
+    service.getAllJudgments = function(authHeader) {
+      var defer = $q.defer();
+
+      JudgmentRESTService(authHeader).judgments.get({event_id: eventId})
+        .$promise.then(function(resp) {
+        defer.resolve(resp);
+        console.log('Successfully retrieved all judgments from server.');
+      }).catch(function(error) {
+        defer.reject();
+        console.log('Error retrieving all judgments from server.');
+      });
+      
+      return defer.promise;
+    }
+
+    return service; 
+  }
+}]);
 
