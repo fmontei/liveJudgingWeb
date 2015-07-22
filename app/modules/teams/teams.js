@@ -95,6 +95,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 			$scope.teamDesc = '';
 			$('#team-modal').modal('hide');
       $('#preview-image-create').hide();
+      $('#preview-image-edit').hide();
       $('#file-name-text').val('');
 			sessionStorage.remove('selectedTeam');
 		}
