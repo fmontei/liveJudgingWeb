@@ -323,10 +323,10 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 	}
 })
 
-.factory('RubricRESTService', function($resource, CurrentUserService) {
+.factory('RubricRESTService', function($rootScope, $resource, CurrentUserService) {
 	return function(authHeader) {
 		return {
-			rubrics: $resource('http://api.stevedolan.me/events/:event_id/rubrics', {
+			rubrics: $resource($rootScope.rootURL + 'events/:event_id/rubrics', {
 				event_id: '@id'
 			}, {
 				get: {
@@ -339,7 +339,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			rubric: $resource('http://api.stevedolan.me/rubrics/:id', {
+			rubric: $resource($rootScope.rootURL + 'rubrics/:id', {
 				id: '@id'
 			}, {
 				get: {
@@ -355,7 +355,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			criteria: $resource('http://api.stevedolan.me/rubrics/:rubric_id/criteria', {
+			criteria: $resource($rootScope.rootURL + 'rubrics/:rubric_id/criteria', {
 				rubric_id: '@id'
 			}, {
 				get: {
@@ -367,7 +367,7 @@ angular.module('liveJudgingAdmin.rubrics', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			criterion: $resource('http://api.stevedolan.me/criteria/:id', {
+			criterion: $resource($rootScope.rootURL + 'criteria/:id', {
 				id: '@id'
 			}, {
 				get: {

@@ -552,10 +552,10 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
     }
 }])
 
-.factory('CategoryRESTService', function($resource) {
+.factory('CategoryRESTService', function($rootScope, $resource) {
     return function(authHeader) {
         return {
-            categories: $resource('http://api.stevedolan.me/events/:event_id/categories', {
+            categories: $resource($rootScope.rootURL + 'events/:event_id/categories', {
                 event_id: '@id'
             }, {
                 get: {
@@ -564,7 +564,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     headers: authHeader
                 }
             }),
-            new_category: $resource('http://api.stevedolan.me/events/:event_id/categories', {
+            new_category: $resource($rootScope.rootURL + 'events/:event_id/categories', {
                 event_id: '@id'
             }, {
                 create: {
@@ -572,7 +572,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     headers: authHeader
                 }
             }),
-            category: $resource('http://api.stevedolan.me/categories/:id', {
+            category: $resource($rootScope.rootURL + 'categories/:id', {
                 id: '@id'
             }, {
                 get: {
@@ -588,7 +588,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     headers: authHeader
                 }
             }),
-            rubrics: $resource('http://api.stevedolan.me/rubrics/:rubric_id/categories', {
+            rubrics: $resource($rootScope.rootURL + 'rubrics/:rubric_id/categories', {
                 category_id: '@id'
             }, {
                 addToCat: {
@@ -596,7 +596,7 @@ angular.module('liveJudgingAdmin.categories', ['ngRoute'])
                     headers: authHeader
                 },
                 removeFromCat: {
-                    url: 'http://api.stevedolan.me/rubrics/:rubric_id/categories/:id',
+                    url: $rootScope.rootURL + 'rubrics/:rubric_id/categories/:id',
                     params: {rubric_id: '@rubric_id', id: '@category_id'},
                     method: 'DELETE',
                     headers: authHeader

@@ -752,10 +752,10 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 }])
 
-.factory('JudgeRESTService', function($resource) {
+.factory('JudgeRESTService', function($rootScope, $resource) {
 	return function(authHeader) {
 		return {
-			judges: $resource('http://api.stevedolan.me/events/:event_id/judges', {
+			judges: $resource($rootScope.rootURL + 'events/:event_id/judges', {
 				event_id: '@id'
 			}, {
 				get: {
@@ -768,7 +768,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			judge: $resource('http://api.stevedolan.me/judges/:id', {
+			judge: $resource($rootScope.rootURL + 'judges/:id', {
 				id: '@id'
 			}, {
 				delete: {
@@ -776,7 +776,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			judgeTeams: $resource('http://api.stevedolan.me/judges/:judge_id/teams', {
+			judgeTeams: $resource($rootScope.rootURL + 'judges/:judge_id/teams', {
 				judge_id: '@id'
 			}, {
 				get: {
@@ -790,7 +790,7 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 				},
 				remove: {
 					method: 'DELETE',
-					url: 'http://api.stevedolan.me/judges/:judge_id/teams/:id',
+					url: $rootScope.rootURL + 'judges/:judge_id/teams/:id',
 					params: {judge_id: '@judge_id', id: '@team_id'},
 					headers: authHeader
 				}
@@ -799,10 +799,10 @@ angular.module('liveJudgingAdmin.judges', ['ngRoute'])
 	}
 })
 
-.factory('JudgmentRESTService', function($resource) {
+.factory('JudgmentRESTService', function($rootScope, $resource) {
 	return function(authHeader) {
 		return {
-			judgments: $resource('http://api.stevedolan.me/events/:event_id/judgments', {
+			judgments: $resource($rootScope.rootURL + 'events/:event_id/judgments', {
 				event_id: '@id'
 			}, {
 				get: {

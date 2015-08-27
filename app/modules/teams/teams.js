@@ -483,10 +483,10 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 	}
 }])
 
-.factory('TeamRESTService', function($resource, CurrentUserService) {
+.factory('TeamRESTService', function($rootScope, $resource, CurrentUserService) {
 	return function(authHeader) {
 		return {
-			team: $resource('http://api.stevedolan.me/teams/:id', {
+			team: $resource($rootScope.rootURL + 'teams/:id', {
 				id: '@id'
 			}, {
 				get: {
@@ -502,7 +502,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 					headers: authHeader
 				}
 			}),
-			teams: $resource('http://api.stevedolan.me/events/:event_id/teams', {
+			teams: $resource($rootScope.rootURL + 'events/:event_id/teams', {
 				event_id: '@id'
 			}, {
 				get: {
@@ -515,7 +515,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 					headers: authHeader
 				}
 			}),
-      team_category: $resource('http://api.stevedolan.me/team_categories/:id', {
+      team_category: $resource($rootScope.rootURL + 'team_categories/:id', {
 				id: '@id'
 			}, {
 				get: {
@@ -523,7 +523,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 					headers: authHeader
 				}
       }),
-			team_categories: $resource('http://api.stevedolan.me/teams/:team_id/categories', {
+			team_categories: $resource($rootScope.rootURL + 'teams/:team_id/categories', {
 				team_id: '@id', category_id: '@category_id'
 			}, {
 				get: {
@@ -536,7 +536,7 @@ angular.module('liveJudgingAdmin.teams', ['ngRoute', 'liveJudgingAdmin.login'])
 					headers: authHeader
 				},
 				remove_team: {
-					url: 'http://api.stevedolan.me/teams/:team_id/categories/:category_id',
+					url: $rootScope.rootURL + 'teams/:team_id/categories/:category_id',
 					method: 'DELETE',
 					headers: authHeader
 				}

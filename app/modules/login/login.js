@@ -70,17 +70,18 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     }
 ])
 
-.factory('RegistrationRESTService', ['$resource', 'CurrentUserService', function($resource, CurrentUserService) {
-    return $resource('http://api.stevedolan.me/users', {}, {
+.factory('RegistrationRESTService', ['$rootScope', '$resource', 'CurrentUserService', 
+                                     function($rootScope, $resource, CurrentUserService) {
+    return $resource($rootScope.rootURL + 'users', {}, {
         register: {
             method: 'POST'
         }
     });
 }])
 
-.factory('UserRESTService', ['$resource', function($resource) {
+.factory('UserRESTService', ['$rootScope', '$resource', function($rootScope, $resource) {
     return function(authHeader) {
-        return $resource('http://api.stevedolan.me/users', {}, {
+        return $resource($rootScope.rootURL + 'users', {}, {
             get: {
                 method: 'GET',
                 params: {email: '@email'},
@@ -91,9 +92,9 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     }
 }])
 
-.factory('LoginService', function($resource) {
+.factory('LoginService', ['$rootScope', '$resource', function($rootScope, $resource) {
     return function(authHeader) {
-        return $resource('http://api.stevedolan.me/login', {'platform': 'Web'}, {
+        return $resource($rootScope.rootURL + 'login', {'platform': 'Web'}, {
             login: {
                 method: 'GET',
                 headers: authHeader,
@@ -101,11 +102,11 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
             }
         });
     }
-})
+}])
 
-.factory('LogoutService', function($resource) {
+.factory('LogoutService', function($rootScope, $resource) {
     return function(authHeader) {
-        return $resource('http://api.stevedolan.me/logout', {}, {
+        return $resource($rootScope.rootURL + 'logout', {}, {
             logout: {
                 method: 'GET',
                 headers: authHeader
@@ -114,11 +115,11 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     }
 })
 
-.factory('CurrentUserService', function($resource,
+.factory('CurrentUserService', function($rootScope,
+                                        $resource,
                                         $base64,
                                         sessionStorage,
                                         $location,
-                                        $rootScope,
                                         LoginService,
                                         LogoutService) {
     var service = {
@@ -128,7 +129,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     };
   
     service.editUser = function(authHeader) {
-        return $resource('http://api.stevedolan.me/users/:id', {
+        return $resource($rootScope.rootURL + 'users/:id', {
           id: '@id' 
         }, {
             edit: {
@@ -145,7 +146,7 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
     },
 
     service.login = function(user) {
-		service.hasLoginError = false;
+		    service.hasLoginError = false;
         LoginService(service.getLoginAuthHeader(user.email, user.password)).login().$promise.then(function(resp) {
             console.log(service);
             service.currentUser = resp;

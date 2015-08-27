@@ -935,10 +935,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 	return service;
 })
 
-.factory('EventRESTService', function($resource, CurrentUserService) {
+.factory('EventRESTService', function($rootScope, $resource, CurrentUserService) {
 	return function(authHeader) {
 		return {
-			events: $resource('http://api.stevedolan.me/events', {}, {
+			events: $resource($rootScope.rootURL + 'events', {}, {
 				create: {
 					method: 'POST',
 					headers: authHeader
@@ -949,7 +949,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					headers: authHeader
 				}
 			}),
-			event: $resource('http://api.stevedolan.me/events/:id', {
+			event: $resource($rootScope.rootURL + 'events/:id', {
 				id: '@id'
 			}, {
 				get: {

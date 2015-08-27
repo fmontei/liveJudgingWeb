@@ -28,6 +28,8 @@ angular.module('liveJudgingAdmin', [
     }
   });
   
+  $rootScope.rootURL = 'http://judging_api.stevedolan.me/';
+  
   $rootScope.hints = new Object();
   $rootScope.hints['beginEvent'] = {'content': 'Click to begin event. <u>Important:</u> Event end time & date must not be expired.', 'placement': 'bottom', 'enabled': false};
   $rootScope.hints['mainHeading'] = {'content': 'Default view. Click category to see category view, then click here to return to default view.', 'placement': 'bottom', 'enabled': false};
