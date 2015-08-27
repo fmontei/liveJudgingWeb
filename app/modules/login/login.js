@@ -32,7 +32,9 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 			
         $scope.returningUser = {};
 			
-				$scope.tabs = [{active: true}, {active: false}];
+				$scope.tabs = [{active: true}, {active: false}, {active: false}];
+      
+        $scope.defaultAccounts = [{email: 'alice@test.com', password: 'password'}];
 			
 				$scope.$watch(function() {
 						return CurrentUserService.hasLoginError;
@@ -66,6 +68,14 @@ angular.module('liveJudgingAdmin.login', ['base64', 'ngRoute'])
 
         $scope.logout = function() {
             CurrentUserService.logout();
+        };
+      
+        $scope.setLoginPassword = function() {
+          angular.forEach($scope.defaultAccounts, function(account) {
+            if (account.email === $scope.returningUser.email) {
+              $scope.returningUser.password = account.password;
+            }
+          });  
         };
     }
 ])

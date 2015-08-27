@@ -2,7 +2,42 @@
 <div ng-controller="LoginCtrl" class="container content login-form-wrapper">
 
     <tabset>
-        <tab heading="Login" class="login-tab" active="tabs[0].active">
+        <tab heading="Login (Simplified)" class="login-tab" active="tabs[0].active">
+            <div ng-switch on="loginError">
+              <div ng-switch-default>
+                <p class="alert alert-danger" ng-bind="loginError"></p>
+              </div>
+              <div ng-switch-when="undefined">
+              </div>
+            </div>
+            <div ng-switch on="success">
+              <div ng-switch-default>
+                <p class="alert alert-success" ng-bind="success"></p>
+              </div>
+              <div ng-switch-when="undefined">
+              </div>
+            </div>
+            <form class="login-form" ng-submit="login(returningUser)">
+                <label>Email</label>
+                <select class="form-control"
+                        ng-model="returningUser.email"
+                        ng-change="setLoginPassword()"
+                        class="form-control login-input"
+                        required
+                        autofocus>
+                  <option>alice@test.com</option>
+                </select>
+
+                <label>Password</label>
+                <input type="password"
+                       ng-model="returningUser.password"
+                       class="form-control login-input"
+                       readonly
+                       required>
+                <button class="btn btn-lg btn-primary login-button">Login</button>
+            </form>
+        </tab>
+        <tab heading="Login" class="login-tab" active="tabs[1].active">
             <div ng-switch on="loginError">
               <div ng-switch-default>
                 <p class="alert alert-danger" ng-bind="loginError"></p>
