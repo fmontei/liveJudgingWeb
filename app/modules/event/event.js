@@ -333,6 +333,10 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		$scope.isEventRunning = function() {
 			return EventUtilService.isEventRunning();
 		};
+    
+    $scope.isEventExpired = function() {
+			return EventUtilService.isEventExpired();
+		};
 
 		$scope.editEvent = function() {
 			$location.path('/eventEdit');
@@ -985,7 +989,6 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			if (event) {
 				var startDateTime = Date.parse(event.start_time);
 				var endDateTime = Date.parse(event.end_time);
-       
 				if (startDateTime <= Date.now() && endDateTime >= Date.now()) {
 					sessionStorage.put("event" + event.id + "_running", "true");
 					return true;
@@ -994,7 +997,16 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				}
 			}
 	    return false;
-		}
+		},
+    isEventExpired: function() {
+      var event = sessionStorage.getObject('selected_event');
+			if (event) {
+        var curDateTime = Date.now();
+        var endDateTime = Date.parse(event.end_time);
+        return endDateTime - curDateTime > 0;
+      }
+      return false;
+    }
 	};
 
 	return service;
