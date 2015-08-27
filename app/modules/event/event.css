@@ -1,3 +1,16 @@
+/* Event Begin Styling */
+.alert-center {
+  position: relative;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);  
+  width: 50%;
+  color: crimson;
+  border: solid darkred 2px;
+  margin-top: 70px;
+  margin-bottom: -50px;
+}
+
 .custom-jumbotron {
   display: inline-block;
   background: white;

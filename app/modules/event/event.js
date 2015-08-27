@@ -79,7 +79,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 				location: eventForm.location,
 				start_time: eventForm.startDateTime,
 				end_time: eventForm.endDateTime
-			}
+			};
 
 			if ($scope.isCreation) {
 				EventRESTService(CurrentUserService.getAuthHeader()).events.create(eventReq).$promise.then(function(resp) {
@@ -290,8 +290,9 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 
 .controller('EventCtrl', ['sessionStorage', '$filter', '$location', '$interval', '$timeout', '$rootScope', '$scope', 'CategoryManagementService', 
                           'CurrentUserService', 'EventRESTService', 'EventUtilService', 'TeamRESTService', 'EventDashboardService', 'JudgmentRESTService',
+                          'ConvertDateTimeService',
 	function(sessionStorage, $filter, $location, $interval, $timeout, $rootScope, $scope, CategoryManagementService, CurrentUserService, EventRESTService, 
-           EventUtilService, TeamRESTService, EventDashboardService, JudgmentRESTService) {
+           EventUtilService, TeamRESTService, EventDashboardService, JudgmentRESTService, ConvertDateTimeService) {
     
     var categoryManagementService = CategoryManagementService($scope);
     
@@ -340,17 +341,19 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 		$scope.beginEvent = function() {
 			var curEvent = sessionStorage.getObject('selected_event');
 			var eventId = curEvent.id;
-			var eventDuration = Date.parse(curEvent.end_time) - Date.parse(curEvent.start_time);
-			var newStartTime = Date.now();
-			var newEndTime = newStartTime + eventDuration;
-
+      var formatted = ConvertDateTimeService.convert(curEvent.start_time, 
+                                                     curEvent.end_time);
+      var eventDuration = formatted.endDate - formatted.startDate;
+			var newStartTime = new Date(Date.now());
+			var newEndTime = new Date(newStartTime + eventDuration);
+      
 			var updatedEvent = {
 					name: curEvent.name,
-					start_time: $filter('date')(newStartTime, 'yyyy-MM-dd HH:mm:ss'),
-					end_time: $filter('date')(newEndTime, 'yyyy-MM-dd HH:mm:ss'),
+					start_time: newStartTime,
+					end_time: newEndTime,
 					location: curEvent.location
 			};
-	  
+    
 			EventRESTService(CurrentUserService.getAuthHeader()).event.update({id: eventId}, updatedEvent)
         .$promise.then(function(resp) {
         sessionStorage.putObject('selected_event', resp);
@@ -370,7 +373,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
         sessionStorage.put('categoryInc', 0);
       else
         sessionStorage.put('categoryInc', categoryInc);
-    }
+    };
 
     $scope.recipientList = []; // Contains list of judges to be notified
 
@@ -565,6 +568,67 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
     }
 	}
 ])
+
+.factory('ConvertDateTimeService', function() {
+  var service = {};
+  
+  service.convert = function(startDateTime, endDateTime) {
+    var justStartDate = startDateTime.substring(0, startDateTime.indexOf(' '));
+    var justEndDate = endDateTime.substring(0, endDateTime.indexOf(' '));
+    
+    var justStartTime = startDateTime.substring(startDateTime.indexOf(' '));
+    var justEndTime = endDateTime.substring(endDateTime.indexOf(' '));
+    
+    var startDatePieces = justStartDate.split('-');
+    var endDatePieces = justEndDate.split('-');
+    
+    var startTimePieces = justStartTime.split(':');
+    var endTimePieces = justEndTime.split(':');
+    
+    var startSecondsAndMeridian = startTimePieces[2].split(' ');
+    if (startSecondsAndMeridian[1] === 'PM' && startTimePieces[0] != 12) {
+      startTimePieces[0] = parseInt(startTimePieces[0]) + 12;
+      startTimePieces[2] = startSecondsAndMeridian[0];
+    } else {
+      startTimePieces[0] = parseInt(startTimePieces[0]);
+      startTimePieces[2] = startSecondsAndMeridian[0];
+    }
+
+    if (parseInt(startDatePieces[1]) > 0)
+      startDatePieces[1] = parseInt(startDatePieces[1]) - 1;
+
+    if (parseInt(endDatePieces[1] > 0))
+      endDatePieces[1] = parseInt(endDatePieces[1]) - 1;
+
+    var formattedStartDate = new Date(startDatePieces[0],
+                                      startDatePieces[1],
+                                      startDatePieces[2],
+                                      startTimePieces[0],
+                                      startTimePieces[1],
+                                      startTimePieces[2]);
+
+    var endSecondsAndMeridian = endTimePieces[2].split(' ');
+    if (endSecondsAndMeridian[1] == 'PM' && endTimePieces[0] != 12) {
+      endTimePieces[0] = parseInt(endTimePieces[0]) + 12;
+      endTimePieces[2] = endSecondsAndMeridian[0];
+    } else {
+      endTimePieces[0] = parseInt(endTimePieces[0]);
+      endTimePieces[2] = endSecondsAndMeridian[0];
+    }
+
+    var formattedEndDate = new Date(endDatePieces[0],
+                                    endDatePieces[1],
+                                    endDatePieces[2],
+                                    endTimePieces[0],
+                                    endTimePieces[1],
+                                    endTimePieces[2]); 
+    
+    return {startDate: formattedStartDate,
+            endDate: formattedEndDate};
+  };
+  
+  return service;
+})
 
 .factory('EventDashboardService', ['$q', 'sessionStorage', 'CurrentUserService',
 				 'JudgeManagementService', 'RubricRESTService', 'TeamManagementService', 'JudgmentManagementService',
@@ -921,6 +985,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 			if (event) {
 				var startDateTime = Date.parse(event.start_time);
 				var endDateTime = Date.parse(event.end_time);
+       
 				if (startDateTime <= Date.now() && endDateTime >= Date.now()) {
 					sessionStorage.put("event" + event.id + "_running", "true");
 					return true;
@@ -928,7 +993,7 @@ angular.module('liveJudgingAdmin.event', ['ngRoute'])
 					return false;
 				}
 			}
-	  return false;
+	    return false;
 		}
 	};
 
