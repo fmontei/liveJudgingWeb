@@ -1,120 +1,120 @@
 <!-- Login Form -->
 <div ng-controller="LoginCtrl" class="container content login-form-wrapper">
 
-    <tabset>
-        <tab heading="Login (Simplified)" class="login-tab" active="tabs[0].active">
-            <div ng-switch on="loginError">
-              <div ng-switch-default>
-                <p class="alert alert-danger" ng-bind="loginError"></p>
-              </div>
-              <div ng-switch-when="undefined">
-              </div>
-            </div>
-            <div ng-switch on="success">
-              <div ng-switch-default>
-                <p class="alert alert-success" ng-bind="success"></p>
-              </div>
-              <div ng-switch-when="undefined">
-              </div>
-            </div>
-            <form class="login-form" ng-submit="login(returningUser)">
-                <label>Email</label>
-                <select class="form-control"
-                        ng-model="returningUser.email"
-                        ng-change="setLoginPassword()"
-                        class="form-control login-input"
-                        required
-                        autofocus>
-                  <option>alice@test.com</option>
-                </select>
+  <tabset>
+    <tab heading="Login (Simplified)" class="login-tab" active="tabs[0].active">
+        <div ng-switch on="loginError">
+          <div ng-switch-default>
+            <p class="alert alert-danger" ng-bind="loginError"></p>
+          </div>
+          <div ng-switch-when="undefined">
+          </div>
+        </div>
+        <div ng-switch on="success">
+          <div ng-switch-default>
+            <p class="alert alert-success" ng-bind="success"></p>
+          </div>
+          <div ng-switch-when="undefined">
+          </div>
+        </div>
+        <form class="login-form" ng-submit="login(returningUser)">
+            <label>Email</label>
+            <select class="form-control"
+                    ng-model="returningUser.email"
+                    ng-change="setLoginPassword()"
+                    class="form-control login-input"
+                    required
+                    autofocus>
+              <option>alice@test.com</option>
+            </select>
 
-                <label>Password</label>
-                <input type="password"
-                       ng-model="returningUser.password"
-                       class="form-control login-input"
-                       readonly
-                       required>
-                <button class="btn btn-lg btn-primary login-button">Login</button>
-            </form>
-        </tab>
-        <tab heading="Login" class="login-tab" active="tabs[1].active">
-            <div ng-switch on="loginError">
-              <div ng-switch-default>
-                <p class="alert alert-danger" ng-bind="loginError"></p>
-              </div>
-              <div ng-switch-when="undefined">
-              </div>
-            </div>
-            <div ng-switch on="success">
-              <div ng-switch-default>
-                <p class="alert alert-success" ng-bind="success"></p>
-              </div>
-              <div ng-switch-when="undefined">
-              </div>
-            </div>
-            <form class="login-form" ng-submit="login(returningUser)">
-                <label>Email</label>
-                <input type="email"
-                       ng-model="returningUser.email"
-                       class="form-control login-input"
-                       required
-                       autofocus>
+            <label>Password</label>
+            <input type="password"
+                   ng-model="returningUser.password"
+                   class="form-control login-input"
+                   readonly
+                   required>
+            <button class="btn btn-lg btn-primary login-button">Login</button>
+        </form>
+    </tab>
+    <tab heading="Login" class="login-tab" active="tabs[1].active">
+        <div ng-switch on="loginError">
+          <div ng-switch-default>
+            <p class="alert alert-danger" ng-bind="loginError"></p>
+          </div>
+          <div ng-switch-when="undefined">
+          </div>
+        </div>
+        <div ng-switch on="success">
+          <div ng-switch-default>
+            <p class="alert alert-success" ng-bind="success"></p>
+          </div>
+          <div ng-switch-when="undefined">
+          </div>
+        </div>
+        <form class="login-form" ng-submit="login(returningUser)">
+            <label>Email</label>
+            <input type="email"
+                   ng-model="returningUser.email"
+                   class="form-control login-input"
+                   required
+                   autofocus>
 
-                <label>Password</label>
-                <input type="password"
-                       ng-model="returningUser.password"
-                       class="form-control login-input"
-                       required>
-                <button class="btn btn-lg btn-primary login-button">Login</button>
-            </form>
-        </tab>
+            <label>Password</label>
+            <input type="password"
+                   ng-model="returningUser.password"
+                   class="form-control login-input"
+                   required>
+            <button class="btn btn-lg btn-primary login-button">Login</button>
+        </form>
+    </tab>
 
-        <tab heading="Register" class="login-tab" active="tabs[1].active">
-        <div ng-switch on="registerError">
+    <tab heading="Register" class="login-tab" active="tabs[2].active">
+      <div ng-switch on="registerError">
         <div ng-switch-default>
           <p class="alert alert-danger" ng-bind="registerError"></p>
         </div>
         <div ng-switch-when="undefined">
         </div>
       </div>
-            <form class="login-form" ng-submit="register(newUser)">
-                <label>Email</label>
-                <input type="email"
-                       ng-model="newUser.email"
-                       class="form-control login-input"
-                       required
-                       autofocus>
+      <form class="login-form" ng-submit="register(newUser)">
+          <label>Email</label>
+          <input type="email"
+                 ng-model="newUser.email"
+                 class="form-control login-input"
+                 required
+                 autofocus>
 
-                <label>Password</label>
-                <input type="password"
-                       ng-model="newUser.password"
-                       class="form-control login-input"
-                       pattern=".{6,20}"
-                       title="Password must be between 6 - 20 characters long."
-                       required>
+          <label>Password</label>
+          <input type="password"
+                 ng-model="newUser.password"
+                 class="form-control login-input"
+                 pattern=".{6,20}"
+                 title="Password must be between 6 - 20 characters long."
+                 required>
 
-                <label>Confirm Password</label>
-                <input type="password"
-                       ng-model="newUser.password_confirmation"
-                       class="form-control login-input"
-                       required
-                       login-validation
-                       compare-to="newUser.password">
+          <label>Confirm Password</label>
+          <input type="password"
+                 ng-model="newUser.password_confirmation"
+                 class="form-control login-input"
+                 required
+                 login-validation
+                 compare-to="newUser.password">
 
-                <label>First Name</label>
-                <input type="text"
-                       ng-model="newUser.first_name"
-                       class="form-control login-input"
-                       required>
+          <label>First Name</label>
+          <input type="text"
+                 ng-model="newUser.first_name"
+                 class="form-control login-input"
+                 required>
 
-                <label>Last Name</label>
-                <input type="text"
-                       ng-model="newUser.last_name"
-                       class="form-control login-input"
-                       required>
-                <input type="submit" class="btn btn-lg btn-primary login-button" value="Register" />
-            </form>
-        </tab>
-    </tabset>         
+          <label>Last Name</label>
+          <input type="text"
+                 ng-model="newUser.last_name"
+                 class="form-control login-input"
+                 required>
+          <input type="submit" class="btn btn-lg btn-primary login-button" value="Register" />
+      </form>
+    </tab>
+  </tabset>         
 
 </div>
