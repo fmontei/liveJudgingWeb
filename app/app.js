@@ -28,7 +28,8 @@ angular.module('liveJudgingAdmin', [
     }
   });
   
-  $rootScope.rootURL = 'http://judging_api.stevedolan.me/';
+  $rootScope.rootURL = 'http://live-judging-api.fmonteiro.info/';
+  console.log($rootScope.rootURL);
   
   $rootScope.hints = new Object();
   $rootScope.hints['beginEvent'] = {'content': 'Click to begin event. <u>Important:</u> Event end time & date must not be expired.', 'placement': 'bottom', 'enabled': false};
