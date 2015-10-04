@@ -28,7 +28,7 @@ angular.module('liveJudgingAdmin', [
     }
   });
   
-  $rootScope.rootURL = 'http://live-judging-api.fmonteiro.info/';
+  $rootScope.rootURL = 'http://live-judging-api.herokuapp.com/';
   console.log($rootScope.rootURL);
   
   $rootScope.hints = new Object();
