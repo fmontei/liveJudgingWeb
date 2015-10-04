@@ -2,6 +2,10 @@
  
 var express = require('express');
 var http = require('http');
+var path = require('path');
+var favicon = require('serve-favicon');
+var morgan = require('morgan'); // formerly express.logger
+var errorhandler = require('errorhandler');
 var app = express();
  
 // all environments
